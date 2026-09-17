@@ -92,9 +92,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="hidden lg:flex items-center gap-6 px-5 border-r border-edge min-w-0">
-            <Field k="AOI" v={state.aoi ? `${state.aoi}, ${state.country}` : "—"} />
-            <Field k="Event ID" v={state.id ?? "—"} />
-            <Field k="Observation" v={state.acq ? utc(state.acq) : "—"} />
+            <Field k="AOI" v={state.aoi ? `${state.aoi}, ${state.country}` : "-"} />
+            <Field k="Event ID" v={state.id ?? "-"} />
+            <Field k="Observation" v={state.acq ? utc(state.acq) : "-"} />
           </div>
 
           <div className="flex-1 min-w-0" />

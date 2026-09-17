@@ -1,4 +1,4 @@
-# BLUEBAN 813 — project configuration
+# BLUEBAN 813 - project configuration
 # All values here are traceable to a documented source. See docs/DATA_ACCESS_AUDIT.md.
 
 project:
@@ -6,7 +6,7 @@ project:
   tagline: Detect. Fingerprint. Forecast. Protect.
   team: Kanban
   challenge: Water Quality & Inland/Coastal Water Intelligence
-  programme: Arab Youth Space Hackathon 2026 — 813 Challenge
+  programme: Arab Youth Space Hackathon 2026 - 813 Challenge
   version: 0.1.0
 
 aoi:
@@ -23,7 +23,7 @@ aoi:
   extent_km: [26.13, 20.91]
 
 # ---------------------------------------------------------------------------
-# SENSOR CASCADE — each sensor has one job. See docs/METHODOLOGY.md.
+# SENSOR CASCADE - each sensor has one job. See docs/METHODOLOGY.md.
 # ---------------------------------------------------------------------------
 sensors:
   stage_a_regional_watch:
@@ -60,7 +60,7 @@ sensors:
     role: Independent reference for chlorophyll and total suspended matter
 
 # ---------------------------------------------------------------------------
-# PRIMARY SCENES — selected in docs/AOI_SELECTION.md
+# PRIMARY SCENES - selected in docs/AOI_SELECTION.md
 # ---------------------------------------------------------------------------
 scenes:
   tanager_primary:
@@ -88,7 +88,7 @@ scenes:
     delta_hours: 24.7
 
 # ---------------------------------------------------------------------------
-# SATELLITE 813 — published specification (UAE Space Agency hackathon data page)
+# SATELLITE 813 - published specification (UAE Space Agency hackathon data page)
 # The PoC does NOT use 813 data: it is incubation-only. We simulate the sensor
 # from the real Tanager cube. See docs/813_PRODUCT_NOTES.md.
 # ---------------------------------------------------------------------------

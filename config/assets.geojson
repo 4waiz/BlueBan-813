@@ -1,0 +1,78 @@
+{
+ "type": "FeatureCollection",
+ "properties": {
+  "name": "Gulf of Annaba operator asset register",
+  "note": "Every asset here is a REAL, publicly mapped coastal feature inside the AOI, with its OpenStreetMap element id recorded so any coordinate can be checked. No coordinate in this file was estimated, and no confidential infrastructure location is included.",
+  "source": "OpenStreetMap contributors, queried via the Overpass API on 2026-09-17 for the AOI bounding box 36.8739,7.5175,37.0599,7.8093",
+  "licence": "OpenStreetMap data is available under the Open Database License (ODbL). (c) OpenStreetMap contributors.",
+  "policy": "BLUEBAN 813 ships no infrastructure database. This register exists so the Gulf of Annaba demonstration runs against real places rather than invented ones. An operator replaces it with their own assets.",
+  "caveat": "A facility asset is placed at the mapped centroid of the facility, which is not the location of its water intake structure. Distances are therefore facility distances, not intake distances."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": { "type": "Point", "coordinates": [7.774241, 36.905051] },
+   "properties": {
+    "id": "A01",
+    "name": "Annaba fishing harbour",
+    "name_local": "ميناء عنابة للصيد",
+    "type": "PORT",
+    "osm": "way/377885029",
+    "osm_tags": "landuse=harbour",
+    "notes": "Working fishing harbour on the Annaba waterfront. Harbour water quality is both an operational and a compliance concern, and harbours are chronic turbidity sources in their own right."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": { "type": "Point", "coordinates": [7.763084, 36.892052] },
+   "properties": {
+    "id": "A02",
+    "name": "Annaba Port power station",
+    "name_local": "Centrale electrique d'Annaba Port",
+    "type": "INDUSTRIAL_INTAKE",
+    "osm": "way/226955369",
+    "osm_tags": "power=plant, plant:output:electricity=72 MW",
+    "sensitivity": 0.8,
+    "notes": "A 72 MW thermal power station on the harbour. Thermal plants draw large volumes of seawater for condenser cooling, so suspended sediment and biofouling load in the source water directly affect screen and heat-exchanger performance. Placed at the mapped plant centroid, not at an intake structure."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": { "type": "Point", "coordinates": [7.761094, 36.927583] },
+   "properties": {
+    "id": "A03",
+    "name": "Plage Chapuis",
+    "type": "PUBLIC_BEACH",
+    "osm": "way/108063412",
+    "osm_tags": "natural=beach",
+    "notes": "Named public beach on the Annaba seafront, roughly 2.5 km north of the harbour. Bathing-water quality is a public-health and compliance matter."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": { "type": "Point", "coordinates": [7.780217, 36.957139] },
+   "properties": {
+    "id": "A04",
+    "name": "Plage Ain Achir",
+    "type": "PUBLIC_BEACH",
+    "osm": "way/296899348",
+    "osm_tags": "natural=beach",
+    "notes": "Named public beach north of the city, near the Cap de Garde headland. Included as a second bathing-water receptor at a materially different distance from the detected event."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": { "type": "Point", "coordinates": [7.783556, 36.967081] },
+   "properties": {
+    "id": "A05",
+    "name": "Cap de Garde lighthouse",
+    "name_local": "Phare de Cap de Garde",
+    "type": "CUSTOM",
+    "osm": "node/1408222792",
+    "osm_tags": "man_made=lighthouse",
+    "sensitivity": 0.5,
+    "notes": "Fixed navigational landmark on the Cap de Garde headland, used here as a far-field coastal reference station. It is NOT designated as a marine protected area in OpenStreetMap, and no protected-area designation inside this AOI could be verified, so none is claimed."
+   }
+  }
+ ]
+}

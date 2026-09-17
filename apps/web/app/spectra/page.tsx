@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * SPECTRA — the hyperspectral oscilloscope.
+ * SPECTRA - the hyperspectral oscilloscope.
  *
  * This is where the difference between 11 broad bands and a continuous
  * spectrum becomes visible rather than asserted. The cursor reads out the
@@ -16,6 +16,15 @@ import {
 } from "@/components/hud";
 import { api, SpectraPayload, WaterEvent, CLASS_COLOR, fmt, fmtInt } from "@/lib/api";
 
+/**
+ * Sentinel-2 MSI bands drawn on the spectrum.
+ *
+ * Centres and bandwidths are the ESA Sentinel-2 User Handbook / MSI spectral
+ * response values, and they are the same numbers pipeline/satellite813.py uses
+ * to build the multispectral arm of the ablation. B9 (945 nm water vapour) and
+ * B10 (1375 nm cirrus) are omitted: they carry atmosphere, not water-leaving
+ * signal. B11/B12 sit outside the water-informative range plotted here.
+ */
 const S2_BANDS: { name: string; nm: number; w: number }[] = [
   { name: "B1", nm: 443, w: 21 }, { name: "B2", nm: 492, w: 66 },
   { name: "B3", nm: 560, w: 36 }, { name: "B4", nm: 665, w: 31 },
@@ -75,7 +84,7 @@ export default function Spectra() {
         });
       }
     } else if (mode === "difference") {
-      series = [{ key: "diff", color: "#F5C451", label: "Event − background", v: pick(sp.difference) }];
+      series = [{ key: "diff", color: "#F5C451", label: "Event - background", v: pick(sp.difference) }];
     } else if (mode === "zscore") {
       series = [{ key: "z", color: "#3FD1A0", label: "z of difference", v: pick(sp.z_score) }];
     } else {
@@ -315,11 +324,11 @@ export default function Spectra() {
               ))}
               <div className="flex-1" />
               <Toggle on={showS2} set={setShowS2} label="Sentinel-2 bands" color="#3FD1A0" />
-              <Toggle on={showEnv} set={setShowEnv} label="P5–P95 envelope" color="#4A93FF" />
+              <Toggle on={showEnv} set={setShowEnv} label="P5-P95 envelope" color="#4A93FF" />
               <Toggle on={showRegions} set={setShowRegions} label="All regions" color="#C77DFF" />
               <div className="flex gap-1">
-                {([["Full", null], ["VIS 400–750", [400, 750]], ["Red-edge 640–760", [640, 760]],
-                   ["Blue 400–560", [400, 560]]] as [string, [number, number] | null][]).map(([l, z]) => (
+                {([["Full", null], ["VIS 400-750", [400, 750]], ["Red-edge 640-760", [640, 760]],
+                   ["Blue 400-560", [400, 560]]] as [string, [number, number] | null][]).map(([l, z]) => (
                   <button key={l} onClick={() => setZoom(z)}
                           className="chamfer-sm hud-label px-2 py-[3px]"
                           style={{
@@ -363,7 +372,7 @@ export default function Spectra() {
 
         {/* ---------------------------------------------------- side panel */}
         <div className="flex flex-col gap-3 min-w-0">
-          <Panel title="Cursor readout" right={<Chip label={cw ? `${cw.toFixed(1)} nm` : "—"} color="#3186FF" />}>
+          <Panel title="Cursor readout" right={<Chip label={cw ? `${cw.toFixed(1)} nm` : "-"} color="#3186FF" />}>
             {cw === null ? (
               <p className="text-[11px] text-dim leading-relaxed">
                 Move the cursor across the spectrum to read exact values,
@@ -395,8 +404,12 @@ export default function Spectra() {
             <KV k="Event pixels" v={fmtInt(sp.event.n_pixels)} />
             <KV k="Bands plotted" v={fmtInt(sp.wavelengths_nm.length)} />
             <KV k="Range"
-                v={`${fmt(sp.wavelengths_nm[0], 1)}–${fmt(sp.wavelengths_nm.at(-1), 1)} nm`} />
-            <KV k="Sentinel-2 bands here" v="8" color="#3FD1A0" />
+                v={`${fmt(sp.wavelengths_nm[0], 1)}-${fmt(sp.wavelengths_nm.at(-1), 1)} nm`} />
+            <KV k="Sentinel-2 bands here"
+                v={String(S2_BANDS.filter(
+                     (b) => b.nm >= sp.wavelengths_nm[0]
+                         && b.nm <= (sp.wavelengths_nm.at(-1) ?? 0)).length)}
+                color="#3FD1A0" />
             <KV k="813 bands here" v={fmtInt(sp.sensor_bands.n_813_bands_in_range)}
                 color="#4A93FF" />
           </Panel>
@@ -434,7 +447,7 @@ export default function Spectra() {
             </p>
             <Caveat>
               The simulator was validated against a real Sentinel-2 acquisition
-              38 minutes apart: r = 0.95–0.97 over land in the visible. See
+              38 minutes apart: r = 0.95-0.97 over land in the visible. See
               Validation.
             </Caveat>
           </Panel>

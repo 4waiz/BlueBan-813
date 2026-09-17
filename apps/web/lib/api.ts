@@ -183,8 +183,91 @@ export interface SpectrumStats {
   n_pixels: number;
 }
 
+/* --------------------------------------------------------------- transport */
+
+/**
+ * Two deployment modes share one client.
+ *
+ * "live"   - the FastAPI service is reachable at /api (Next.js proxies it).
+ * "static" - the site is a static export (Cloudflare Pages), and the pipeline
+ *            artefacts were baked into /data at build time. There is no server,
+ *            so every read maps onto a file and writes are unavailable.
+ *
+ * Keeping the mapping in one place means no page or component needs to know
+ * which mode it is running in.
+ */
+export const DATA_MODE: "live" | "static" =
+  (process.env.NEXT_PUBLIC_DATA_MODE as "live" | "static") ?? "live";
+
+export const IS_STATIC = DATA_MODE === "static";
+
+// Deliberately not "/data": that is also an app route, and sharing the
+// prefix invites a future filename collision with the page itself.
+const STATIC_ROOT = "/pipeline";
+
+const LAYER_FILES: Record<string, string> = {
+  rgb: "rgb_water.png",
+  anomaly: "anomaly.png",
+  ndci: "ndci.png",
+  turbidity: "turbidity.png",
+  events: "event_polygons.geojson",
+  water: "water_mask.geojson",
+  sensor_spec_813: "sensor_spec_813.json",
+};
+
+/** Absolute URL for a map layer, correct in both modes. */
+export function layerUrl(name: string): string {
+  if (!IS_STATIC) return `/api/layers/${name}`;
+  return `${STATIC_ROOT}/layers/${LAYER_FILES[name] ?? `${name}.json`}`;
+}
+
+/** Map an API path onto a static artefact path. */
+function staticPath(apiPath: string): string {
+  const [bare, query] = apiPath.split("?");
+  const p = bare.replace(/^\/api\//, "");
+
+  if (p === "health") return `${STATIC_ROOT}/health.json`;
+  if (p === "status") return `${STATIC_ROOT}/status.json`;
+  if (p === "config") return `${STATIC_ROOT}/config.json`;
+  if (p === "events") return `${STATIC_ROOT}/events/index.json`;
+  if (p === "layers") return `${STATIC_ROOT}/layers/index.json`;
+  if (p === "validation") return `${STATIC_ROOT}/validation/index.json`;
+  if (p === "hyperspectral-lift") return `${STATIC_ROOT}/validation/lift.json`;
+  if (p === "timeseries") return `${STATIC_ROOT}/validation/s2_timeseries.json`;
+  if (p === "assets") return `${STATIC_ROOT}/assets.json`;
+  if (p === "docs-list") return `${STATIC_ROOT}/docs/index.json`;
+
+  const doc = p.match(/^docs\/(.+)$/);
+  if (doc) return `${STATIC_ROOT}/docs/${doc[1]}.md`;
+
+  const layer = p.match(/^layers\/(.+)$/);
+  if (layer) return layerUrl(layer[1]);
+
+  const ev = p.match(/^events\/([^/]+)$/);
+  if (ev) return `${STATIC_ROOT}/events/${ev[1]}.json`;
+
+  const sub = p.match(/^events\/([^/]+)\/(.+)$/);
+  if (sub) {
+    const [, id, what] = sub;
+    if (what === "spectrum") return `${STATIC_ROOT}/events/${id}_spectra.json`;
+    if (what === "forecast") return `${STATIC_ROOT}/events/${id}_forecast.json`;
+    if (what === "provenance") return `${STATIC_ROOT}/events/${id}_provenance.json`;
+    if (what === "samples") {
+      return query?.includes("fmt=csv")
+        ? `${STATIC_ROOT}/events/${id}_samples.csv`
+        : `${STATIC_ROOT}/events/${id}_samples.geojson`;
+    }
+  }
+  return `${STATIC_ROOT}/${p}.json`;
+}
+
+/** The URL a browser should actually fetch for a logical API path. */
+export function resolve(apiPath: string): string {
+  return IS_STATIC ? staticPath(apiPath) : apiPath;
+}
+
 async function get<T>(path: string): Promise<T> {
-  const r = await fetch(path, { cache: "no-store" });
+  const r = await fetch(resolve(path), { cache: "no-store" });
   if (!r.ok) {
     let detail = r.statusText;
     try {
@@ -217,6 +300,19 @@ export const api = {
     name: string; type: string; lon: number; lat: number;
     sensitivity?: number | null; notes?: string;
   }) => {
+    if (IS_STATIC) {
+      // A static export has no write endpoint. Rather than fail silently, keep
+      // the asset in this browser so the operator can still see it scored
+      // against the current event, and say plainly that it is local only.
+      const key = "blueban.localAssets";
+      const prev = JSON.parse(localStorage.getItem(key) ?? "[]");
+      const rec = { ...a, id: `L${prev.length + 1}`, source: "browser_local" };
+      localStorage.setItem(key, JSON.stringify([...prev, rec]));
+      throw new Error(
+        "This deployment is a static export with no write endpoint. The asset "
+        + "was stored in this browser only. Run the API locally to persist it "
+        + "and score its exposure.");
+    }
     const r = await fetch("/api/assets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -227,7 +323,7 @@ export const api = {
   },
   docsList: () => get<{ docs: { key: string; file: string; bytes: number }[] }>("/api/docs-list"),
   doc: async (key: string) => {
-    const r = await fetch(`/api/docs/${key}`, { cache: "no-store" });
+    const r = await fetch(resolve(`/api/docs/${key}`), { cache: "no-store" });
     if (!r.ok) throw new Error(`${r.status}`);
     return r.text();
   },
@@ -254,23 +350,23 @@ export const CLASS_COLOR: Record<string, string> = {
   UNKNOWN_ANOMALY: "#8A93B8",
 };
 
-export function fmt(n: number | null | undefined, digits = 2, dash = "—"): string {
+export function fmt(n: number | null | undefined, digits = 2, dash = "-"): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return dash;
   return n.toFixed(digits);
 }
 
-export function fmtInt(n: number | null | undefined, dash = "—"): string {
+export function fmtInt(n: number | null | undefined, dash = "-"): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return dash;
   return Math.round(n).toLocaleString("en-US");
 }
 
 export function pct(n: number | null | undefined, digits = 0): string {
-  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  if (n === null || n === undefined || !Number.isFinite(n)) return "-";
   return `${(n * 100).toFixed(digits)}%`;
 }
 
 export function utc(s: string | null | undefined): string {
-  if (!s) return "—";
+  if (!s) return "-";
   const d = new Date(s);
   if (Number.isNaN(d.getTime())) return s;
   return d.toISOString().replace("T", " ").replace(/\.\d+Z$/, "Z").replace("Z", " UTC");

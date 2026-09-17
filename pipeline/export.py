@@ -119,8 +119,8 @@ def save_rgb_png(path: str, r, g, b, valid: np.ndarray,
 
     # A SHARED stretch across the three channels, not one per channel.
     # Stretching each channel to its own percentiles normalises away the
-    # relative brightness between them, and clear water — which is genuinely
-    # blue-dominated, roughly 0.063 at 441 nm against 0.007 at 666 nm here —
+    # relative brightness between them, and clear water - which is genuinely
+    # blue-dominated, roughly 0.063 at 441 nm against 0.007 at 666 nm here -
     # comes back as false magenta. A common range preserves the real colour.
     stack = np.dstack([r, g, b])
     vals = stack[ref]
@@ -170,6 +170,10 @@ def save_scalar_png(path: str, values: np.ndarray, mask: np.ndarray,
     finite = np.isfinite(v)
     if log:
         v = np.log10(np.clip(v, 1.0, None))
+    # Default limits are the 2nd and 99th percentile of the masked population,
+    # so the stretch adapts to the scene instead of being hand-tuned, and the
+    # chosen values are returned for the legend to print.
+    auto = vmin is None or vmax is None
     if vmin is None:
         vmin = float(np.nanpercentile(v[finite], 2)) if finite.any() else 0.0
     if vmax is None:
@@ -186,7 +190,10 @@ def save_scalar_png(path: str, values: np.ndarray, mask: np.ndarray,
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     Image.fromarray((rgba * 255).astype(np.uint8), mode="RGBA").save(
         path, optimize=True)
-    return {"path": path, "vmin": vmin, "vmax": vmax, "log": log, "cmap": cmap}
+    return {"path": path, "vmin": round(float(vmin), 6),
+            "vmax": round(float(vmax), 6), "log": log, "cmap": cmap,
+            "limits": "2nd-99th percentile of masked pixels" if auto else "fixed",
+            "n_pixels": int(finite.sum())}
 
 
 def write_json(path: str, obj) -> str:

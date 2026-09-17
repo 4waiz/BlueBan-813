@@ -39,27 +39,27 @@
    "geometry": {
     "type": "Point",
     "coordinates": [
-     7.775670635061561,
-     36.89707981684214
+     7.761894694574882,
+     36.89531453022766
     ]
    },
    "properties": {
     "id": "S02",
     "role": "ASSET_BOUNDARY",
     "role_question": "Has anything reached the protected asset yet?",
-    "lon": 7.775671,
-    "lat": 36.89708,
+    "lon": 7.761895,
+    "lat": 36.895315,
     "priority": 1,
-    "rationale": "Nearest analysable water to Port water quality point (example), 189 m away. This is the measurement that answers whether the asset is affected yet.",
+    "rationale": "Nearest analysable water to Annaba Port power station, 378 m away. This is the measurement that answers whether the asset is affected yet.",
     "expected_variables": [
      "Turbidity (NTU)",
      "Chlorophyll-a",
      "Total organic carbon",
      "Algal toxins if a bloom is suspected"
     ],
-    "anomaly_score": 24057.03,
+    "anomaly_score": 5507.8,
     "distance_from_shore_m": 30.0,
-    "distance_to_asset_m": 189.0,
+    "distance_to_asset_m": 378.0,
     "confidence": null
    }
   },

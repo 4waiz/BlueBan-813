@@ -132,3 +132,57 @@ body {
   padding: 10px 12px !important;
 }
 .maplibregl-popup-tip { border-top-color: #243056 !important; }
+
+/* ---------------------------------------------------------- entrance motion */
+@keyframes asset-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.panel-in { animation: panel-in 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+
+@keyframes trace-in {
+  from { stroke-dashoffset: var(--len, 4000); }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* A soft scan pass across a panel, used once on arrival to read as an
+   instrument powering up rather than as a loading spinner. */
+@keyframes boot-scan {
+  0%   { opacity: 0; transform: translateX(-100%); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+.boot-scan::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(49,134,255,0.11), transparent);
+  animation: boot-scan 1.1s ease-out 1 both;
+}
+
+@keyframes needle-settle {
+  0%   { transform: rotate(-8deg); }
+  60%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Interactive affordances -------------------------------------------------- */
+.tap {
+  transition: transform 0.12s cubic-bezier(0.22, 0.61, 0.36, 1),
+              background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+.tap:active { transform: translateY(1px) scale(0.985); }
+
+.row-hover { transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+.row-hover:hover { background-color: rgba(255,255,255,0.035); }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-in, .boot-scan::before { animation: none !important; }
+  .tap:active { transform: none; }
+}

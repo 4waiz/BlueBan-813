@@ -1,0 +1,1427 @@
+{
+ "event_id": "BP-2026-001",
+ "generated_utc": "2026-09-15T13:38:39Z",
+ "aoi": {
+  "id": "DZ-ANNABA",
+  "name": "Gulf of Annaba",
+  "country": "Algeria",
+  "bounds_lonlat": [
+   7.51495297214694,
+   36.87116733617604,
+   7.811374400129816,
+   37.06263813489972
+  ]
+ },
+ "observation": {
+  "primary_sensor": "Tanager-1 hyperspectral",
+  "scene_id": "20250601_104901_58_4001",
+  "acquisition_utc": "2025-06-01T10:49:01.582000Z",
+  "pixel_size_m": 30.0,
+  "epsg_native": 32632,
+  "sun_elevation_deg": 73.0,
+  "view_off_nadir_deg": 19.9
+ },
+ "state": "NORMAL",
+ "severity": 0.3317216181541424,
+ "confidence": 0.6867867239496848,
+ "assessment": {
+  "severity": 0.3317,
+  "confidence": 0.6868,
+  "priority": "NORMAL",
+  "priority_reason": "TEMPORAL VETO: this observation sits at the 6.6th percentile of the multi-year record for this location and season, at or below the median. The spatial anomaly is therefore a persistent feature of this coastline, not an event. Priority reduced from HIGH_PRIORITY to NORMAL.",
+  "severity_components": [
+   {
+    "name": "area",
+    "value": 0.1129,
+    "weight": 0.2,
+    "description": "Event area 1.129 km2, saturating at 10 km2."
+   },
+   {
+    "name": "spectral_anomaly",
+    "value": 0.9969,
+    "weight": 0.25,
+    "description": "Spectral anomaly at the 99.7th percentile of the water population in this scene."
+   },
+   {
+    "name": "magnitude",
+    "value": 0.1176,
+    "weight": 0.2,
+    "description": "Peak reflectance 1.47x background water."
+   },
+   {
+    "name": "historical_rarity",
+    "value": 0.066,
+    "weight": 0.3,
+    "description": "6.6th percentile against the multi-year record for this location and season."
+   }
+  ],
+  "confidence_components": [
+   {
+    "name": "valid_coverage",
+    "value": 0.6838,
+    "weight": 0.2,
+    "description": "68.4% of the AOI passed quality screening."
+   },
+   {
+    "name": "cloud_free",
+    "value": 0.9992,
+    "weight": 0.15,
+    "description": "Cloud cover 0.08%."
+   },
+   {
+    "name": "sample_size",
+    "value": 1.0,
+    "weight": 0.15,
+    "description": "1254 pixels contributed to the event spectrum."
+   },
+   {
+    "name": "spectral_snr",
+    "value": 0.8606,
+    "weight": 0.2,
+    "description": "Median signal-to-noise 25.8 over the water-informative bands, from the sensor's own uncertainty layer."
+   },
+   {
+    "name": "class_margin",
+    "value": 0.549,
+    "weight": 0.15,
+    "description": "Leading optical hypothesis leads the next by 0.55."
+   },
+   {
+    "name": "bottom_influence",
+    "value": 0.15,
+    "weight": 0.2,
+    "description": "Shallow-water bottom reflectance risk 0.85; high risk reduces confidence in a water-column interpretation."
+   }
+  ],
+  "rules_fired": [
+   {
+    "rule": "An asset has exposure 0.48, above 0.30.",
+    "level": "WATCH"
+   },
+   {
+    "rule": "Drift track reaches an exposed asset within 6 h.",
+    "level": "HIGH_PRIORITY"
+   },
+   {
+    "rule": "TEMPORAL VETO: this observation sits at the 6.6th percentile of the multi-year record for this location and season, at or below the median. The spatial anomaly is therefore a persistent feature of this coastline, not an event. Priority reduced from HIGH_PRIORITY to NORMAL.",
+    "level": "NORMAL",
+    "veto": true
+   }
+  ],
+  "note": "Severity and confidence are reported separately and are never combined into a single score. Priority follows an explicit rule table, shown in rules_fired."
+ },
+ "geometry": {
+  "centroid_lonlat": [
+   7.769854,
+   36.885713
+  ],
+  "area_km2": 1.1286,
+  "pixel_count": 1254,
+  "equivalent_radius_m": 599.4,
+  "median_distance_from_shore_m": 90.0,
+  "region_label": "L7"
+ },
+ "classification": {
+  "top_class": "SEDIMENT_LIKE",
+  "label": "High turbidity / suspended sediment signature",
+  "scores": {
+   "BACKGROUND_WATER": 0.0,
+   "SEDIMENT_LIKE": 0.7745,
+   "BLOOM_LIKE": 0.0,
+   "CYANO_LIKE": 0.0,
+   "CDOM_LIKE": 0.2255,
+   "SURFACE_FILM_LIKE": 0.0,
+   "BOTTOM_INFLUENCED": 0.0,
+   "UNKNOWN_ANOMALY": 0.0
+  },
+  "confidence": 0.549,
+  "evidence": [
+   {
+    "name": "broadband_vis_enhancement",
+    "value": 5.277945,
+    "supports": "SEDIMENT_LIKE",
+    "weight": 4.2779,
+    "description": "Mean enhancement at 560 and 665 nm relative to background water."
+   },
+   {
+    "name": "visible_tilt_665_over_443",
+    "value": 3.869016,
+    "supports": "SEDIMENT_LIKE",
+    "weight": 3.869,
+    "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+   },
+   {
+    "name": "blue_depression_443",
+    "value": 3.881583,
+    "supports": "CDOM_LIKE",
+    "weight": 2.0,
+    "description": "Blue reflectance suppressed relative to green without a red-edge peak, the signature of dissolved organic absorption."
+   },
+   {
+    "name": "phycocyanin_absorption_620",
+    "value": 0.066619,
+    "supports": "none",
+    "weight": 0.6662,
+    "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+   },
+   {
+    "name": "red_edge_ratio_705_665",
+    "value": 0.774678,
+    "supports": "none",
+    "weight": 0.0,
+    "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+   },
+   {
+    "name": "floating_algae_index",
+    "value": -0.021941,
+    "supports": "none",
+    "weight": 0.0,
+    "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+   },
+   {
+    "name": "chl_absorption_depth_675",
+    "value": -0.033867,
+    "supports": "none",
+    "weight": -0.3387,
+    "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+   }
+  ],
+  "caveats": [
+   "Pixel is 90 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required."
+  ],
+  "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+ },
+ "anomaly": {
+  "n_components": 12,
+  "explained_variance": 0.944641,
+  "background_pixels": 159967,
+  "test_pixels": 209077,
+  "threshold_score": 936.1867,
+  "params": {
+   "alpha": 0.01,
+   "robust_background": true,
+   "n_bands_used": 100,
+   "method": "RX / Mahalanobis in PCA space",
+   "reference": "Reed & Yu (1990) IEEE Trans. ASSP 38(10):1760-1770",
+   "threshold_rule": "empirical percentile of background RX distribution",
+   "threshold_empirical": 936.1867,
+   "threshold_chi2_nominal": 26.217,
+   "chi2_assumption_note": "Chi-squared threshold reported for reference only; the background is a mixture and is not multivariate normal, so the empirical threshold is used."
+  },
+  "event_mean_rx": 31337.33,
+  "event_max_rx": 43707.12,
+  "event_percentile_in_scene": 99.695
+ },
+ "indices": {
+  "NDWI": {
+   "event_median": 0.86463,
+   "background_median": 0.57626,
+   "event_p95": 0.88017,
+   "median_uncertainty": 0.00403,
+   "spec": {
+    "name": "NDWI",
+    "long_name": "Normalized Difference Water Index",
+    "formula": "(Green - NIR) / (Green + NIR)",
+    "wavelengths_nm": {
+     "green": 560,
+     "nir": 860
+    },
+    "reference": "McFeeters (1996), Int. J. Remote Sensing 17(7):1425-1432",
+    "input_quantity": "surface reflectance (unitless, 0-1)",
+    "units_out": "dimensionless",
+    "valid_range": [
+     -1.0,
+     1.0
+    ],
+    "interpretation": "> 0 generally open water; sensitive to built surfaces",
+    "assumptions": [
+     "Atmospherically corrected reflectance",
+     "Breaks down over bright urban surfaces (use MNDWI there)"
+    ]
+   }
+  },
+  "MNDWI": {
+   "event_median": 0.93676,
+   "background_median": 0.74339,
+   "event_p95": 0.95367,
+   "median_uncertainty": 0.00258,
+   "spec": {
+    "name": "MNDWI",
+    "long_name": "Modified Normalized Difference Water Index",
+    "formula": "(Green - SWIR1) / (Green + SWIR1)",
+    "wavelengths_nm": {
+     "green": 560,
+     "swir1": 1610
+    },
+    "reference": "Xu (2006), Int. J. Remote Sensing 27(14):3025-3033",
+    "input_quantity": "surface reflectance (unitless, 0-1)",
+    "units_out": "dimensionless",
+    "valid_range": [
+     -1.0,
+     1.0
+    ],
+    "interpretation": "> 0 water; suppresses built-up false positives better than NDWI",
+    "assumptions": [
+     "Requires a clean SWIR band",
+     "SWIR is strongly absorbed by water, so contrast is high"
+    ]
+   }
+  },
+  "NDCI": {
+   "event_median": -0.18059,
+   "background_median": -0.05117,
+   "event_p95": -0.13822,
+   "median_uncertainty": 0.0122,
+   "spec": {
+    "name": "NDCI",
+    "long_name": "Normalized Difference Chlorophyll Index",
+    "formula": "(RE705 - Red665) / (RE705 + Red665)",
+    "wavelengths_nm": {
+     "red_edge": 705,
+     "red": 665
+    },
+    "reference": "Mishra & Mishra (2012), Remote Sensing of Environment 117:394-406",
+    "input_quantity": "surface reflectance / Rrs (unitless)",
+    "units_out": "dimensionless proxy (NOT mg/m3)",
+    "valid_range": [
+     -1.0,
+     1.0
+    ],
+    "interpretation": "Higher values indicate stronger chlorophyll-a absorption contrast; a screening proxy only",
+    "assumptions": [
+     "Designed for turbid productive inland/coastal water",
+     "Loses sensitivity in clear oligotrophic water where the 705 nm peak is weak",
+     "Requires an in-situ calibration to become a concentration"
+    ]
+   }
+  },
+  "TURBIDITY_PROXY": {
+   "event_median": -0.4935,
+   "background_median": -0.47344,
+   "event_p95": -0.36304,
+   "median_uncertainty": 0.00836,
+   "spec": {
+    "name": "TURBIDITY_PROXY",
+    "long_name": "Red/Green normalized turbidity proxy",
+    "formula": "(Red665 - Green560) / (Red665 + Green560)",
+    "wavelengths_nm": {
+     "red": 665,
+     "green": 560
+    },
+    "reference": "Used as the turbidity proxy in the official 813 challenge notebook 06; consistent in form with red-band turbidity indicators such as Nechad et al. (2009), RSE 113:2141-2154",
+    "input_quantity": "surface reflectance (unitless, 0-1)",
+    "units_out": "dimensionless proxy (NOT NTU/FNU)",
+    "valid_range": [
+     -1.0,
+     1.0
+    ],
+    "interpretation": "Higher values indicate relatively stronger red backscatter, typical of suspended sediment",
+    "assumptions": [
+     "Not a calibrated turbidity retrieval",
+     "Sensitive to bottom reflectance in shallow water"
+    ]
+   }
+  },
+  "FAI": {
+   "event_median": -0.02194,
+   "background_median": -0.00089,
+   "event_p95": -0.01743,
+   "median_uncertainty": 0.00056,
+   "spec": {
+    "name": "FAI",
+    "long_name": "Floating Algae Index",
+    "formula": "R_NIR - [R_RED + (R_SWIR - R_RED) * (nir - red)/(swir - red)]",
+    "wavelengths_nm": {
+     "red": 665,
+     "nir": 859,
+     "swir": 1610
+    },
+    "reference": "Hu (2009), Remote Sensing of Environment 113:2118-2129",
+    "input_quantity": "surface reflectance (unitless, 0-1)",
+    "units_out": "reflectance difference (unitless)",
+    "valid_range": [
+     -0.1,
+     0.3
+    ],
+    "interpretation": "Positive values indicate NIR elevation above the baseline, characteristic of floating/surface algal material",
+    "assumptions": [
+     "More robust to thin cloud and glint than NDVI over water",
+     "Detects FLOATING material; subsurface blooms may not register"
+    ]
+   }
+  }
+ },
+ "quality": {
+  "scene": {
+   "valid_fraction": 0.683839383811546,
+   "cloud_fraction": 0.0008021914486721014,
+   "cirrus_fraction": 1.647210366883165e-06,
+   "nodata_fraction": 0.31535677752941504,
+   "n_bands_total": 426,
+   "n_bands_good": 368,
+   "n_bands_flagged_bad": 58,
+   "bad_band_ranges_nm": [
+    [
+     1342.4100341796875,
+     1437.550048828125,
+     20
+    ],
+    [
+     1782.5799560546875,
+     1967.2099609375,
+     38
+    ]
+   ]
+  },
+  "water_mask": {
+   "mndwi_threshold": 0.15,
+   "nir_max": 0.1,
+   "min_component_px": 50,
+   "shoreline_buffer_px": 2,
+   "scipy_available": true,
+   "px_valid": 415150,
+   "px_water_raw": 215721,
+   "px_water_after_components": 215651,
+   "px_water_final": 209077,
+   "water_fraction_of_valid": 0.5036179694086474,
+   "water_fraction_of_scene": 0.3443938018768315,
+   "shoreline_px_removed": 6574
+  },
+  "masking_steps": {
+   "steps": [
+    {
+     "step": "product_quality_masks",
+     "kept": 415150,
+     "removed": 191937,
+     "total": 607087,
+     "kept_fraction": 0.683839,
+     "detail": {
+      "nodata_fraction": 0.31535677752941504,
+      "cloud_fraction": 0.0008021914486721014,
+      "cirrus_fraction": 1.647210366883165e-06
+     }
+    },
+    {
+     "step": "sunglint_nir",
+     "kept": 215662,
+     "removed": 391425,
+     "total": 607087,
+     "kept_fraction": 0.355241,
+     "detail": {
+      "nir_threshold": 0.05
+     }
+    }
+   ],
+   "final_kept": 215662,
+   "final_kept_fraction": 0.355241
+  },
+  "informative_bands": {
+   "n": 100,
+   "range_nm": [
+    401.29,
+    896.36
+   ],
+   "median_snr": 25.82,
+   "selection_rule": "SNR >= 3 from the product's own uncertainty layer, and 400-900 nm where water-leaving signal exists"
+  },
+  "bottom_influence_risk": 0.85
+ },
+ "temporal": {
+  "baseline_available": true,
+  "assessment": {
+   "value": -0.337498,
+   "n_seasonal": 106,
+   "seasonal_percentile": 6.60377358490566,
+   "all_time_percentile": 27.33644859813084,
+   "n_all_time": 428,
+   "window_days": 45,
+   "seasonal_median": -0.050612500000000005,
+   "matched_date": "2025-06-01",
+   "days_from_target": 0,
+   "state": "NORMAL",
+   "variable": "TURBIDITY_PROXY_p95",
+   "all_variables": {
+    "TURBIDITY_PROXY": {
+     "seasonal_percentile": 5.660377358490567,
+     "all_time_percentile": 27.102803738317753,
+     "value": -0.485705,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": -0.34505,
+     "baseline_p95": -0.032077
+    },
+    "NDCI": {
+     "seasonal_percentile": 1.8867924528301887,
+     "all_time_percentile": 20.093457943925234,
+     "value": -0.149988,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": -0.034628,
+     "baseline_p95": 0.043925
+    },
+    "R560": {
+     "seasonal_percentile": 2.8301886792452833,
+     "all_time_percentile": 17.056074766355138,
+     "value": 0.0323,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": 0.0542,
+     "baseline_p95": 0.112285
+    },
+    "R665": {
+     "seasonal_percentile": 0.9433962264150944,
+     "all_time_percentile": 12.850467289719624,
+     "value": 0.0086,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": 0.0249,
+     "baseline_p95": 0.09116
+    },
+    "MNDWI": {
+     "seasonal_percentile": 87.73584905660378,
+     "all_time_percentile": 64.7196261682243,
+     "value": 0.659422,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": 0.485173,
+     "baseline_p95": 0.919711
+    },
+    "TURBIDITY_PROXY_p95": {
+     "seasonal_percentile": 6.60377358490566,
+     "all_time_percentile": 27.33644859813084,
+     "value": -0.337498,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": -0.206703,
+     "baseline_p95": 0.063732
+    },
+    "NDCI_p95": {
+     "seasonal_percentile": 7.547169811320755,
+     "all_time_percentile": 21.49532710280374,
+     "value": 0.0,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": 0.038459,
+     "baseline_p95": 0.338752
+    },
+    "R560_p95": {
+     "seasonal_percentile": 64.15094339622641,
+     "all_time_percentile": 76.4018691588785,
+     "value": 0.1148,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": 0.089638,
+     "baseline_p95": 0.149462
+    },
+    "R665_p95": {
+     "seasonal_percentile": 38.67924528301887,
+     "all_time_percentile": 62.383177570093466,
+     "value": 0.0564,
+     "n_seasonal": 106,
+     "matched_date": "2025-06-01",
+     "days_from_target": 0,
+     "baseline_median": 0.046675,
+     "baseline_p95": 0.113641
+    }
+   },
+   "n_observations_zone": 428
+  }
+ },
+ "forecast": {
+  "metadata": {
+   "method": "Wind-driven surface drift with random-walk diffusion",
+   "model_class": "Lagrangian particle advection",
+   "is_hydrodynamic_model": false,
+   "wind_source": "ERA5 reanalysis via Open-Meteo historical archive API",
+   "wind_at_t0": {
+    "time": "2025-06-01T10:00",
+    "speed_ms": 2.25,
+    "direction_from_deg": 87.0,
+    "u_ms": -2.247,
+    "v_ms": -0.118
+   },
+   "parameters": {
+    "wind_drift_factor": 0.03,
+    "deflection_deg": 15.0,
+    "horizontal_diffusivity_m2_s": 5.0
+   },
+   "references": [
+    "Ekman (1905) Ark. Mat. Astr. Fys. 2(11)",
+    "ASCE (1996) J. Hydraulic Engineering 122(11):594-609",
+    "Breivik et al. (2011) wind-induced drift of objects at sea"
+   ],
+   "coastline_handling": "Particles driven onto land are beached at their last water position and stop drifting. beached_fraction reports how much of the cloud has stranded by each horizon.",
+   "not_included": [
+    "Tidal currents",
+    "Geostrophic and density-driven circulation",
+    "River discharge momentum",
+    "Bathymetric steering and coastline-induced eddies",
+    "Stokes drift from surface waves",
+    "Particle settling, resuspension and biological growth or decay"
+   ],
+   "interpretation": "A scenario estimate of where surface material would go under the observed wind alone. Treat the envelope as a search area for field teams, not as a prediction of concentration at a location.",
+   "validation_status": "Not validated against observed plume motion for this AOI: no repeat hyperspectral pass and no drifter data were available. Reported as an unvalidated scenario estimate.",
+   "wind_sample_point": {
+    "requested_lonlat": [
+     7.67354,
+     37.00267
+    ],
+    "era5_cell_lonlat": [
+     7.70751,
+     36.942
+    ],
+    "why": "Sampled over offshore water, not at the event centroid, because ERA5's ~25 km grid would otherwise return a land cell."
+   }
+  },
+  "steps": [
+   {
+    "hours": 0.0,
+    "timestamp": "2025-06-01T10:00",
+    "centroid": [
+     7.769869,
+     36.885722
+    ],
+    "displacement_m": 0.0,
+    "bearing_deg": 0.0,
+    "spread_radius_m": 621.0,
+    "beached_fraction": 0.0
+   },
+   {
+    "hours": 6.0,
+    "timestamp": "2025-06-01T16:00",
+    "centroid": [
+     7.768256,
+     36.885794
+    ],
+    "displacement_m": 143.8,
+    "bearing_deg": 273.2,
+    "spread_radius_m": 629.5,
+    "beached_fraction": 0.9983
+   },
+   {
+    "hours": 12.0,
+    "timestamp": "2025-06-01T22:00",
+    "centroid": [
+     7.76824,
+     36.885797
+    ],
+    "displacement_m": 145.2,
+    "bearing_deg": 273.3,
+    "spread_radius_m": 633.2,
+    "beached_fraction": 1.0
+   },
+   {
+    "hours": 24.0,
+    "timestamp": "2025-06-02T10:00",
+    "centroid": [
+     7.76824,
+     36.885797
+    ],
+    "displacement_m": 145.2,
+    "bearing_deg": 273.3,
+    "spread_radius_m": 633.2,
+    "beached_fraction": 1.0
+   },
+   {
+    "hours": 48.0,
+    "timestamp": "2025-06-03T10:00",
+    "centroid": [
+     7.76824,
+     36.885797
+    ],
+    "displacement_m": 145.2,
+    "bearing_deg": 273.3,
+    "spread_radius_m": 633.2,
+    "beached_fraction": 1.0
+   }
+  ]
+ },
+ "exposure": [
+  {
+   "asset": {
+    "id": "A01",
+    "name": "Port water quality point (example)",
+    "type": "PORT",
+    "type_label": "Port / harbour",
+    "lon": 7.7745,
+    "lat": 36.8985,
+    "sensitivity": 0.5,
+    "notes": "Illustrative placement on the Annaba harbour frontage.",
+    "source": "demo_fixture",
+    "why_it_matters": "Operational and environmental-compliance relevance.",
+    "primary_concerns": [
+     "turbidity",
+     "pollution"
+    ]
+   },
+   "distance_m": 1480.7,
+   "distance_km": 1.481,
+   "bearing_from_event_deg": 16.2,
+   "direction": "NNE",
+   "closest_approach_m": 189.1,
+   "closest_approach_hours": 0.0,
+   "intersects_forecast": true,
+   "eta_hours": 6.0,
+   "exposure_score": 0.4814,
+   "basis": [
+    "Current separation 1.48 km, asset lies NNE of the event centroid.",
+    "7.3% of drift particles come within 599 m of the asset by +6 h.",
+    "Exposure = proximity 0.963 x trajectory 1.00 x asset sensitivity 0.50 = 0.481."
+   ]
+  },
+  {
+   "asset": {
+    "id": "A02",
+    "name": "Annaba bathing water (example)",
+    "type": "PUBLIC_BEACH",
+    "type_label": "Public beach / bathing water",
+    "lon": 7.762,
+    "lat": 36.917,
+    "sensitivity": 0.8,
+    "notes": "Illustrative placement on the Annaba beach frontage.",
+    "source": "demo_fixture",
+    "why_it_matters": "Public health exposure and bathing-water compliance.",
+    "primary_concerns": [
+     "harmful algal bloom",
+     "microbial",
+     "visible pollution"
+    ]
+   },
+   "distance_m": 3548.4,
+   "distance_km": 3.548,
+   "bearing_from_event_deg": 348.7,
+   "direction": "NNW",
+   "closest_approach_m": 2526.6,
+   "closest_approach_hours": 0.0,
+   "intersects_forecast": false,
+   "eta_hours": null,
+   "exposure_score": 0.1689,
+   "basis": [
+    "Current separation 3.55 km, asset lies NNW of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 2.53 km at +0 h.",
+    "Exposure = proximity 0.603 x trajectory 0.35 x asset sensitivity 0.80 = 0.169."
+   ]
+  },
+  {
+   "asset": {
+    "id": "A03",
+    "name": "Coastal water intake (example)",
+    "type": "DESALINATION_INTAKE",
+    "type_label": "Desalination intake",
+    "lon": 7.745,
+    "lat": 36.956,
+    "sensitivity": 1.0,
+    "notes": "Illustrative offshore intake placement. BLUEBAN 813 ships no infrastructure database; operators pin their own assets.",
+    "source": "demo_fixture",
+    "why_it_matters": "Source water quality directly affects membrane fouling, pre-treatment load and, in the worst case, forces a shutdown of potable supply.",
+    "primary_concerns": [
+     "algal bloom",
+     "turbidity",
+     "hydrocarbon",
+     "organics"
+    ]
+   },
+   "distance_m": 8121.9,
+   "distance_km": 8.122,
+   "bearing_from_event_deg": 344.2,
+   "direction": "NNW",
+   "closest_approach_m": 7096.2,
+   "closest_approach_hours": 0.0,
+   "intersects_forecast": false,
+   "eta_hours": null,
+   "exposure_score": 0.0847,
+   "basis": [
+    "Current separation 8.12 km, asset lies NNW of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 7.10 km at +0 h.",
+    "Exposure = proximity 0.242 x trajectory 0.35 x asset sensitivity 1.00 = 0.085."
+   ]
+  },
+  {
+   "asset": {
+    "id": "A04",
+    "name": "Cap de Garde habitat zone (example)",
+    "type": "MARINE_PROTECTED_AREA",
+    "type_label": "Marine protected area",
+    "lon": 7.788,
+    "lat": 36.969,
+    "sensitivity": 0.9,
+    "notes": "Illustrative placement on the Cap de Garde headland.",
+    "source": "demo_fixture",
+    "why_it_matters": "Ecological damage is often irreversible on management timescales.",
+    "primary_concerns": [
+     "sedimentation",
+     "eutrophication",
+     "pollution"
+    ]
+   },
+   "distance_m": 9400.5,
+   "distance_km": 9.401,
+   "bearing_from_event_deg": 9.9,
+   "direction": "N",
+   "closest_approach_m": 8071.9,
+   "closest_approach_hours": 0.0,
+   "intersects_forecast": false,
+   "eta_hours": null,
+   "exposure_score": 0.0627,
+   "basis": [
+    "Current separation 9.40 km, asset lies N of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 8.07 km at +0 h.",
+    "Exposure = proximity 0.199 x trajectory 0.35 x asset sensitivity 0.90 = 0.063."
+   ]
+  }
+ ],
+ "samples": [
+  {
+   "id": "S01",
+   "role": "EVENT_CORE",
+   "role_question": "What is actually present at the point of strongest signal?",
+   "lon": 7.772098,
+   "lat": 36.88893,
+   "priority": 1,
+   "rationale": "Highest spectral anomaly in the event (RX 43707). The strongest signal gives laboratory analysis the best chance of identifying what is actually present.",
+   "expected_variables": [
+    "Chlorophyll-a (spectrophotometric or HPLC)",
+    "Total suspended solids (gravimetric)",
+    "Turbidity (nephelometric, NTU)",
+    "Phytoplankton identification and cell counts"
+   ],
+   "anomaly_score": 43707.12,
+   "distance_from_shore_m": 150.0,
+   "distance_to_asset_m": null,
+   "confidence": null
+  },
+  {
+   "id": "S02",
+   "role": "ASSET_BOUNDARY",
+   "role_question": "Has anything reached the protected asset yet?",
+   "lon": 7.775671,
+   "lat": 36.89708,
+   "priority": 1,
+   "rationale": "Nearest analysable water to Port water quality point (example), 189 m away. This is the measurement that answers whether the asset is affected yet.",
+   "expected_variables": [
+    "Turbidity (NTU)",
+    "Chlorophyll-a",
+    "Total organic carbon",
+    "Algal toxins if a bloom is suspected"
+   ],
+   "anomaly_score": 24057.03,
+   "distance_from_shore_m": 30.0,
+   "distance_to_asset_m": 189.0,
+   "confidence": null
+  },
+  {
+   "id": "S03",
+   "role": "LEADING_EDGE",
+   "role_question": "Where is the boundary, and is the event advancing?",
+   "lon": 7.768106,
+   "lat": 36.885914,
+   "priority": 2,
+   "rationale": "Edge of the event nearest the modelled drift direction (bearing 273deg). Sampling here tests whether the event is advancing and how sharp the front is.",
+   "expected_variables": [
+    "Turbidity (NTU)",
+    "Chlorophyll-a",
+    "Temperature and salinity profile"
+   ],
+   "anomaly_score": 33377.85,
+   "distance_from_shore_m": 134.0,
+   "distance_to_asset_m": null,
+   "confidence": null
+  },
+  {
+   "id": "S04",
+   "role": "BACKGROUND_CONTROL",
+   "role_question": "What does unaffected water in this body read today?",
+   "lon": 7.721998,
+   "lat": 36.986023,
+   "priority": 2,
+   "rationale": "Lowest-anomaly water at least 800 m offshore (RX 1.2). Without a same-day control, an absolute laboratory value from the event cannot be interpreted.",
+   "expected_variables": [
+    "Same analyte suite as the event core, for direct comparison"
+   ],
+   "anomaly_score": 1.15,
+   "distance_from_shore_m": 3000.0,
+   "distance_to_asset_m": null,
+   "confidence": null
+  },
+  {
+   "id": "S05",
+   "role": "UNCERTAINTY_POINT",
+   "role_question": "Where is the interpretation least certain?",
+   "lon": 7.669725,
+   "lat": 36.968142,
+   "priority": 3,
+   "rationale": "Marginal anomaly (RX between the 85th and 97th percentile) in shallow water, where bottom reflectance and suspended matter are hard to separate optically. A depth reading and a TSS sample here would resolve the ambiguity for the whole nearshore band.",
+   "expected_variables": [
+    "Full analyte suite",
+    "Secchi depth",
+    "Water depth (to test bottom-reflectance influence)"
+   ],
+   "anomaly_score": 101.77,
+   "distance_from_shore_m": 95.0,
+   "distance_to_asset_m": null,
+   "confidence": null
+  }
+ ],
+ "all_regions": [
+  {
+   "label": "L4",
+   "area_km2": 3.1365,
+   "pixel_count": 3485,
+   "mean_rx": 2188.95,
+   "max_rx": 29398.57,
+   "is_primary": false,
+   "classification": {
+    "top_class": "BOTTOM_INFLUENCED",
+    "label": "Shallow water / bottom reflectance",
+    "scores": {
+     "BACKGROUND_WATER": 0.0,
+     "SEDIMENT_LIKE": 0.0,
+     "BLOOM_LIKE": 0.4177,
+     "CYANO_LIKE": 0.0,
+     "CDOM_LIKE": 0.0,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.5823,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 0.1645,
+    "evidence": [
+     {
+      "name": "green_dominant_nearshore",
+      "value": 0.840067,
+      "supports": "BOTTOM_INFLUENCED",
+      "weight": 0.8401,
+      "description": "Green enhancement exceeds red enhancement by 0.84 at 247 m from shore. Water absorbs red strongly, so a bright bottom raises green far more than red; suspended matter in the water column raises both."
+     },
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.077855,
+      "supports": "none",
+      "weight": 0.7785,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 1.663817,
+      "supports": "none",
+      "weight": 0.6638,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": 0.030133,
+      "supports": "BLOOM_LIKE",
+      "weight": 0.3013,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 0.079917,
+      "supports": "none",
+      "weight": 0.0799,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 0.975735,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": -0.002335,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     }
+    ],
+    "caveats": [
+     "Pixel is 247 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  },
+  {
+   "label": "L7",
+   "area_km2": 1.1286,
+   "pixel_count": 1254,
+   "mean_rx": 31337.33,
+   "max_rx": 43707.12,
+   "is_primary": true,
+   "classification": {
+    "top_class": "SEDIMENT_LIKE",
+    "label": "High turbidity / suspended sediment signature",
+    "scores": {
+     "BACKGROUND_WATER": 0.0,
+     "SEDIMENT_LIKE": 0.7745,
+     "BLOOM_LIKE": 0.0,
+     "CYANO_LIKE": 0.0,
+     "CDOM_LIKE": 0.2255,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.0,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 0.549,
+    "evidence": [
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 5.277945,
+      "supports": "SEDIMENT_LIKE",
+      "weight": 4.2779,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 3.869016,
+      "supports": "SEDIMENT_LIKE",
+      "weight": 3.869,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     },
+     {
+      "name": "blue_depression_443",
+      "value": 3.881583,
+      "supports": "CDOM_LIKE",
+      "weight": 2.0,
+      "description": "Blue reflectance suppressed relative to green without a red-edge peak, the signature of dissolved organic absorption."
+     },
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.066619,
+      "supports": "none",
+      "weight": 0.6662,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 0.774678,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": -0.021941,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": -0.033867,
+      "supports": "none",
+      "weight": -0.3387,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     }
+    ],
+    "caveats": [
+     "Pixel is 90 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  },
+  {
+   "label": "L6",
+   "area_km2": 0.2565,
+   "pixel_count": 285,
+   "mean_rx": 7320.27,
+   "max_rx": 8018.41,
+   "is_primary": false,
+   "classification": {
+    "top_class": "SEDIMENT_LIKE",
+    "label": "High turbidity / suspended sediment signature",
+    "scores": {
+     "BACKGROUND_WATER": 0.0,
+     "SEDIMENT_LIKE": 0.8571,
+     "BLOOM_LIKE": 0.1429,
+     "CYANO_LIKE": 0.0,
+     "CDOM_LIKE": 0.0,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.0,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 0.7142,
+    "evidence": [
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 2.70986,
+      "supports": "SEDIMENT_LIKE",
+      "weight": 1.7099,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 1.383652,
+      "supports": "SEDIMENT_LIKE",
+      "weight": 1.3837,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     },
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.080478,
+      "supports": "none",
+      "weight": 0.8048,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": 0.025793,
+      "supports": "BLOOM_LIKE",
+      "weight": 0.2579,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 0.927806,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": -0.007159,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     }
+    ],
+    "caveats": [
+     "Pixel is 42 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  },
+  {
+   "label": "L3",
+   "area_km2": 0.2313,
+   "pixel_count": 257,
+   "mean_rx": 4759.0,
+   "max_rx": 16543.11,
+   "is_primary": false,
+   "classification": {
+    "top_class": "UNKNOWN_ANOMALY",
+    "label": "Unclassified spectral anomaly",
+    "scores": {
+     "BACKGROUND_WATER": 0.0,
+     "SEDIMENT_LIKE": 0.1977,
+     "BLOOM_LIKE": 0.2026,
+     "CYANO_LIKE": 0.3724,
+     "CDOM_LIKE": 0.0,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.2273,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 0.1451,
+    "evidence": [
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.123985,
+      "supports": "CYANO_LIKE",
+      "weight": 1.2399,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "green_dominant_nearshore",
+      "value": 1.220841,
+      "supports": "BOTTOM_INFLUENCED",
+      "weight": 1.2208,
+      "description": "Green enhancement exceeds red enhancement by 1.22 at 95 m from shore. Water absorbs red strongly, so a bright bottom raises green far more than red; suspended matter in the water column raises both."
+     },
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 2.061754,
+      "supports": "SEDIMENT_LIKE",
+      "weight": 1.0618,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": 0.054413,
+      "supports": "BLOOM_LIKE",
+      "weight": 0.5441,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 0.466486,
+      "supports": "none",
+      "weight": 0.4665,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": 0.000258,
+      "supports": "none",
+      "weight": 0.0515,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 0.876075,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     }
+    ],
+    "caveats": [
+     "Pixel is 95 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required.",
+     "Leading hypothesis (Cyanobacteria-like pigment signature) scored only 37%; reported as unclassified rather than asserted."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  },
+  {
+   "label": "L1",
+   "area_km2": 0.0954,
+   "pixel_count": 106,
+   "mean_rx": 1635.77,
+   "max_rx": 2613.87,
+   "is_primary": false,
+   "classification": {
+    "top_class": "UNKNOWN_ANOMALY",
+    "label": "Unclassified spectral anomaly",
+    "scores": {
+     "BACKGROUND_WATER": 0.0,
+     "SEDIMENT_LIKE": 0.0,
+     "BLOOM_LIKE": 0.3925,
+     "CYANO_LIKE": 0.3868,
+     "CDOM_LIKE": 0.0,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.2207,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 0.0056,
+    "evidence": [
+     {
+      "name": "green_dominant_nearshore",
+      "value": 1.033375,
+      "supports": "BOTTOM_INFLUENCED",
+      "weight": 1.0334,
+      "description": "Green enhancement exceeds red enhancement by 1.03 at 60 m from shore. Water absorbs red strongly, so a bright bottom raises green far more than red; suspended matter in the water column raises both."
+     },
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.090564,
+      "supports": "CYANO_LIKE",
+      "weight": 0.9056,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 1.603642,
+      "supports": "none",
+      "weight": 0.6036,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": 0.05673,
+      "supports": "BLOOM_LIKE",
+      "weight": 0.5673,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 1.175737,
+      "supports": "BLOOM_LIKE",
+      "weight": 0.5272,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": 0.001044,
+      "supports": "none",
+      "weight": 0.2088,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 0.063192,
+      "supports": "none",
+      "weight": 0.0632,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     }
+    ],
+    "caveats": [
+     "Pixel is 60 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required.",
+     "Leading hypothesis (Chlorophyll / bloom-like signature) scored only 39%; reported as unclassified rather than asserted."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  },
+  {
+   "label": "L2",
+   "area_km2": 0.0675,
+   "pixel_count": 75,
+   "mean_rx": 3811.89,
+   "max_rx": 18346.01,
+   "is_primary": false,
+   "classification": {
+    "top_class": "CYANO_LIKE",
+    "label": "Cyanobacteria-like pigment signature",
+    "scores": {
+     "BACKGROUND_WATER": 0.0,
+     "SEDIMENT_LIKE": 0.0,
+     "BLOOM_LIKE": 0.2699,
+     "CYANO_LIKE": 0.4661,
+     "CDOM_LIKE": 0.0,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.264,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 0.1962,
+    "evidence": [
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.118069,
+      "supports": "CYANO_LIKE",
+      "weight": 1.1807,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "green_dominant_nearshore",
+      "value": 1.132548,
+      "supports": "BOTTOM_INFLUENCED",
+      "weight": 1.1325,
+      "description": "Green enhancement exceeds red enhancement by 1.13 at 67 m from shore. Water absorbs red strongly, so a bright bottom raises green far more than red; suspended matter in the water column raises both."
+     },
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 1.733931,
+      "supports": "none",
+      "weight": 0.7339,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": 0.057903,
+      "supports": "BLOOM_LIKE",
+      "weight": 0.579,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 0.102581,
+      "supports": "none",
+      "weight": 0.1026,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 0.913145,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": -0.001346,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     }
+    ],
+    "caveats": [
+     "Pixel is 67 m from shore. Bottom reflectance is a competing explanation that a single scene cannot exclude; the temporal baseline test is required."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  },
+  {
+   "label": "L5",
+   "area_km2": 0.0243,
+   "pixel_count": 27,
+   "mean_rx": 973.01,
+   "max_rx": 1096.22,
+   "is_primary": false,
+   "classification": {
+    "top_class": "BACKGROUND_WATER",
+    "label": "Normal / background water",
+    "scores": {
+     "BACKGROUND_WATER": 1.0,
+     "SEDIMENT_LIKE": 0.0,
+     "BLOOM_LIKE": 0.0,
+     "CYANO_LIKE": 0.0,
+     "CDOM_LIKE": 0.0,
+     "SURFACE_FILM_LIKE": 0.0,
+     "BOTTOM_INFLUENCED": 0.0,
+     "UNKNOWN_ANOMALY": 0.0
+    },
+    "confidence": 1.0,
+    "evidence": [
+     {
+      "name": "phycocyanin_absorption_620",
+      "value": 0.054713,
+      "supports": "none",
+      "weight": 0.5471,
+      "description": "Excess depth of the 620 nm feature over background water. Phycocyanin is a cyanobacterial accessory pigment. This requires narrow bands: Sentinel-2 has no band at 620 nm at all, so a multispectral sensor cannot form this evidence."
+     },
+     {
+      "name": "broadband_vis_enhancement",
+      "value": 1.494687,
+      "supports": "none",
+      "weight": 0.4947,
+      "description": "Mean enhancement at 560 and 665 nm relative to background water."
+     },
+     {
+      "name": "chl_absorption_depth_675",
+      "value": 0.00728,
+      "supports": "none",
+      "weight": 0.0728,
+      "description": "Excess depth of the 675 nm chlorophyll-a absorption feature over the local background water, measured against a 650/715 nm continuum. Positive means more pigment absorption than normal here."
+     },
+     {
+      "name": "visible_tilt_665_over_443",
+      "value": 0.066775,
+      "supports": "none",
+      "weight": 0.0668,
+      "description": "Enhancement at 665 nm minus enhancement at 443 nm. Mineral particles scatter more efficiently toward the red, so sediment raises red more than blue; dissolved organic matter absorbs blue and does the opposite."
+     },
+     {
+      "name": "red_edge_ratio_705_665",
+      "value": 0.997989,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "Ratio of the 705 nm enhancement to the 665 nm enhancement. Algal biomass produces a reflectance peak near 700-710 nm that mineral sediment does not."
+     },
+     {
+      "name": "floating_algae_index",
+      "value": -0.002948,
+      "supports": "none",
+      "weight": 0.0,
+      "description": "NIR reflectance above the red-to-SWIR baseline (Hu 2009). Positive values indicate material at or above the surface."
+     }
+    ],
+    "caveats": [
+     "No distinctive optical signature; treated as background."
+    ],
+    "disclaimer": "Optical hypothesis from satellite reflectance. NOT a chemical, biological or toxicological identification. Field sampling and laboratory analysis are required to confirm any interpretation."
+   }
+  }
+ ],
+ "provenance_summary": {
+  "completeness": 1.0,
+  "missing_fields": [],
+  "n_sources": 5,
+  "code_version": "uncommitted"
+ },
+ "satellite_813": {
+  "status": "SIMULATED",
+  "n_bands": 205,
+  "n_bands_supported": 191,
+  "range_nm": [
+   400.0,
+   1700.0
+  ],
+  "spatial_resolution_m_specified": 20.0,
+  "spatial_resolution_m_simulated": 30.0,
+  "warning": "Simulated from Tanager. No real Satellite 813 data is used anywhere in this system."
+ }
+}

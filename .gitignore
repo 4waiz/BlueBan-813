@@ -1,0 +1,37 @@
+# Data — never commit raw EO
+data/raw/
+data/cache/
+*.h5
+*.hdf5
+*.nc
+*.SAFE/
+*.zip
+*.tif
+!outputs/layers/*.tif
+reference/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+.turbo/
+
+# Secrets
+.env
+.env.local
+*.key
+credentials.json
+
+# OS
+.DS_Store
+Thumbs.db

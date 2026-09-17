@@ -1,0 +1,184 @@
+{
+ "experiment": "Event detectability by sensor configuration",
+ "question": "How much of a full-spectrum (368-band) anomaly characterisation survives at each sensor's spectral resolution?",
+ "reference_labels": {
+  "source": "RX detector on all 368 product-good Tanager bands",
+  "is_ground_truth": false,
+  "note": "A full-spectrum instrument's judgment, not an in-situ measurement. This experiment measures reproduction of that judgment at reduced spectral resolution.",
+  "threshold": 936.1867,
+  "background_cut_percentile": 50,
+  "ambiguous_pixels_dropped": 99025
+ },
+ "n_samples": 25513,
+ "n_positive": 5513,
+ "n_spatial_blocks": 162,
+ "block_size_m": 1200,
+ "n_folds": 5,
+ "model": "Logistic regression, balanced class weights",
+ "results": {
+  "spatial_blocked": {
+   "S2_multispectral_11band": {
+    "n": 25513,
+    "n_positive": 5513,
+    "precision": 1.0,
+    "recall": 0.9996372211137312,
+    "f1": 0.9998185776487664,
+    "roc_auc": 0.999814284418647,
+    "average_precision": 0.9998371059718539,
+    "confusion_matrix": {
+     "tn": 20000,
+     "fp": 0,
+     "fn": 2,
+     "tp": 5511
+    },
+    "n_features": 11
+   },
+   "813_hyperspectral_205band": {
+    "n": 25513,
+    "n_positive": 5513,
+    "precision": 1.0,
+    "recall": 0.9998186105568656,
+    "f1": 0.9999092970521541,
+    "roc_auc": 1.0,
+    "average_precision": 1.0,
+    "confusion_matrix": {
+     "tn": 20000,
+     "fp": 0,
+     "fn": 1,
+     "tp": 5512
+    },
+    "n_features": 191
+   },
+   "813_hyperspectral_261band_5nm": {
+    "n": 25513,
+    "n_positive": 5513,
+    "precision": 1.0,
+    "recall": 0.9996372211137312,
+    "f1": 0.9998185776487664,
+    "roc_auc": 0.9998183021948123,
+    "average_precision": 0.9998566942449568,
+    "confusion_matrix": {
+     "tn": 20000,
+     "fp": 0,
+     "fn": 2,
+     "tp": 5511
+    },
+    "n_features": 242
+   }
+  },
+  "random_split": {
+   "S2_multispectral_11band": {
+    "n": 25513,
+    "n_positive": 5513,
+    "precision": 1.0,
+    "recall": 0.9998186105568656,
+    "f1": 0.9999092970521541,
+    "roc_auc": 1.0,
+    "average_precision": 1.0,
+    "confusion_matrix": {
+     "tn": 20000,
+     "fp": 0,
+     "fn": 1,
+     "tp": 5512
+    },
+    "n_features": 11
+   },
+   "813_hyperspectral_205band": {
+    "n": 25513,
+    "n_positive": 5513,
+    "precision": 1.0,
+    "recall": 0.9998186105568656,
+    "f1": 0.9999092970521541,
+    "roc_auc": 0.9999987937602032,
+    "average_precision": 0.9999957270995506,
+    "confusion_matrix": {
+     "tn": 20000,
+     "fp": 0,
+     "fn": 1,
+     "tp": 5512
+    },
+    "n_features": 191
+   },
+   "813_hyperspectral_261band_5nm": {
+    "n": 25513,
+    "n_positive": 5513,
+    "precision": 1.0,
+    "recall": 0.9998186105568656,
+    "f1": 0.9999092970521541,
+    "roc_auc": 1.0,
+    "average_precision": 1.0,
+    "confusion_matrix": {
+     "tn": 20000,
+     "fp": 0,
+     "fn": 1,
+     "tp": 5512
+    },
+    "n_features": 242
+   }
+  }
+ },
+ "hyperspectral_lift": {
+  "813_hyperspectral_205band": {
+   "f1_baseline": 0.999819,
+   "f1_hyperspectral": 0.999909,
+   "f1_absolute_gain": 9.1e-05,
+   "f1_relative_gain_pct": 0.009,
+   "roc_auc_baseline": 0.999814,
+   "roc_auc_hyperspectral": 1.0,
+   "roc_auc_absolute_gain": 0.000186,
+   "roc_auc_relative_gain_pct": 0.019,
+   "precision_baseline": 1.0,
+   "precision_hyperspectral": 1.0,
+   "precision_absolute_gain": 0.0,
+   "precision_relative_gain_pct": 0.0,
+   "recall_baseline": 0.999637,
+   "recall_hyperspectral": 0.999819,
+   "recall_absolute_gain": 0.000181,
+   "recall_relative_gain_pct": 0.018,
+   "average_precision_baseline": 0.999837,
+   "average_precision_hyperspectral": 1.0,
+   "average_precision_absolute_gain": 0.000163,
+   "average_precision_relative_gain_pct": 0.016,
+   "f1_gain_ci95": {
+    "lo": 0.0,
+    "hi": 0.0002754074789279304
+   },
+   "f1_gain_significant": false,
+   "p_gain_positive": 0.615
+  },
+  "813_hyperspectral_261band_5nm": {
+   "f1_baseline": 0.999819,
+   "f1_hyperspectral": 0.999819,
+   "f1_absolute_gain": 0.0,
+   "f1_relative_gain_pct": 0.0,
+   "roc_auc_baseline": 0.999814,
+   "roc_auc_hyperspectral": 0.999818,
+   "roc_auc_absolute_gain": 4e-06,
+   "roc_auc_relative_gain_pct": 0.0,
+   "precision_baseline": 1.0,
+   "precision_hyperspectral": 1.0,
+   "precision_absolute_gain": 0.0,
+   "precision_relative_gain_pct": 0.0,
+   "recall_baseline": 0.999637,
+   "recall_hyperspectral": 0.999637,
+   "recall_absolute_gain": 0.0,
+   "recall_relative_gain_pct": 0.0,
+   "average_precision_baseline": 0.999837,
+   "average_precision_hyperspectral": 0.999857,
+   "average_precision_absolute_gain": 2e-05,
+   "average_precision_relative_gain_pct": 0.002,
+   "f1_gain_ci95": {
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "f1_gain_significant": false,
+   "p_gain_positive": 0.0
+  }
+ },
+ "caveats": [
+  "Reference labels come from the full-spectrum RX detector, not from in-situ measurement. This quantifies information loss at reduced spectral resolution; it does not establish that the detected anomaly is any particular substance.",
+  "Both arms are convolved from the same Tanager pixels, so the only difference is spectral configuration.",
+  "The 813 arm is simulated at 30 m, not its specified 20 m, so it is pessimistic about the real sensor.",
+  "Ambiguous pixels between the background and anomaly thresholds were excluded, so these figures describe separation of confident populations and would be lower on borderline cases."
+ ]
+}

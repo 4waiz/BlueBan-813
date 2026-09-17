@@ -1,0 +1,131 @@
+# BLUEBAN 813 — project configuration
+# All values here are traceable to a documented source. See docs/DATA_ACCESS_AUDIT.md.
+
+project:
+  name: BLUEBAN 813
+  tagline: Detect. Fingerprint. Forecast. Protect.
+  team: Kanban
+  challenge: Water Quality & Inland/Coastal Water Intelligence
+  programme: Arab Youth Space Hackathon 2026 — 813 Challenge
+  version: 0.1.0
+
+aoi:
+  id: DZ-ANNABA
+  name: Gulf of Annaba
+  country: Algeria
+  # Bounds are the exact footprint of the primary Tanager scene (EPSG:4326).
+  bbox: [7.5174573391889, 36.87386550739371, 7.809339376236341, 37.05991800372398]
+  # Native grid of the primary hyperspectral scene.
+  crs: EPSG:32632
+  transform: [367950.0, 30.0, 0.0, 4102500.0, 0.0, -30.0]
+  shape: [697, 871]        # rows, cols
+  pixel_size_m: 30.0
+  extent_km: [26.13, 20.91]
+
+# ---------------------------------------------------------------------------
+# SENSOR CASCADE — each sensor has one job. See docs/METHODOLOGY.md.
+# ---------------------------------------------------------------------------
+sensors:
+  stage_a_regional_watch:
+    sensor: Sentinel-3 OLCI
+    product: sentinel-3-olci-wfr-l2-netcdf
+    provider: Microsoft Planetary Computer (ESA/Copernicus)
+    role: Wide-area ocean-colour screening and multi-year baseline climatology
+    native_resolution_m: 300
+
+  stage_b_spatial_detail:
+    sensor: Sentinel-2 MSI
+    product: sentinel-2-l2a
+    provider: Microsoft Planetary Computer (ESA/Copernicus)
+    role: Higher-resolution boundary mapping; independent same-hour cross-check
+    native_resolution_m: [10, 20, 60]
+
+  stage_c_spectral_forensics:
+    sensor: Tanager-1 (Planet)
+    product: ortho_sr_hdf5
+    provider: Planet open STAC catalog
+    role: Full 426-band spectral fingerprint; source cube for the 813 simulator
+    native_resolution_m: 30
+    licence: CC-BY-4.0
+
+  stage_d_thermal_context:
+    sensor: Landsat 8/9 OLI-TIRS
+    product: landsat-c2-l2
+    provider: Microsoft Planetary Computer (USGS)
+    role: Surface water temperature context
+    native_resolution_m: 30
+
+  stage_e_validation:
+    sensor: Sentinel-3 OLCI Level-2 operational products
+    role: Independent reference for chlorophyll and total suspended matter
+
+# ---------------------------------------------------------------------------
+# PRIMARY SCENES — selected in docs/AOI_SELECTION.md
+# ---------------------------------------------------------------------------
+scenes:
+  tanager_primary:
+    id: 20250601_104901_58_4001
+    collection: coastal-water-bodies
+    datetime: '2025-06-01T10:49:01.582000Z'
+    cloud_percent: 0
+    gsd: 35.03
+    view_off_nadir: 19.9
+    sun_elevation: 73.0
+
+  sentinel2_coincident:
+    # 38 minutes after the Tanager overpass, both effectively cloud-free.
+    ids:
+      - S2C_MSIL2A_20250601T101041_R022_T32SLF_20250601T142413
+      - S2C_MSIL2A_20250601T101041_R022_T32SLG_20250601T142413
+    datetime: '2025-06-01T10:10:41.025000Z'
+    delta_hours: 0.64
+
+  landsat_context:
+    ids:
+      - LC09_L2SP_193034_20250531_02_T1
+      - LC09_L2SP_193035_20250531_02_T1
+    datetime: '2025-05-31T10:06:22Z'
+    delta_hours: 24.7
+
+# ---------------------------------------------------------------------------
+# SATELLITE 813 — published specification (UAE Space Agency hackathon data page)
+# The PoC does NOT use 813 data: it is incubation-only. We simulate the sensor
+# from the real Tanager cube. See docs/813_PRODUCT_NOTES.md.
+# ---------------------------------------------------------------------------
+satellite_813:
+  status: SIMULATED_FROM_TANAGER
+  source_of_spec: https://spaceacademy-hackathons.space.gov.ae/data
+  n_bands: 205
+  wavelength_range_nm: [400.0, 1700.0]
+  spectral_sampling_nm: 5.0
+  spatial_resolution_m: 20.0
+  note: >
+    Official onboarding states Satellite 813 is available to selected teams during
+    incubation only, and explicitly instructs teams not to design a PoC that depends
+    on it. BLUEBAN 813 therefore ships an auditable sensor simulator so the mission
+    utility question can be answered before 813 data exists.
+
+# ---------------------------------------------------------------------------
+# ALGORITHM PARAMETERS
+# ---------------------------------------------------------------------------
+water_mask:
+  # Modified NDWI using green/SWIR is more robust than NDWI over built coastline.
+  mndwi_threshold: 0.15
+  ndwi_threshold: 0.10
+  nir_reflectance_max: 0.10     # water is dark in NIR; rejects bright surf/land
+  min_component_px: 50
+
+quality:
+  use_product_good_wavelengths: true   # Planet ships per-band good/bad flags
+  max_uncertainty_ratio: 1.0           # reject pixels where sigma > value
+  sunglint_nir_threshold: 0.05
+
+anomaly:
+  method: rx_mahalanobis
+  pca_components: 12
+  background: robust_water_population
+
+temporal:
+  baseline_years: 4
+  percentile_alert: 90
+  percentile_high: 95

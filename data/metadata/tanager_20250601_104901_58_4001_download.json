@@ -1,0 +1,17 @@
+{
+ "item_id": "20250601_104901_58_4001",
+ "collection": "coastal-water-bodies",
+ "asset_key": "ortho_sr_hdf5",
+ "source_url": "https://storage.googleapis.com/open-cogs/planet-stac/tanager1-release2-core-imagery/ortho_sr_hdf5/20250601_104901_58_4001_ortho_sr_hdf5.h5",
+ "stac_item_url": "https://www.planet.com/data/stac/tanager-core-imagery/coastal-water-bodies/20250601_104901_58_4001/20250601_104901_58_4001.json",
+ "local_path": "data/raw/tanager/20250601_104901_58_4001_ortho_sr_hdf5.h5",
+ "bytes": 906164921,
+ "sha256": "4242bf42f5da5673bd3a381714f20f87538423287cd3962bbfd5b564fc2a81ce",
+ "downloaded_utc": "2026-09-15T12:13:53Z",
+ "licence": "CC-BY-4.0",
+ "datetime": "2025-06-01T10:49:01.582000Z",
+ "platform": "Planet",
+ "constellation": "Tanager",
+ "gsd": 35.03,
+ "attribution": "Tanager STAC Data, available at www.planet.com/data/stac (c) 2025 Planet Labs PBC. All Rights Reserved."
+}

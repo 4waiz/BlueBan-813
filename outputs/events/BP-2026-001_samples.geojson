@@ -1,0 +1,149 @@
+{
+ "type": "FeatureCollection",
+ "properties": {
+  "generator": "BLUEBAN 813 smart sampling planner",
+  "note": "Suggested field-sampling locations. Satellite observation is a screening tool; laboratory analysis of physical samples is required to confirm any interpretation."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.7720975604845846,
+     36.88893033245745
+    ]
+   },
+   "properties": {
+    "id": "S01",
+    "role": "EVENT_CORE",
+    "role_question": "What is actually present at the point of strongest signal?",
+    "lon": 7.772098,
+    "lat": 36.88893,
+    "priority": 1,
+    "rationale": "Highest spectral anomaly in the event (RX 43707). The strongest signal gives laboratory analysis the best chance of identifying what is actually present.",
+    "expected_variables": [
+     "Chlorophyll-a (spectrophotometric or HPLC)",
+     "Total suspended solids (gravimetric)",
+     "Turbidity (nephelometric, NTU)",
+     "Phytoplankton identification and cell counts"
+    ],
+    "anomaly_score": 43707.12,
+    "distance_from_shore_m": 150.0,
+    "distance_to_asset_m": null,
+    "confidence": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.775670635061561,
+     36.89707981684214
+    ]
+   },
+   "properties": {
+    "id": "S02",
+    "role": "ASSET_BOUNDARY",
+    "role_question": "Has anything reached the protected asset yet?",
+    "lon": 7.775671,
+    "lat": 36.89708,
+    "priority": 1,
+    "rationale": "Nearest analysable water to Port water quality point (example), 189 m away. This is the measurement that answers whether the asset is affected yet.",
+    "expected_variables": [
+     "Turbidity (NTU)",
+     "Chlorophyll-a",
+     "Total organic carbon",
+     "Algal toxins if a bloom is suspected"
+    ],
+    "anomaly_score": 24057.03,
+    "distance_from_shore_m": 30.0,
+    "distance_to_asset_m": 189.0,
+    "confidence": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.768106124122356,
+     36.885914390326484
+    ]
+   },
+   "properties": {
+    "id": "S03",
+    "role": "LEADING_EDGE",
+    "role_question": "Where is the boundary, and is the event advancing?",
+    "lon": 7.768106,
+    "lat": 36.885914,
+    "priority": 2,
+    "rationale": "Edge of the event nearest the modelled drift direction (bearing 273deg). Sampling here tests whether the event is advancing and how sharp the front is.",
+    "expected_variables": [
+     "Turbidity (NTU)",
+     "Chlorophyll-a",
+     "Temperature and salinity profile"
+    ],
+    "anomaly_score": 33377.85,
+    "distance_from_shore_m": 134.0,
+    "distance_to_asset_m": null,
+    "confidence": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.721998358871529,
+     36.98602250233947
+    ]
+   },
+   "properties": {
+    "id": "S04",
+    "role": "BACKGROUND_CONTROL",
+    "role_question": "What does unaffected water in this body read today?",
+    "lon": 7.721998,
+    "lat": 36.986023,
+    "priority": 2,
+    "rationale": "Lowest-anomaly water at least 800 m offshore (RX 1.2). Without a same-day control, an absolute laboratory value from the event cannot be interpreted.",
+    "expected_variables": [
+     "Same analyte suite as the event core, for direct comparison"
+    ],
+    "anomaly_score": 1.15,
+    "distance_from_shore_m": 3000.0,
+    "distance_to_asset_m": null,
+    "confidence": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.669724700912432,
+     36.96814168628432
+    ]
+   },
+   "properties": {
+    "id": "S05",
+    "role": "UNCERTAINTY_POINT",
+    "role_question": "Where is the interpretation least certain?",
+    "lon": 7.669725,
+    "lat": 36.968142,
+    "priority": 3,
+    "rationale": "Marginal anomaly (RX between the 85th and 97th percentile) in shallow water, where bottom reflectance and suspended matter are hard to separate optically. A depth reading and a TSS sample here would resolve the ambiguity for the whole nearshore band.",
+    "expected_variables": [
+     "Full analyte suite",
+     "Secchi depth",
+     "Water depth (to test bottom-reflectance influence)"
+    ],
+    "anomaly_score": 101.77,
+    "distance_from_shore_m": 95.0,
+    "distance_to_asset_m": null,
+    "confidence": null
+   }
+  }
+ ]
+}

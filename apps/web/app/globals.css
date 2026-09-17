@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+
+html, body {
+  height: 100%;
+  background: #070A16;
+  color: #F4F6FF;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  /* Two very low-contrast radial washes give the dark field some depth
+     without becoming decorative. Mission-control screens are not flat black. */
+  background-image:
+    radial-gradient(1100px 700px at 18% -8%, rgba(49,134,255,0.10), transparent 62%),
+    radial-gradient(900px 600px at 88% 110%, rgba(49,134,255,0.06), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* ---------------------------------------------------------------- HUD atoms */
+.hud-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5A6490;
+}
+
+.hud-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Thin instrumentation rule, brighter at the left where the label sits. */
+.rule-h {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(36,48,86,1) 0%, rgba(36,48,86,0.35) 55%, transparent 100%);
+}
+
+/* Chamfered cockpit panel. clip-path is cheaper and crisper than nested
+   pseudo-element borders, and it survives arbitrary panel sizes. */
+.chamfer {
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.chamfer-sm {
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+
+.panel {
+  background: linear-gradient(180deg, rgba(16,22,47,0.92) 0%, rgba(10,15,34,0.92) 100%);
+  border: 1px solid #1B2444;
+}
+
+.panel-quiet {
+  background: rgba(10,15,34,0.55);
+  border: 1px solid rgba(27,36,68,0.8);
+}
+
+/* Scanline texture for the hero frame only. Kept extremely faint: it should
+   read as instrument glass, never as a retro effect. */
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg, rgba(255,255,255,0.016) 0px, rgba(255,255,255,0.016) 1px, transparent 1px, transparent 3px);
+}
+
+.glow-beam { box-shadow: 0 0 0 1px rgba(49,134,255,0.35), 0 0 22px -6px rgba(49,134,255,0.55); }
+
+/* -------------------------------------------------------------- scrollbars */
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #1B2444; border-radius: 0; }
+*::-webkit-scrollbar-thumb:hover { background: #243056; }
+
+/* ------------------------------------------------------------------ motion */
+@keyframes pulse-ring {
+  0%   { transform: scale(0.85); opacity: 0.85; }
+  70%  { transform: scale(1.45); opacity: 0;    }
+  100% { transform: scale(1.45); opacity: 0;    }
+}
+.pulse-ring { animation: pulse-ring 2.6s cubic-bezier(0.22,0.61,0.36,1) infinite; }
+
+@keyframes sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.sweep { animation: sweep 2.4s linear infinite; }
+
+@keyframes blink-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.blink-soft { animation: blink-soft 1.8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring, .sweep, .blink-soft { animation: none; }
+}
+
+/* MapLibre: strip the default light chrome so it matches the dark HUD. */
+.maplibregl-ctrl-attrib {
+  background: rgba(7,10,22,0.82) !important;
+  color: #5A6490 !important;
+  font-family: var(--font-mono);
+  font-size: 9px !important;
+}
+.maplibregl-ctrl-attrib a { color: #8A93B8 !important; }
+.maplibregl-ctrl-group {
+  background: rgba(16,22,47,0.92) !important;
+  border: 1px solid #1B2444 !important;
+  border-radius: 0 !important;
+}
+.maplibregl-ctrl-group button { filter: invert(0.85) hue-rotate(180deg); }
+.maplibregl-popup-content {
+  background: #0A0F22 !important;
+  border: 1px solid #243056;
+  border-radius: 0 !important;
+  color: #F4F6FF;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 10px 12px !important;
+}
+.maplibregl-popup-tip { border-top-color: #243056 !important; }

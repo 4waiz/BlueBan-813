@@ -1,0 +1,340 @@
+{
+ "experiment": "Multispectral vs simulated-813 hyperspectral ablation",
+ "design": "Both feature sets convolved from the SAME Tanager pixels; only spectral configuration differs.",
+ "source_scene": "20250601_104901_58_4001",
+ "source_datetime": "2025-06-01T10:49:01Z",
+ "target_source": "Sentinel-3 OLCI WFR Level-2 (ESA operational)",
+ "target_dates": [
+  "2025-05-31"
+ ],
+ "matchup_window_hours": 30.0,
+ "matchup_dt_hours": {
+  "min": -25.518,
+  "max": -25.518,
+  "median": -25.518
+ },
+ "n_matchups": 658,
+ "n_spatial_blocks": 29,
+ "block_km": 3.0,
+ "n_folds": 5,
+ "model": "PLSR, components chosen by inner blocked CV",
+ "targets": {
+  "CHL_NN_log10": {
+   "n": 658,
+   "target_min": -1.496062994003296,
+   "target_max": 0.881889820098877,
+   "target_sd": 0.3176383673601597,
+   "units": "log10(mg m^-3)",
+   "spatial_blocked": {
+    "S2_multispectral_11band": {
+     "n": 658,
+     "r2": 0.07820238959966463,
+     "rmse": 0.30496552291604895,
+     "mae": 0.20098802052794384,
+     "bias": -0.009333751423597984,
+     "pearson_r": 0.2812946032546499,
+     "mean_n_components": 2.0,
+     "max_components_allowed": 15,
+     "n_features": 11,
+     "label": "S2_multispectral_11band",
+     "r2_ci95": {
+      "lo": -0.023355911011469565,
+      "hi": 0.17184830686571367,
+      "n_boot": 2000
+     },
+     "rmse_ci95": {
+      "lo": 0.26750913748196786,
+      "hi": 0.3424108449992843,
+      "n_boot": 2000
+     }
+    },
+    "813_hyperspectral_205band": {
+     "n": 658,
+     "r2": 0.009747096661213095,
+     "rmse": 0.31608655073885744,
+     "mae": 0.2030989369798376,
+     "bias": -0.01893296567512499,
+     "pearson_r": 0.1977121845558442,
+     "mean_n_components": 4.2,
+     "max_components_allowed": 15,
+     "n_features": 191,
+     "label": "813_hyperspectral_205band",
+     "r2_ci95": {
+      "lo": -0.09396820711739977,
+      "hi": 0.10175214500950809,
+      "n_boot": 2000
+     },
+     "rmse_ci95": {
+      "lo": 0.2784416448613996,
+      "hi": 0.35379338014595574,
+      "n_boot": 2000
+     }
+    },
+    "813_hyperspectral_261band_5nm": {
+     "n": 658,
+     "r2": 0.01638303711267819,
+     "rmse": 0.3150256816568327,
+     "mae": 0.21225881421270615,
+     "bias": -0.0002765385575291081,
+     "pearson_r": 0.17154383864856648,
+     "mean_n_components": 2.4,
+     "max_components_allowed": 15,
+     "n_features": 242,
+     "label": "813_hyperspectral_261band_5nm",
+     "r2_ci95": {
+      "lo": -0.07073152696744449,
+      "hi": 0.08693430594207024,
+      "n_boot": 2000
+     },
+     "rmse_ci95": {
+      "lo": 0.2773736862148814,
+      "hi": 0.35291866681519063,
+      "n_boot": 2000
+     }
+    }
+   },
+   "random_split": {
+    "S2_multispectral_11band": {
+     "n": 658,
+     "r2": 0.2927795849630036,
+     "rmse": 0.26712242549872883,
+     "mae": 0.18562774757045516,
+     "bias": -0.003046942150103365,
+     "pearson_r": 0.5414799694215482,
+     "mean_n_components": 6.2,
+     "max_components_allowed": 15,
+     "n_features": 11,
+     "label": "S2_multispectral_11band"
+    },
+    "813_hyperspectral_205band": {
+     "n": 658,
+     "r2": 0.6303538781476734,
+     "rmse": 0.19311945724453206,
+     "mae": 0.14284856674471044,
+     "bias": -0.0038777099625696533,
+     "pearson_r": 0.7952987396512925,
+     "mean_n_components": 13.2,
+     "max_components_allowed": 15,
+     "n_features": 191,
+     "label": "813_hyperspectral_205band"
+    },
+    "813_hyperspectral_261band_5nm": {
+     "n": 658,
+     "r2": 0.6564010202061281,
+     "rmse": 0.18619108723683436,
+     "mae": 0.13897055145631754,
+     "bias": -0.0034331897578828534,
+     "pearson_r": 0.8116816586987621,
+     "mean_n_components": 13.8,
+     "max_components_allowed": 15,
+     "n_features": 242,
+     "label": "813_hyperspectral_261band_5nm"
+    }
+   },
+   "hyperspectral_lift": {
+    "813_hyperspectral_205band": {
+     "r2_baseline": 0.078202,
+     "r2_hyperspectral": 0.009747,
+     "r2_absolute_change": -0.068455,
+     "r2_gain": -0.068455,
+     "rmse_baseline": 0.304966,
+     "rmse_hyperspectral": 0.316087,
+     "rmse_absolute_change": 0.011121,
+     "rmse_reduction_pct": -3.647,
+     "mae_baseline": 0.200988,
+     "mae_hyperspectral": 0.203099,
+     "mae_absolute_change": 0.002111,
+     "mae_reduction_pct": -1.05,
+     "r2_gain_ci95": {
+      "lo": -0.13117738999707634,
+      "hi": -0.014147685625517332
+     },
+     "r2_gain_significant": false,
+     "p_gain_positive": 0.006
+    },
+    "813_hyperspectral_261band_5nm": {
+     "r2_baseline": 0.078202,
+     "r2_hyperspectral": 0.016383,
+     "r2_absolute_change": -0.061819,
+     "r2_gain": -0.061819,
+     "rmse_baseline": 0.304966,
+     "rmse_hyperspectral": 0.315026,
+     "rmse_absolute_change": 0.01006,
+     "rmse_reduction_pct": -3.299,
+     "mae_baseline": 0.200988,
+     "mae_hyperspectral": 0.212259,
+     "mae_absolute_change": 0.011271,
+     "mae_reduction_pct": -5.608,
+     "r2_gain_ci95": {
+      "lo": -0.1092983943849744,
+      "hi": -0.016605234868282966
+     },
+     "r2_gain_significant": false,
+     "p_gain_positive": 0.0045
+    }
+   }
+  },
+  "TSM_NN_log10": {
+   "n": 658,
+   "target_min": -1.148437738418579,
+   "target_max": 2.3665213584899902,
+   "target_sd": 0.4212577329671408,
+   "units": "log10(g m^-3)",
+   "spatial_blocked": {
+    "S2_multispectral_11band": {
+     "n": 658,
+     "r2": 0.1227078012782783,
+     "rmse": 0.39456632783999285,
+     "mae": 0.19351684949717815,
+     "bias": -0.023458548252720982,
+     "pearson_r": 0.36133090954773955,
+     "mean_n_components": 2.6,
+     "max_components_allowed": 15,
+     "n_features": 11,
+     "label": "S2_multispectral_11band",
+     "r2_ci95": {
+      "lo": -0.03949873207165021,
+      "hi": 0.33474374057172146,
+      "n_boot": 2000
+     },
+     "rmse_ci95": {
+      "lo": 0.28603541176074826,
+      "hi": 0.4909290206313115,
+      "n_boot": 2000
+     }
+    },
+    "813_hyperspectral_205band": {
+     "n": 658,
+     "r2": 0.12924809789738034,
+     "rmse": 0.3930928116873644,
+     "mae": 0.19648280552075695,
+     "bias": -0.02181296686735507,
+     "pearson_r": 0.3643536241516702,
+     "mean_n_components": 2.6,
+     "max_components_allowed": 15,
+     "n_features": 191,
+     "label": "813_hyperspectral_205band",
+     "r2_ci95": {
+      "lo": -0.03184072684808235,
+      "hi": 0.2926536821434454,
+      "n_boot": 2000
+     },
+     "rmse_ci95": {
+      "lo": 0.2999344265660072,
+      "hi": 0.4854277229053281,
+      "n_boot": 2000
+     }
+    },
+    "813_hyperspectral_261band_5nm": {
+     "n": 658,
+     "r2": -0.15800856005046948,
+     "rmse": 0.4533188424200834,
+     "mae": 0.22642225588922069,
+     "bias": 0.029372248177002465,
+     "pearson_r": 0.42608277814896695,
+     "mean_n_components": 3.0,
+     "max_components_allowed": 15,
+     "n_features": 242,
+     "label": "813_hyperspectral_261band_5nm",
+     "r2_ci95": {
+      "lo": -0.38250037158033656,
+      "hi": 0.02009014477276071,
+      "n_boot": 2000
+     },
+     "rmse_ci95": {
+      "lo": 0.35677460285211,
+      "hi": 0.5452994912013305,
+      "n_boot": 2000
+     }
+    }
+   },
+   "random_split": {
+    "S2_multispectral_11band": {
+     "n": 658,
+     "r2": 0.4711539481904805,
+     "rmse": 0.3063462154039625,
+     "mae": 0.16599206599857014,
+     "bias": -4.665835654277672e-05,
+     "pearson_r": 0.6866996171455378,
+     "mean_n_components": 8.0,
+     "max_components_allowed": 15,
+     "n_features": 11,
+     "label": "S2_multispectral_11band"
+    },
+    "813_hyperspectral_205band": {
+     "n": 658,
+     "r2": 0.48982512088160657,
+     "rmse": 0.30088976931812317,
+     "mae": 0.16610632799924469,
+     "bias": -0.001394606537269819,
+     "pearson_r": 0.7038667264567025,
+     "mean_n_components": 10.4,
+     "max_components_allowed": 15,
+     "n_features": 191,
+     "label": "813_hyperspectral_205band"
+    },
+    "813_hyperspectral_261band_5nm": {
+     "n": 658,
+     "r2": 0.6542576165701617,
+     "rmse": 0.24769896790859247,
+     "mae": 0.1625133528247796,
+     "bias": -0.0029475434371560518,
+     "pearson_r": 0.8125609945450268,
+     "mean_n_components": 14.4,
+     "max_components_allowed": 15,
+     "n_features": 242,
+     "label": "813_hyperspectral_261band_5nm"
+    }
+   },
+   "hyperspectral_lift": {
+    "813_hyperspectral_205band": {
+     "r2_baseline": 0.122708,
+     "r2_hyperspectral": 0.129248,
+     "r2_absolute_change": 0.00654,
+     "r2_gain": 0.00654,
+     "rmse_baseline": 0.394566,
+     "rmse_hyperspectral": 0.393093,
+     "rmse_absolute_change": -0.001474,
+     "rmse_reduction_pct": 0.373,
+     "mae_baseline": 0.193517,
+     "mae_hyperspectral": 0.196483,
+     "mae_absolute_change": 0.002966,
+     "mae_reduction_pct": -1.533,
+     "r2_gain_ci95": {
+      "lo": -0.1156033527101475,
+      "hi": 0.11844433756346237
+     },
+     "r2_gain_significant": false,
+     "p_gain_positive": 0.5245
+    },
+    "813_hyperspectral_261band_5nm": {
+     "r2_baseline": 0.122708,
+     "r2_hyperspectral": -0.158009,
+     "r2_absolute_change": -0.280716,
+     "r2_gain": -0.280716,
+     "rmse_baseline": 0.394566,
+     "rmse_hyperspectral": 0.453319,
+     "rmse_absolute_change": 0.058753,
+     "rmse_reduction_pct": -14.89,
+     "mae_baseline": 0.193517,
+     "mae_hyperspectral": 0.226422,
+     "mae_absolute_change": 0.032905,
+     "mae_reduction_pct": -17.004,
+     "r2_gain_ci95": {
+      "lo": -0.5373890044358602,
+      "hi": -0.11274794287419007
+     },
+     "r2_gain_significant": false,
+     "p_gain_positive": 0.0
+    }
+   }
+  }
+ },
+ "caveats": [
+  "OLCI matchups are offset from the Tanager acquisition by a median -25.5 h. Coastal water can change materially in a day, so the target carries real temporal noise. This depresses ALL arms equally and therefore does not bias the comparison between them, but it does cap the achievable absolute R2.",
+  "OLCI is 300 m; Tanager spectra were averaged over the OLCI footprint (>= 25 contributing 30 m water pixels per matchup).",
+  "OLCI CHL_NN and TSM_NN are model retrievals, not in-situ measurements. This experiment measures agreement with an operational product, not accuracy against ground truth.",
+  "The 813 arm is simulated at Tanager's 30 m, not 813's specified 20 m, so it is pessimistic about the real sensor's spatial capability.",
+  "No in-situ data was available for this AOI (see DATA_ACCESS_AUDIT.md)."
+ ]
+}

@@ -3,24 +3,30 @@
 /**
  * HUD primitives: the instrument vocabulary the whole interface is built from.
  *
- * The design language is borrowed from aerospace flight-control displays —
+ * The design language is borrowed from aerospace flight-control displays -
  * thin instrumentation rules, chamfered panels, monospaced telemetry, colour
  * used only to carry state. None of it is decorative: if a colour appears, it
  * means something.
  */
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+import { useCountUp, prefersReducedMotion } from "@/lib/motion";
 
 /* ------------------------------------------------------------------ panels */
 
 export function Panel({
   title, right, children, className = "", tight = false, accent,
+  delay = 0, boot = false,
 }: {
   title?: string; right?: React.ReactNode; children: React.ReactNode;
   className?: string; tight?: boolean; accent?: string;
+  delay?: number; boot?: boolean;
 }) {
   return (
-    <section className={`panel chamfer relative ${className}`}>
+    <section
+      className={`panel chamfer relative panel-in ${boot ? "boot-scan" : ""} ${className}`}
+      style={{ animationDelay: `${delay}ms` }}>
       {accent && (
         <span className="absolute left-0 top-0 h-full w-[2px]"
               style={{ background: accent, boxShadow: `0 0 12px -2px ${accent}` }} />
@@ -76,17 +82,24 @@ export function Chip({ label, color = "#5A6490", filled = false }:
 
 export function Readout({
   label, value, unit, sub, color = "#F4F6FF", size = "md", mono = true,
+  animate, digits = 2,
 }: {
   label: string; value: React.ReactNode; unit?: string; sub?: string;
   color?: string; size?: "sm" | "md" | "lg" | "xl"; mono?: boolean;
+  /** When given, the number counts up to this value instead of appearing. */
+  animate?: number | null; digits?: number;
 }) {
   const sizes = { sm: "text-[15px]", md: "text-[21px]", lg: "text-[30px]", xl: "text-[44px]" };
+  const counted = useCountUp(animate ?? null, animate === undefined ? 0 : 900);
+  const shown = animate !== undefined && animate !== null && Number.isFinite(counted)
+    ? counted.toFixed(digits)
+    : value;
   return (
     <div className="min-w-0">
       <div className="hud-label mb-1 truncate">{label}</div>
       <div className={`${mono ? "hud-value" : ""} ${sizes[size]} leading-none flex items-baseline gap-1.5`}
            style={{ color }}>
-        <span className="truncate">{value}</span>
+        <span className="truncate">{shown}</span>
         {unit && <span className="text-[10px] text-dim tracking-wide2 shrink-0">{unit}</span>}
       </div>
       {sub && <div className="hud-label mt-1.5 truncate" style={{ letterSpacing: "0.1em" }}>{sub}</div>}
@@ -102,26 +115,28 @@ export function Readout({
  */
 export function Meter({
   label, value, min = 0, max = 1, display, unit, color = "#3186FF",
-  marker, markerLabel,
+  marker, markerLabel, hint,
 }: {
   label: string; value: number | null | undefined; min?: number; max?: number;
   display?: string; unit?: string; color?: string;
-  marker?: number; markerLabel?: string;
+  marker?: number; markerLabel?: string; hint?: string;
 }) {
   const ok = value !== null && value !== undefined && Number.isFinite(value);
-  const frac = ok ? Math.max(0, Math.min(1, ((value as number) - min) / (max - min))) : 0;
+  const anim = useCountUp(ok ? (value as number) : null, 850);
+  const shownVal = ok && Number.isFinite(anim) ? anim : (value as number);
+  const frac = ok ? Math.max(0, Math.min(1, (shownVal - min) / (max - min))) : 0;
   const mfrac = marker !== undefined ? Math.max(0, Math.min(1, (marker - min) / (max - min))) : null;
   return (
-    <div className="py-[7px]">
+    <div className="py-[7px] group" title={hint}>
       <div className="flex items-baseline justify-between gap-2 mb-[5px]">
         <span className="hud-label truncate">{label}</span>
         <span className="hud-value text-[12px] shrink-0" style={{ color: ok ? "#F4F6FF" : "#5A6490" }}>
-          {display ?? (ok ? (value as number).toFixed(2) : "—")}
+          {display ?? (ok ? (value as number).toFixed(2) : "-")}
           {unit && <span className="text-dim text-[9px] ml-1">{unit}</span>}
         </span>
       </div>
-      <div className="relative h-[3px] bg-edge/70">
-        <div className="absolute inset-y-0 left-0 transition-[width] duration-500"
+      <div className="relative h-[3px] bg-edge/70 group-hover:h-[5px] transition-[height] duration-150">
+        <div className="absolute inset-y-0 left-0"
              style={{ width: `${frac * 100}%`, background: color,
                       boxShadow: `0 0 8px -2px ${color}` }} />
         {mfrac !== null && (
@@ -185,14 +200,16 @@ export function SequenceItem({
  */
 export function Gauge({
   label, value, min = 0, max = 1, display, unit, color = "#3186FF",
-  size = 108, sub, danger,
+  size = 108, sub, danger, hint, digits = 2,
 }: {
   label: string; value: number | null | undefined; min?: number; max?: number;
   display?: string; unit?: string; color?: string; size?: number;
-  sub?: string; danger?: boolean;
+  sub?: string; danger?: boolean; hint?: string; digits?: number;
 }) {
   const ok = value !== null && value !== undefined && Number.isFinite(value);
-  const frac = ok ? Math.max(0, Math.min(1, ((value as number) - min) / (max - min))) : 0;
+  const anim = useCountUp(ok ? (value as number) : null, 1050);
+  const live = ok && Number.isFinite(anim) ? anim : (value as number);
+  const frac = ok ? Math.max(0, Math.min(1, (live - min) / (max - min))) : 0;
   const R = size / 2 - 11;
   const C = 2 * Math.PI * R;
   // 270 degree sweep starting at the 7-o'clock position.
@@ -200,8 +217,10 @@ export function Gauge({
   const arc = C * SWEEP;
 
   return (
-    <div className="flex flex-col items-center gap-1.5 select-none">
-      <svg width={size} height={size} className="overflow-visible">
+    <div className="flex flex-col items-center gap-1.5 select-none group"
+         title={hint}>
+      <svg width={size} height={size} className="overflow-visible
+                 transition-transform duration-200 group-hover:scale-[1.035]">
         <g transform={`rotate(135 ${size / 2} ${size / 2})`}>
           <circle cx={size / 2} cy={size / 2} r={R} fill="none"
                   stroke="#1B2444" strokeWidth={5}
@@ -209,8 +228,7 @@ export function Gauge({
           <circle cx={size / 2} cy={size / 2} r={R} fill="none"
                   stroke={color} strokeWidth={5}
                   strokeDasharray={`${arc * frac} ${C}`} strokeLinecap="butt"
-                  style={{ filter: `drop-shadow(0 0 5px ${color}66)`,
-                           transition: "stroke-dasharray 700ms cubic-bezier(0.22,0.61,0.36,1)" }} />
+                  style={{ filter: `drop-shadow(0 0 5px ${color}66)` }} />
         </g>
         {/* dotted outer ring */}
         <circle cx={size / 2} cy={size / 2} r={R + 7} fill="none"
@@ -229,7 +247,7 @@ export function Gauge({
         <text x={size / 2} y={size / 2 + 2} textAnchor="middle"
               className="hud-value"
               style={{ fontSize: size > 96 ? 20 : 16, fill: ok ? "#F4F6FF" : "#5A6490" }}>
-          {display ?? (ok ? (value as number).toFixed(2) : "—")}
+          {display ?? (ok ? live.toFixed(digits) : "-")}
         </text>
         {unit && (
           <text x={size / 2} y={size / 2 + 16} textAnchor="middle"

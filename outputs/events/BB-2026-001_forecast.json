@@ -1,5 +1,5 @@
 {
- "event_id": "BP-2026-001",
+ "event_id": "BB-2026-001",
  "metadata": {
   "method": "Wind-driven surface drift with random-walk diffusion",
   "model_class": "Lagrangian particle advection",

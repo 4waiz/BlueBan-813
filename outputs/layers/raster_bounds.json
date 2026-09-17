@@ -18,5 +18,54 @@
   697,
   871
  ],
- "pixel_size_m": 30.0
+ "pixel_size_m": 30.0,
+ "extent_km": [
+  26.13,
+  20.91
+ ],
+ "water_area_km2": 188.169,
+ "scales": {
+  "rgb": {
+   "stretch": {
+    "r": [
+     0.003418800747022033,
+     0.07309906184673315
+    ],
+    "g": [
+     0.003418800747022033,
+     0.07309906184673315
+    ],
+    "b": [
+     0.003418800747022033,
+     0.07309906184673315
+    ]
+   },
+   "land_gain": 0.3,
+   "land_saturation": 0.18
+  },
+  "anomaly": {
+   "vmin": 0.686372,
+   "vmax": 3.527814,
+   "log": true,
+   "cmap": "inferno",
+   "limits": "2nd-99th percentile of masked pixels",
+   "n_pixels": 209077
+  },
+  "ndci": {
+   "vmin": -0.180699,
+   "vmax": 0.181566,
+   "log": false,
+   "cmap": "YlGn",
+   "limits": "2nd-99th percentile of masked pixels",
+   "n_pixels": 207400
+  },
+  "turbidity": {
+   "vmin": -0.713918,
+   "vmax": -0.343846,
+   "log": false,
+   "cmap": "magma",
+   "limits": "2nd-99th percentile of masked pixels",
+   "n_pixels": 207691
+  }
+ }
 }

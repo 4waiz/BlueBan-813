@@ -1,11 +1,11 @@
 {
  "events": [
   {
-   "event_id": "BP-2026-001",
+   "event_id": "BB-2026-001",
    "aoi": "Gulf of Annaba",
    "country": "Algeria",
    "acquisition_utc": "2025-06-01T10:49:01.582000Z",
-   "state": "NORMAL",
+   "state": "WATCH",
    "severity": 0.3317,
    "confidence": 0.6868,
    "class": "SEDIMENT_LIKE",
@@ -13,5 +13,5 @@
    "area_km2": 1.1286
   }
  ],
- "generated_utc": "2026-09-15T13:38:39Z"
+ "generated_utc": "2026-09-17T19:12:53Z"
 }

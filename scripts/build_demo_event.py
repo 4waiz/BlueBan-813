@@ -48,34 +48,32 @@ from pipeline.satellite813 import (TanagerScene, save_sensor_spec,  # noqa: E402
                                    spec_813, resample_spectra)
 
 TANAGER = "data/raw/tanager/20250601_104901_58_4001_ortho_sr_hdf5.h5"
-EVENT_ID = "BP-2026-001"
+EVENT_ID = "BB-2026-001"
 OUT_EVENTS = "outputs/events"
 OUT_LAYERS = "outputs/layers"
 AOI_NAME = "Gulf of Annaba"
 AOI_COUNTRY = "Algeria"
 
-# Demonstration assets. These are ILLUSTRATIVE operator-configured locations,
-# not surveyed infrastructure coordinates. BLUEBAN 813 ships no infrastructure
-# database; an operator pins their own assets or uploads GeoJSON/CSV.
-DEMO_ASSETS = [
-    EX.Asset("A01", "Port water quality point (example)", "PORT",
-             7.7745, 36.8985,
-             notes="Illustrative placement on the Annaba harbour frontage.",
-             source="demo_fixture"),
-    EX.Asset("A02", "Annaba bathing water (example)", "PUBLIC_BEACH",
-             7.7620, 36.9170,
-             notes="Illustrative placement on the Annaba beach frontage.",
-             source="demo_fixture"),
-    EX.Asset("A03", "Coastal water intake (example)", "DESALINATION_INTAKE",
-             7.7450, 36.9560,
-             notes="Illustrative offshore intake placement. BLUEBAN 813 ships "
-                   "no infrastructure database; operators pin their own assets.",
-             source="demo_fixture"),
-    EX.Asset("A04", "Cap de Garde habitat zone (example)", "MARINE_PROTECTED_AREA",
-             7.7880, 36.9690,
-             notes="Illustrative placement on the Cap de Garde headland.",
-             source="demo_fixture"),
-]
+# Operator assets are DATA, not code. config/assets.geojson holds real,
+# publicly mapped coastal features inside the AOI, each with its OpenStreetMap
+# element id so any coordinate can be verified. Nothing there is estimated, and
+# no confidential infrastructure location is included. An operator replaces the
+# file with their own register.
+ASSET_REGISTER = os.path.join("config", "assets.geojson")
+
+
+def load_assets():
+    """Read the operator asset register, or fail loudly rather than inventing one."""
+    if not os.path.exists(ASSET_REGISTER):
+        raise FileNotFoundError(
+            f"{ASSET_REGISTER} is missing. BLUEBAN 813 does not ship default "
+            f"infrastructure coordinates; provide an asset register.")
+    with open(ASSET_REGISTER, encoding="utf-8") as f:
+        gj = json.load(f)
+    assets = EX.from_geojson(gj)
+    for a in assets:
+        a.source = "config/assets.geojson (OpenStreetMap)"
+    return assets, gj.get("properties", {})
 
 
 def log(msg):
@@ -284,7 +282,9 @@ def main():
 
     # ---------------------------------------------------------------- Exposure
     log("Exposure: assessing operator assets")
-    exposures = [EX.assess(a, ev_lon, ev_lat, steps, ev_radius) for a in DEMO_ASSETS]
+    demo_assets, asset_meta = load_assets()
+    log(f"  register: {len(demo_assets)} real assets from {ASSET_REGISTER}")
+    exposures = [EX.assess(a, ev_lon, ev_lat, steps, ev_radius) for a in demo_assets]
     exposures.sort(key=lambda e: -e.exposure_score)
     max_exp = exposures[0].exposure_score if exposures else 0.0
     eta = next((e.eta_hours for e in exposures if e.eta_hours is not None), None)
@@ -332,17 +332,25 @@ def main():
     # ------------------------------------------------------------------ Layers
     log("Export: map layers")
     bounds = XP.bounds_lonlat((scene.rows, scene.cols), transform, epsg)
-    XP.save_rgb_png(os.path.join(OUT_LAYERS, "rgb_water.png"),
-                    bands["red"], bands["green"], bands["coastal"], valid, water)
-    XP.save_scalar_png(os.path.join(OUT_LAYERS, "anomaly.png"),
-                       rx.score, water, cmap="inferno", log=True,
-                       vmin=0.5, vmax=4.2)
-    XP.save_scalar_png(os.path.join(OUT_LAYERS, "ndci.png"),
-                       idx_vals["NDCI"], water, cmap="YlGn",
-                       vmin=-0.25, vmax=0.10)
-    XP.save_scalar_png(os.path.join(OUT_LAYERS, "turbidity.png"),
-                       idx_vals["TURBIDITY_PROXY"], water, cmap="magma",
-                       vmin=-0.65, vmax=-0.15)
+
+    # Colour-scale limits are DERIVED from the data, not chosen by hand, and are
+    # exported so the map legend prints the range the pixels were actually
+    # mapped onto rather than a number typed into the interface.
+    scales = {}
+    scales["rgb"] = XP.save_rgb_png(
+        os.path.join(OUT_LAYERS, "rgb_water.png"),
+        bands["red"], bands["green"], bands["coastal"], valid, water)
+    scales["anomaly"] = XP.save_scalar_png(
+        os.path.join(OUT_LAYERS, "anomaly.png"), rx.score, water,
+        cmap="inferno", log=True)
+    scales["ndci"] = XP.save_scalar_png(
+        os.path.join(OUT_LAYERS, "ndci.png"), idx_vals["NDCI"], water,
+        cmap="YlGn")
+    scales["turbidity"] = XP.save_scalar_png(
+        os.path.join(OUT_LAYERS, "turbidity.png"),
+        idx_vals["TURBIDITY_PROXY"], water, cmap="magma")
+    for k, v in scales.items():
+        v.pop("path", None)
 
     def region_props(v):
         r = next((x for x in regions if x.label == v), None)
@@ -371,6 +379,11 @@ def main():
         "transform": list(transform),
         "shape": [scene.rows, scene.cols],
         "pixel_size_m": scene.grid.pixel_size_m,
+        "extent_km": [round(scene.cols * scene.grid.pixel_size_m / 1000.0, 2),
+                      round(scene.rows * scene.grid.pixel_size_m / 1000.0, 2)],
+        "water_area_km2": round(
+            int(water.sum()) * (scene.grid.pixel_size_m ** 2) / 1e6, 3),
+        "scales": scales,
     })
 
     # -------------------------------------------------------------- Provenance
@@ -546,6 +559,7 @@ def main():
             "steps": [s.to_dict(include_particles=False) for s in steps],
         },
         "exposure": [e.to_dict() for e in exposures],
+        "asset_register": asset_meta,
         "samples": [s.to_dict() for s in samples],
         "all_regions": [
             {**{"label": f"L{r.label}", "area_km2": round(r.area_km2, 5),

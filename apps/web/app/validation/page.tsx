@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * VALIDATION — every experiment we ran, including the ones that found nothing.
+ * VALIDATION - every experiment we ran, including the ones that found nothing.
  *
  * The section ordering is deliberate. The negative results come BEFORE the
  * headline, because a reviewer should see that we looked for the hyperspectral
@@ -33,7 +33,7 @@ export default function Validation() {
   return (
     <div className="h-full overflow-y-auto p-3 space-y-3">
       {/* ------------------------------------------------ the headline claim */}
-      <Panel title="Why 813? — the measured answer" accent="#3186FF">
+      <Panel title="Why 813? - the measured answer" accent="#3186FF">
         <div className="grid lg:grid-cols-[1fr_1fr_1.2fr] gap-5 items-center">
           <div className="text-center panel-quiet chamfer p-4">
             <div className="hud-label mb-2">Multispectral baseline</div>
@@ -66,7 +66,7 @@ export default function Validation() {
               Hyperspectral lift
             </div>
             <div className="hud-value text-[40px] leading-none text-nominal">
-              −{fmt(op?.relative_reduction_pct, 1)}%
+              -{fmt(op?.relative_reduction_pct, 1)}%
             </div>
             <div className="text-[11px] leading-[1.6] text-muted mt-2">
               fewer false alarms at matched recall
@@ -74,7 +74,7 @@ export default function Validation() {
             <div className="mt-3 space-y-1">
               <KV k="ΔF1" v={`+${fmt(head?.absolute_gain, 4)}`} color="#3FD1A0" />
               <KV k="95% CI" v={`[${fmt(head?.ci95?.lo, 4)}, ${fmt(head?.ci95?.hi, 4)}]`} />
-              <KV k="Significant" v={head?.significant ? "YES — CI excludes zero" : "no"}
+              <KV k="Significant" v={head?.significant ? "YES - CI excludes zero" : "no"}
                   color={head?.significant ? "#3FD1A0" : "#F5C451"} />
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function Validation() {
                accent="#FF7A45">
           <p className="text-[11.5px] leading-[1.7] text-muted mb-3">
             Neighbouring water pixels are near-duplicates. With a random
-            train/test split they land on both sides and every score rises —
+            train/test split they land on both sides and every score rises -
             far more for the high-dimensional arm, which has more capacity to
             memorise. This is the single easiest way to accidentally claim a
             hyperspectral advantage that does not exist.
@@ -163,7 +163,7 @@ export default function Validation() {
                         <td className="text-right text-caution">{fmt(r, 4)}</td>
                         <td className="text-right text-ink">{fmt(b, 4)}</td>
                         <td className="text-right text-alert">
-                          {r !== undefined && b !== undefined ? `${fmt(r - b, 4)}` : "—"}
+                          {r !== undefined && b !== undefined ? `${fmt(r - b, 4)}` : "-"}
                         </td>
                       </tr>
                     );
@@ -175,7 +175,7 @@ export default function Validation() {
           <Caveat>
             An earlier run of this experiment used a random split for the INNER
             component-selection loop too. It drove PLSR to the 20-component cap
-            and produced an outer R² of −15.7. That was a flaw in our protocol,
+            and produced an outer R² of -15.7. That was a flaw in our protocol,
             not a property of the data, and it is documented in the code.
           </Caveat>
         </Panel>
@@ -197,7 +197,7 @@ export default function Validation() {
                 <div className="hud-label mb-2"
                      style={{ color: surf === "land" ? "#3FD1A0" : "#F5C451" }}>
                   over {surf}
-                  {surf === "land" ? " — both corrections in domain" : " — Sen2Cor out of domain"}
+                  {surf === "land" ? " - both corrections in domain" : " - Sen2Cor out of domain"}
                 </div>
                 <table className="w-full text-[10.5px]">
                   <thead>
@@ -236,16 +236,16 @@ export default function Validation() {
 
       {/* ---------------------------------------------- temporal baseline */}
       {v.temporal_baseline && (
-        <Panel title="Temporal baseline — the test that changed the verdict" accent="#3FD1A0">
+        <Panel title="Temporal baseline - the test that changed the verdict" accent="#3FD1A0">
           <div className="grid lg:grid-cols-[320px_1fr] gap-5">
             <div>
               <Readout label="Observations in the record"
-                       value={v.temporal_baseline.zones?.hotspot_inner_gulf?.n_observations ?? "—"}
+                       value={v.temporal_baseline.zones?.hotspot_inner_gulf?.n_observations ?? "-"}
                        size="lg" color="#3FD1A0"
-                       sub="Sentinel-2, hotspot zone, 2020–2025" />
+                       sub="Sentinel-2, hotspot zone, 2020-2025" />
               <div className="mt-3">
                 <KV k="Reference zone obs"
-                    v={v.temporal_baseline.zones?.reference_offshore?.n_observations ?? "—"} />
+                    v={v.temporal_baseline.zones?.reference_offshore?.n_observations ?? "-"} />
                 <KV k="Span" v="5.4 years" />
                 <KV k="Cloud filter" v="≤ 15%" />
               </div>
@@ -307,12 +307,12 @@ export default function Validation() {
             "No in-situ or laboratory measurement was available for this AOI. No chlorophyll-a concentration in mg/m³ and no turbidity in NTU is reported anywhere in this product.",
             "The optical classification is a weighted hypothesis, not a chemical, biological or toxicological identification.",
             "The drift forecast is wind-driven advection, not a hydrodynamic model. It has not been validated against observed plume motion.",
-            "The OLCI matchups carry a median −25.5 h offset; coastal water changes materially in a day.",
+            "The OLCI matchups carry a median -25.5 h offset; coastal water changes materially in a day.",
             "Bottom reflectance cannot be excluded as a contributor to the nearshore signal from a single scene.",
             "No real Satellite 813 data exists in this system. Every 813 product shown is simulated from Planet Tanager-1.",
           ].map((t, i) => (
             <li key={i} className="flex gap-2.5">
-              <span className="text-critical shrink-0">—</span>
+              <span className="text-critical shrink-0">-</span>
               <span>{t}</span>
             </li>
           ))}

@@ -3,7 +3,7 @@ import "./globals.css";
 import Shell from "@/components/Shell";
 
 export const metadata: Metadata = {
-  title: "BLUEBAN 813 — Water Threat Intelligence",
+  title: "BLUEBAN 813 - Water Threat Intelligence",
   description:
     "AI-powered water threat intelligence for the Arab region. Detect. Fingerprint. Forecast. Protect.",
 };

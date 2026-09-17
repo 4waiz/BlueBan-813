@@ -1,6 +1,6 @@
 {
- "event_id": "BP-2026-001",
- "generated_utc": "2026-09-15T13:38:39Z",
+ "event_id": "BB-2026-001",
+ "generated_utc": "2026-09-17T19:12:53Z",
  "aoi": {
   "id": "DZ-ANNABA",
   "name": "Gulf of Annaba",
@@ -21,14 +21,14 @@
   "sun_elevation_deg": 73.0,
   "view_off_nadir_deg": 19.9
  },
- "state": "NORMAL",
+ "state": "WATCH",
  "severity": 0.3317216181541424,
  "confidence": 0.6867867239496848,
  "assessment": {
   "severity": 0.3317,
   "confidence": 0.6868,
-  "priority": "NORMAL",
-  "priority_reason": "TEMPORAL VETO: this observation sits at the 6.6th percentile of the multi-year record for this location and season, at or below the median. The spatial anomaly is therefore a persistent feature of this coastline, not an event. Priority reduced from HIGH_PRIORITY to NORMAL.",
+  "priority": "WATCH",
+  "priority_reason": "TEMPORAL VETO: this observation sits at the 6.6th percentile of the multi-year record for this location and season, at or below the median. The spatial anomaly is therefore a persistent feature of this coastline, not an event. Priority reduced from HIGH_PRIORITY to WATCH.",
   "severity_components": [
    {
     "name": "area",
@@ -95,16 +95,20 @@
   ],
   "rules_fired": [
    {
-    "rule": "An asset has exposure 0.48, above 0.30.",
+    "rule": "An asset has exposure 0.74, above 0.30.",
     "level": "WATCH"
+   },
+   {
+    "rule": "Moderate event (severity 0.33) with elevated asset exposure 0.74.",
+    "level": "INVESTIGATE"
    },
    {
     "rule": "Drift track reaches an exposed asset within 6 h.",
     "level": "HIGH_PRIORITY"
    },
    {
-    "rule": "TEMPORAL VETO: this observation sits at the 6.6th percentile of the multi-year record for this location and season, at or below the median. The spatial anomaly is therefore a persistent feature of this coastline, not an event. Priority reduced from HIGH_PRIORITY to NORMAL.",
-    "level": "NORMAL",
+    "rule": "TEMPORAL VETO: this observation sits at the 6.6th percentile of the multi-year record for this location and season, at or below the median. The spatial anomaly is therefore a persistent feature of this coastline, not an event. Priority reduced from HIGH_PRIORITY to WATCH.",
+    "level": "WATCH",
     "veto": true
    }
   ],
@@ -647,47 +651,79 @@
  "exposure": [
   {
    "asset": {
+    "id": "A02",
+    "name": "Annaba Port power station",
+    "type": "INDUSTRIAL_INTAKE",
+    "type_label": "Industrial water intake",
+    "lon": 7.763084,
+    "lat": 36.892052,
+    "sensitivity": 0.8,
+    "notes": "A 72 MW thermal power station on the harbour. Thermal plants draw large volumes of seawater for condenser cooling, so suspended sediment and biofouling load in the source water directly affect screen and heat-exchanger performance. Placed at the mapped plant centroid, not at an intake structure.",
+    "source": "config/assets.geojson (OpenStreetMap)",
+    "why_it_matters": "Process water quality and filtration load.",
+    "primary_concerns": [
+     "turbidity",
+     "biofouling"
+    ]
+   },
+   "distance_m": 927.0,
+   "distance_km": 0.927,
+   "bearing_from_event_deg": 319.5,
+   "direction": "NW",
+   "closest_approach_m": 406.4,
+   "closest_approach_hours": 6.0,
+   "intersects_forecast": true,
+   "eta_hours": 6.0,
+   "exposure_score": 0.7375,
+   "basis": [
+    "Current separation 0.93 km, asset lies NW of the event centroid.",
+    "22.0% of drift particles come within 599 m of the asset by +6 h.",
+    "Exposure = proximity 0.922 x trajectory 1.00 x asset sensitivity 0.80 = 0.738."
+   ]
+  },
+  {
+   "asset": {
     "id": "A01",
-    "name": "Port water quality point (example)",
+    "name": "Annaba fishing harbour",
     "type": "PORT",
     "type_label": "Port / harbour",
-    "lon": 7.7745,
-    "lat": 36.8985,
+    "lon": 7.774241,
+    "lat": 36.905051,
     "sensitivity": 0.5,
-    "notes": "Illustrative placement on the Annaba harbour frontage.",
-    "source": "demo_fixture",
+    "notes": "Working fishing harbour on the Annaba waterfront. Harbour water quality is both an operational and a compliance concern, and harbours are chronic turbidity sources in their own right.",
+    "source": "config/assets.geojson (OpenStreetMap)",
     "why_it_matters": "Operational and environmental-compliance relevance.",
     "primary_concerns": [
      "turbidity",
      "pollution"
     ]
    },
-   "distance_m": 1480.7,
-   "distance_km": 1.481,
-   "bearing_from_event_deg": 16.2,
-   "direction": "NNE",
-   "closest_approach_m": 189.1,
+   "distance_m": 2185.4,
+   "distance_km": 2.185,
+   "bearing_from_event_deg": 10.3,
+   "direction": "N",
+   "closest_approach_m": 895.4,
    "closest_approach_hours": 0.0,
-   "intersects_forecast": true,
-   "eta_hours": 6.0,
-   "exposure_score": 0.4814,
+   "intersects_forecast": false,
+   "eta_hours": null,
+   "exposure_score": 0.1463,
    "basis": [
-    "Current separation 1.48 km, asset lies NNE of the event centroid.",
-    "7.3% of drift particles come within 599 m of the asset by +6 h.",
-    "Exposure = proximity 0.963 x trajectory 1.00 x asset sensitivity 0.50 = 0.481."
+    "Current separation 2.19 km, asset lies N of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 0.90 km at +0 h.",
+    "Exposure = proximity 0.836 x trajectory 0.35 x asset sensitivity 0.50 = 0.146."
    ]
   },
   {
    "asset": {
-    "id": "A02",
-    "name": "Annaba bathing water (example)",
+    "id": "A03",
+    "name": "Plage Chapuis",
     "type": "PUBLIC_BEACH",
     "type_label": "Public beach / bathing water",
-    "lon": 7.762,
-    "lat": 36.917,
+    "lon": 7.761094,
+    "lat": 36.927583,
     "sensitivity": 0.8,
-    "notes": "Illustrative placement on the Annaba beach frontage.",
-    "source": "demo_fixture",
+    "notes": "Named public beach on the Annaba seafront, roughly 2.5 km north of the harbour. Bathing-water quality is a public-health and compliance matter.",
+    "source": "config/assets.geojson (OpenStreetMap)",
     "why_it_matters": "Public health exposure and bathing-water compliance.",
     "primary_concerns": [
      "harmful algal bloom",
@@ -695,89 +731,92 @@
      "visible pollution"
     ]
    },
-   "distance_m": 3548.4,
-   "distance_km": 3.548,
-   "bearing_from_event_deg": 348.7,
-   "direction": "NNW",
-   "closest_approach_m": 2526.6,
+   "distance_m": 4720.4,
+   "distance_km": 4.72,
+   "bearing_from_event_deg": 350.5,
+   "direction": "N",
+   "closest_approach_m": 3631.0,
    "closest_approach_hours": 0.0,
    "intersects_forecast": false,
    "eta_hours": null,
-   "exposure_score": 0.1689,
+   "exposure_score": 0.1354,
    "basis": [
-    "Current separation 3.55 km, asset lies NNW of the event centroid.",
-    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 2.53 km at +0 h.",
-    "Exposure = proximity 0.603 x trajectory 0.35 x asset sensitivity 0.80 = 0.169."
-   ]
-  },
-  {
-   "asset": {
-    "id": "A03",
-    "name": "Coastal water intake (example)",
-    "type": "DESALINATION_INTAKE",
-    "type_label": "Desalination intake",
-    "lon": 7.745,
-    "lat": 36.956,
-    "sensitivity": 1.0,
-    "notes": "Illustrative offshore intake placement. BLUEBAN 813 ships no infrastructure database; operators pin their own assets.",
-    "source": "demo_fixture",
-    "why_it_matters": "Source water quality directly affects membrane fouling, pre-treatment load and, in the worst case, forces a shutdown of potable supply.",
-    "primary_concerns": [
-     "algal bloom",
-     "turbidity",
-     "hydrocarbon",
-     "organics"
-    ]
-   },
-   "distance_m": 8121.9,
-   "distance_km": 8.122,
-   "bearing_from_event_deg": 344.2,
-   "direction": "NNW",
-   "closest_approach_m": 7096.2,
-   "closest_approach_hours": 0.0,
-   "intersects_forecast": false,
-   "eta_hours": null,
-   "exposure_score": 0.0847,
-   "basis": [
-    "Current separation 8.12 km, asset lies NNW of the event centroid.",
-    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 7.10 km at +0 h.",
-    "Exposure = proximity 0.242 x trajectory 0.35 x asset sensitivity 1.00 = 0.085."
+    "Current separation 4.72 km, asset lies N of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 3.63 km at +0 h.",
+    "Exposure = proximity 0.484 x trajectory 0.35 x asset sensitivity 0.80 = 0.135."
    ]
   },
   {
    "asset": {
     "id": "A04",
-    "name": "Cap de Garde habitat zone (example)",
-    "type": "MARINE_PROTECTED_AREA",
-    "type_label": "Marine protected area",
-    "lon": 7.788,
-    "lat": 36.969,
-    "sensitivity": 0.9,
-    "notes": "Illustrative placement on the Cap de Garde headland.",
-    "source": "demo_fixture",
-    "why_it_matters": "Ecological damage is often irreversible on management timescales.",
+    "name": "Plage Ain Achir",
+    "type": "PUBLIC_BEACH",
+    "type_label": "Public beach / bathing water",
+    "lon": 7.780217,
+    "lat": 36.957139,
+    "sensitivity": 0.8,
+    "notes": "Named public beach north of the city, near the Cap de Garde headland. Included as a second bathing-water receptor at a materially different distance from the detected event.",
+    "source": "config/assets.geojson (OpenStreetMap)",
+    "why_it_matters": "Public health exposure and bathing-water compliance.",
     "primary_concerns": [
-     "sedimentation",
-     "eutrophication",
-     "pollution"
+     "harmful algal bloom",
+     "microbial",
+     "visible pollution"
     ]
    },
-   "distance_m": 9400.5,
-   "distance_km": 9.401,
-   "bearing_from_event_deg": 9.9,
+   "distance_m": 7995.5,
+   "distance_km": 7.995,
+   "bearing_from_event_deg": 6.6,
    "direction": "N",
-   "closest_approach_m": 8071.9,
+   "closest_approach_m": 6690.5,
    "closest_approach_hours": 0.0,
    "intersects_forecast": false,
    "eta_hours": null,
-   "exposure_score": 0.0627,
+   "exposure_score": 0.0735,
    "basis": [
-    "Current separation 9.40 km, asset lies N of the event centroid.",
-    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 8.07 km at +0 h.",
-    "Exposure = proximity 0.199 x trajectory 0.35 x asset sensitivity 0.90 = 0.063."
+    "Current separation 8.00 km, asset lies N of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 6.69 km at +0 h.",
+    "Exposure = proximity 0.262 x trajectory 0.35 x asset sensitivity 0.80 = 0.073."
+   ]
+  },
+  {
+   "asset": {
+    "id": "A05",
+    "name": "Cap de Garde lighthouse",
+    "type": "CUSTOM",
+    "type_label": "Custom asset",
+    "lon": 7.783556,
+    "lat": 36.967081,
+    "sensitivity": 0.5,
+    "notes": "Fixed navigational landmark on the Cap de Garde headland, used here as a far-field coastal reference station. It is NOT designated as a marine protected area in OpenStreetMap, and no protected-area designation inside this AOI could be verified, so none is claimed.",
+    "source": "config/assets.geojson (OpenStreetMap)",
+    "why_it_matters": "Operator-defined.",
+    "primary_concerns": []
+   },
+   "distance_m": 9129.3,
+   "distance_km": 9.129,
+   "bearing_from_event_deg": 7.7,
+   "direction": "N",
+   "closest_approach_m": 7815.3,
+   "closest_approach_hours": 0.0,
+   "intersects_forecast": false,
+   "eta_hours": null,
+   "exposure_score": 0.0367,
+   "basis": [
+    "Current separation 9.13 km, asset lies N of the event centroid.",
+    "No modelled drift particle reaches the asset within the forecast horizon; closest approach 7.82 km at +0 h.",
+    "Exposure = proximity 0.209 x trajectory 0.35 x asset sensitivity 0.50 = 0.037."
    ]
   }
  ],
+ "asset_register": {
+  "name": "Gulf of Annaba operator asset register",
+  "note": "Every asset here is a REAL, publicly mapped coastal feature inside the AOI, with its OpenStreetMap element id recorded so any coordinate can be checked. No coordinate in this file was estimated, and no confidential infrastructure location is included.",
+  "source": "OpenStreetMap contributors, queried via the Overpass API on 2026-09-17 for the AOI bounding box 36.8739,7.5175,37.0599,7.8093",
+  "licence": "OpenStreetMap data is available under the Open Database License (ODbL). (c) OpenStreetMap contributors.",
+  "policy": "BLUEBAN 813 ships no infrastructure database. This register exists so the Gulf of Annaba demonstration runs against real places rather than invented ones. An operator replaces it with their own assets.",
+  "caveat": "A facility asset is placed at the mapped centroid of the facility, which is not the location of its water intake structure. Distances are therefore facility distances, not intake distances."
+ },
  "samples": [
   {
    "id": "S01",
@@ -802,19 +841,19 @@
    "id": "S02",
    "role": "ASSET_BOUNDARY",
    "role_question": "Has anything reached the protected asset yet?",
-   "lon": 7.775671,
-   "lat": 36.89708,
+   "lon": 7.761895,
+   "lat": 36.895315,
    "priority": 1,
-   "rationale": "Nearest analysable water to Port water quality point (example), 189 m away. This is the measurement that answers whether the asset is affected yet.",
+   "rationale": "Nearest analysable water to Annaba Port power station, 378 m away. This is the measurement that answers whether the asset is affected yet.",
    "expected_variables": [
     "Turbidity (NTU)",
     "Chlorophyll-a",
     "Total organic carbon",
     "Algal toxins if a bloom is suspected"
    ],
-   "anomaly_score": 24057.03,
+   "anomaly_score": 5507.8,
    "distance_from_shore_m": 30.0,
-   "distance_to_asset_m": 189.0,
+   "distance_to_asset_m": 378.0,
    "confidence": null
   },
   {
@@ -1410,7 +1449,7 @@
   "completeness": 1.0,
   "missing_fields": [],
   "n_sources": 5,
-  "code_version": "uncommitted"
+  "code_version": "a7aeb92"
  },
  "satellite_813": {
   "status": "SIMULATED",

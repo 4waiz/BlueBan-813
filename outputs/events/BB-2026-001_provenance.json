@@ -1,5 +1,5 @@
 {
- "result_id": "BP-2026-001",
+ "result_id": "BB-2026-001",
  "result_kind": "water_event",
  "sources": [
   {
@@ -545,9 +545,9 @@
    "The drift model is not hydrodynamic."
   ]
  },
- "code_version": "uncommitted",
+ "code_version": "a7aeb92",
  "schema_version": "1.0",
- "processed_utc": "2026-09-15T13:38:39Z",
+ "processed_utc": "2026-09-17T19:12:53Z",
  "environment": {
   "python": "3.12.10",
   "platform": "Windows"

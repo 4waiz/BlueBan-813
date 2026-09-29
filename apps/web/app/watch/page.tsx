@@ -1,270 +1,125 @@
 "use client";
-
 /**
- * WATCH - the regional monitoring record.
- *
- * This screen holds the argument that separates BLUEBAN 813 from a map viewer:
- * an absolute index threshold is meaningless across water bodies, so every
- * observation is judged against the local multi-year distribution for that
- * place and that season.
+ * WATCH: what is monitored, when it was last seen, and what changed from its
+ * own seasonal baseline. Series come from scripts/build_watch.py (Sentinel-2
+ * L2A zone statistics per acquisition); anomaly hits from scripts/build_detect.py.
  */
-
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ResponsiveContainer, ComposedChart, Scatter, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip, ReferenceLine, ReferenceArea, Area,
-} from "recharts";
+import Link from "next/link";
+import { pipelineUrl, useEngineQuery } from "@/lib/engine";
+import { nextPass } from "@/lib/passes";
+import type { Aoi } from "@/lib/engine/types";
+import { Chip, fmt, Panel } from "@/components/ui";
+import { useElementSize } from "@/lib/useSize";
 
-import { Panel, Loading, ErrorBox, KV, Chip, Caveat, Readout } from "@/components/hud";
-import { api, fmt, fmtInt } from "@/lib/api";
+type Row = { date: string; datetime?: string; platform?: string; n_water?: number; cloud?: number; error?: boolean; f?: Record<string, { p50: number; p95: number } | null> };
+type Series = { aoi_id: string; rows: Row[]; window: string[]; n_datatakes: number; n_ok: number };
+type DetectDates = { dates: { date: string; BLOOM_LIKE: { n: number; area_km2: number; max_z: number | null }; SEDIMENT_LIKE: { n: number; area_km2: number; max_z: number | null }; SURFACE_FILM_LIKE: { n: number; area_km2: number; max_z: number | null } }[] };
 
-const ZONES = [
-  { key: "hotspot_inner_gulf", label: "Hotspot · inner gulf", color: "#FF7A45" },
-  { key: "reference_offshore", label: "Reference · offshore", color: "#4A93FF" },
-];
+const FEATS: [string, string][] = [["NDCI", "NDCI (chlorophyll proxy) P95"], ["MCI", "MCI red-edge peak P95"], ["TUR_NECHAD2016", "Turbidity (Nechad, generic cal.) P95"], ["HUE_ANGLE", "Hue angle P50"]];
+const doy = (d: string) => { const t = new Date(d + "T00:00:00Z"); return Math.floor((t.getTime() - Date.UTC(t.getUTCFullYear(), 0, 1)) / 86400e3) + 1; };
+const ddist = (a: number, b: number) => Math.min(Math.abs(a - b), 365 - Math.abs(a - b));
 
-const VARS = [
-  { key: "TURBIDITY_PROXY_p95", label: "Turbidity proxy (zone P95)" },
-  { key: "TURBIDITY_PROXY", label: "Turbidity proxy (zone median)" },
-  { key: "NDCI_p95", label: "NDCI proxy (zone P95)" },
-  { key: "NDCI", label: "NDCI proxy (zone median)" },
-  { key: "R665", label: "Reflectance 665 nm" },
-  { key: "R560", label: "Reflectance 560 nm" },
-];
+function seasonalPct(rows: Row[], feat: string, stat: "p95" | "p50", target: Row) {
+  const v = target.f?.[feat]?.[stat];
+  if (v == null) return null;
+  const td = doy(target.date), ty = target.date.slice(0, 4);
+  const hist = rows.filter((r) => r !== target && r.f?.[feat] && r.date.slice(0, 4) !== ty && ddist(doy(r.date), td) <= 45).map((r) => r.f![feat]![stat]);
+  if (hist.length < 6) return null;
+  return (100 * hist.filter((h) => h < v).length) / hist.length;
+}
 
-const TARGET = "2025-06-01";
-
-export default function Watch() {
-  const [ts, setTs] = useState<any>(null);
-  const [rep, setRep] = useState<any>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [zone, setZone] = useState(ZONES[0].key);
-  const [vr, setVr] = useState(VARS[0].key);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const [a, v] = await Promise.all([
-          api.timeseries(),
-          api.validation().catch(() => null),
-        ]);
-        setTs(a);
-        setRep(v?.temporal_baseline ?? null);
-      } catch (e: any) { setErr(e.message ?? String(e)); }
-    })();
-  }, []);
-
-  const series = useMemo(() => {
-    if (!ts?.[zone]) return [];
-    return ts[zone]
-      .map((o: any) => ({
-        t: new Date(o.datetime).getTime(),
-        date: o.datetime.slice(0, 10),
-        v: o[vr],
-        cloud: o.cloud_cover,
-        n: o.n_water_px,
-      }))
-      .filter((d: any) => d.v !== null && d.v !== undefined && Number.isFinite(d.v))
-      .sort((a: any, b: any) => a.t - b.t);
-  }, [ts, zone, vr]);
-
-  const stats = useMemo(() => {
-    const b = rep?.zones?.[zone]?.baselines?.[vr];
-    if (!b) return null;
-    return {
-      median: b.median, p90: b.percentiles?.["90"], p95: b.percentiles?.["95"],
-      p99: b.percentiles?.["99"], p05: b.percentiles?.["5"],
-      n: b.n_observations, range: b.date_range,
-      target: b.target_assessment, trend: b.trend, seasonal: b.seasonal,
-    };
-  }, [rep, zone, vr]);
-
-  const targetPoint = series.find((d: any) => d.date === TARGET);
-
-  if (err) return <div className="p-6"><ErrorBox error={err} /></div>;
-  if (!ts) return <Loading what="monitoring record" />;
-
+function SeriesChart({ s, feat, det }: { s: Series; feat: string; det: DetectDates | null }) {
+  const box = useElementSize<HTMLDivElement>();
+  const stat = feat === "HUE_ANGLE" ? "p50" : "p95";
+  const pts = s.rows.filter((r) => !r.error && (r.n_water || 0) > 500 && r.f?.[feat]).map((r) => ({ t: new Date(r.date).getTime(), v: r.f![feat]![stat], d: r.date }));
+  const W = Math.max(400, box.width), H = Math.max(200, box.height), L = 50, R = 12, T = 12, B = 26;
+  if (!pts.length) return <div ref={box.ref} className="grid h-full place-items-center text-muted">No valid observations</div>;
+  const t0 = Math.min(...pts.map((p) => p.t)), t1 = Math.max(...pts.map((p) => p.t));
+  const vs = pts.map((p) => p.v).sort((a, b) => a - b);
+  const lo = vs[Math.floor(vs.length * 0.01)], hi = vs[Math.floor(vs.length * 0.99)];
+  const x = (t: number) => L + ((t - t0) / (t1 - t0 || 1)) * (W - L - R);
+  const y = (v: number) => T + (1 - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo || 1)) * (H - T - B);
+  // seasonal envelope: median and 90th percentile by day-of-year bin, all years
+  const bins = Array.from({ length: 37 }, (_, i) => i * 10);
+  const env = bins.map((b) => { const vv = pts.filter((p) => ddist(doy(p.d), b + 5) <= 20).map((p) => p.v).sort((a, c) => a - c); return vv.length > 4 ? { b, med: vv[Math.floor(vv.length / 2)], p90: vv[Math.floor(vv.length * 0.9)] } : null; });
+  const years = [...new Set(pts.map((p) => p.d.slice(0, 4)))];
+  const hits = new Set((det?.dates || []).filter((d) => (d.BLOOM_LIKE?.n || 0) + (d.SEDIMENT_LIKE?.n || 0) + (d.SURFACE_FILM_LIKE?.n || 0) > 0).map((d) => d.date));
   return (
-    <div className="h-full overflow-y-auto p-3 space-y-3">
-      <Panel title="Local baseline - why absolute thresholds do not work" accent="#3FD1A0">
-        <div className="flex flex-wrap items-center gap-1.5 mb-3">
-          {ZONES.map((z) => (
-            <button key={z.key} onClick={() => setZone(z.key)}
-                    className="chamfer-sm hud-label px-2.5 py-[5px] tap border"
-                    style={{
-                      borderColor: zone === z.key ? z.color : "#1B2444",
-                      color: zone === z.key ? z.color : "#5A6490",
-                      background: zone === z.key ? `${z.color}1A` : "transparent",
-                    }}>
-              {z.label} · {fmtInt(ts[z.key]?.length)} obs
-            </button>
-          ))}
-          <span className="flex-1" />
-          {VARS.map((v) => (
-            <button key={v.key} onClick={() => setVr(v.key)}
-                    className="chamfer-sm hud-label px-2 py-[5px] tap border"
-                    style={{
-                      borderColor: vr === v.key ? "#3186FF" : "#1B2444",
-                      color: vr === v.key ? "#4A93FF" : "#5A6490",
-                      background: vr === v.key ? "rgba(49,134,255,0.14)" : "transparent",
-                    }}>
-              {v.label}
-            </button>
-          ))}
-        </div>
+    <div ref={box.ref} className="h-full w-full">
+      <svg width={W} height={H}>
+        <rect x={L} y={T} width={W - L - R} height={H - T - B} fill="#040915" stroke="#16284D" />
+        {years.map((yr) => { const tt = Date.UTC(Number(yr), 0, 1); return tt > t0 && tt < t1 ? <g key={yr}><line x1={x(tt)} x2={x(tt)} y1={T} y2={H - B} stroke="#16284D" /><text x={x(tt) + 3} y={H - 8} fontSize={10} fill="#93A6CB">{yr}</text></g> : null; })}
+        {years.map((yr) => env.filter(Boolean).map((e) => { const tt = Date.UTC(Number(yr), 0, e!.b + 5); if (tt < t0 || tt > t1) return null; return <line key={`${yr}-${e!.b}`} x1={x(tt)} x2={x(tt) + 3} y1={y(e!.p90)} y2={y(e!.p90)} stroke="#FFC23D" strokeOpacity={0.35} />; }))}
+        {pts.map((p) => <circle key={p.d + p.t} cx={x(p.t)} cy={y(p.v)} r={hits.has(p.d) ? 3.6 : 1.8} fill={hits.has(p.d) ? "#FF4D5E" : "#4D93FF"} opacity={hits.has(p.d) ? 1 : 0.8}><title>{p.d}: {p.v.toFixed(4)}{hits.has(p.d) ? " · DETECT candidate" : ""}</title></circle>)}
+        {[lo, (lo + hi) / 2, hi].map((v, i) => <text key={i} x={L - 6} y={y(v) + 3} textAnchor="end" fontSize={10} fill="#93A6CB">{v.toFixed(3)}</text>)}
+      </svg>
+    </div>
+  );
+}
 
-        <div style={{ width: "100%", height: 350 }}>
-          <ResponsiveContainer>
-            <ComposedChart data={series} margin={{ top: 8, right: 14, bottom: 4, left: 4 }}>
-              <CartesianGrid stroke="#1B2444" strokeDasharray="2 5" />
-              {stats && (
-                <>
-                  <ReferenceArea y1={stats.p05} y2={stats.p95}
-                                 fill="#3186FF" fillOpacity={0.07} stroke="none" />
-                  <ReferenceLine y={stats.median} stroke="#3FD1A0" strokeDasharray="4 4"
-                                 label={{ value: "median", position: "insideTopLeft",
-                                          fill: "#3FD1A0", fontSize: 9,
-                                          fontFamily: "var(--font-mono)" }} />
-                  <ReferenceLine y={stats.p95} stroke="#F5C451" strokeDasharray="3 4"
-                                 label={{ value: "P95", position: "insideTopLeft",
-                                          fill: "#F5C451", fontSize: 9,
-                                          fontFamily: "var(--font-mono)" }} />
-                  <ReferenceLine y={stats.p99} stroke="#FF7A45" strokeDasharray="3 4"
-                                 label={{ value: "P99", position: "insideTopLeft",
-                                          fill: "#FF7A45", fontSize: 9,
-                                          fontFamily: "var(--font-mono)" }} />
-                </>
-              )}
-              <XAxis dataKey="t" type="number" scale="time"
-                     domain={["dataMin", "dataMax"]}
-                     tickFormatter={(v) => new Date(v).toISOString().slice(0, 7)}
-                     tick={{ fill: "#5A6490", fontSize: 9, fontFamily: "var(--font-mono)" }}
-                     stroke="#243056" />
-              <YAxis tick={{ fill: "#5A6490", fontSize: 9, fontFamily: "var(--font-mono)" }}
-                     stroke="#243056" width={56}
-                     tickFormatter={(v) => Number(v).toFixed(3)} />
-              <Tooltip
-                contentStyle={{ background: "#0A0F22", border: "1px solid #243056",
-                                borderRadius: 0, fontFamily: "var(--font-mono)",
-                                fontSize: 11 }}
-                labelStyle={{ color: "#5A6490" }}
-                labelFormatter={(v) => new Date(Number(v)).toISOString().slice(0, 10)}
-                formatter={(v: any, n: any) => [Number(v).toFixed(5), n]} />
-              <Scatter dataKey="v" name="observation"
-                       fill={ZONES.find((z) => z.key === zone)?.color ?? "#4A93FF"}
-                       fillOpacity={0.6} />
-              {targetPoint && (
-                <ReferenceLine x={targetPoint.t} stroke="#F4F6FF" strokeWidth={1.2}
-                               label={{ value: "2025-06-01 observation",
-                                        position: "insideTopRight", fill: "#F4F6FF",
-                                        fontSize: 9, fontFamily: "var(--font-mono)" }} />
-              )}
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-
-        <p className="text-[11px] leading-[1.7] text-muted mt-2">
-          Each dot is one cloud-screened Sentinel-2 acquisition. The shaded band
-          is the P5-P95 envelope for this zone. A detection is only an event if it
-          sits in the upper tail of this distribution for its season; otherwise it
-          is a permanent feature of the coastline.
-        </p>
+export default function WatchPage() {
+  const aois = useEngineQuery((e) => e.aois());
+  const incidents = useEngineQuery((e) => e.listIncidents());
+  const uae = useMemo(() => (aois.data || []).filter((a) => a.id.startsWith("AE-")), [aois.data]);
+  const [sel, setSel] = useState<string | null>(null);
+  const [feat, setFeat] = useState("NDCI");
+  const [series, setSeries] = useState<Record<string, Series | null>>({});
+  const [det, setDet] = useState<Record<string, DetectDates | null>>({});
+  const now = useMemo(() => new Date(), []);
+  useEffect(() => {
+    uae.forEach((a) => {
+      if (series[a.id] !== undefined) return;
+      setSeries((s) => ({ ...s, [a.id]: null }));
+      fetch(pipelineUrl(`watch/${a.id}.json`)).then((r) => (r.ok ? r.json() : null)).then((d) => setSeries((s) => ({ ...s, [a.id]: d }))).catch(() => undefined);
+      fetch(pipelineUrl(`detect/${a.id}.json`)).then((r) => (r.ok ? r.json() : null)).then((d) => setDet((s) => ({ ...s, [a.id]: d }))).catch(() => undefined);
+    });
+  }, [uae]); // eslint-disable-line react-hooks/exhaustive-deps
+  const rows = uae.map((a) => {
+    const s = series[a.id];
+    const ok = (s?.rows || []).filter((r) => !r.error && (r.n_water || 0) > 500);
+    const last = ok[ok.length - 1];
+    const pct = last && s ? seasonalPct(ok, "NDCI", "p95", last) : null;
+    const pctT = last && s ? seasonalPct(ok, "TUR_NECHAD2016", "p95", last) : null;
+    const open = (incidents.data || []).filter((i) => i.aoi_id === a.id && ["DETECTED", "UNDER_REVIEW", "FIELD_VALIDATION_REQUIRED"].includes(i.status)).length;
+    const np = nextPass([a], now);
+    return { a, s, ok, last, pct, pctT, open, np };
+  });
+  const ranked = [...rows].sort((x, y) => (y.pct ?? -1) - (x.pct ?? -1));
+  const cur = rows.find((r) => r.a.id === (sel || ranked[0]?.a.id));
+  return (
+    <div className="grid h-full min-h-0 gap-3 p-3 short:gap-2 short:p-2 grid-rows-[auto_minmax(0,1fr)]">
+      <Panel title="Monitored areas" kicker="WATCH · Sentinel-2 L2A archive screen" bodyClass="overflow-x-auto p-3">
+        <table className="w-full text-[12px]">
+          <thead><tr className="border-b border-edge text-left text-[10.5px] uppercase tracking-wider text-dim">
+            <th className="py-2 pr-3">AOI</th><th className="pr-3">Coast</th><th className="pr-3">Last valid observation</th><th className="pr-3 text-right">Valid obs</th>
+            <th className="pr-3 text-right">NDCI P95 · season pct</th><th className="pr-3 text-right">Turbidity P95 · pct</th><th className="pr-3">Change vs baseline</th><th className="pr-3 text-right">Open</th><th className="pr-3">Next pass (nominal)</th></tr></thead>
+          <tbody>
+            {ranked.map(({ a, s, ok, last, pct, pctT, open, np }) => (
+              <tr key={a.id} onClick={() => setSel(a.id)} className={`cursor-pointer border-b border-edge/60 hover:bg-panel2/50 ${cur?.a.id === a.id ? "bg-beam/10" : ""}`}>
+                <td className="py-2 pr-3"><div className="font-semibold">{a.name}</div><div className="hud-value text-[10.5px] text-dim">{a.id}</div></td>
+                <td className="pr-3 text-muted">{a.coast}</td>
+                <td className="pr-3">{last ? <>{fmt.utc(last.datetime || last.date)}<div className="text-[10.5px] text-muted">{last.platform} · {(last.n_water || 0).toLocaleString()} water px</div></> : s === null ? <span className="text-dim">loading…</span> : <span className="text-dim">not screened yet</span>}</td>
+                <td className="hud-value pr-3 text-right">{ok.length || "–"}</td>
+                <td className="hud-value pr-3 text-right">{last?.f?.NDCI ? last.f.NDCI.p95.toFixed(3) : "–"} <span className="text-caution">{pct != null ? `· ${fmt.ord(pct)}` : ""}</span></td>
+                <td className="hud-value pr-3 text-right">{last?.f?.TUR_NECHAD2016 ? last.f.TUR_NECHAD2016.p95.toFixed(1) : "–"} <span className="text-caution">{pctT != null ? `· ${fmt.ord(pctT)}` : ""}</span></td>
+                <td className="pr-3">{pct == null ? <span className="text-dim">n/a</span> : pct >= 95 ? <Chip label="UNUSUAL" color="#FF4D5E" /> : pct >= 80 ? <Chip label="ELEVATED" color="#FFC23D" /> : <Chip label="NORMAL" color="#23D484" />}</td>
+                <td className="hud-value pr-3 text-right">{open ? <span className="text-critical">{open}</span> : 0}</td>
+                <td className="pr-3 text-muted">{np ? `in ${np.inText} · ${np.platform}` : "–"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </Panel>
-
-      <div className="grid lg:grid-cols-3 gap-3">
-        <Panel title="This observation" accent="#3FD1A0" delay={60}>
-          {stats?.target ? (
-            <>
-              <Readout label="Seasonal percentile"
-                       animate={stats.target.seasonal_percentile} digits={1}
-                       value={fmt(stats.target.seasonal_percentile, 1)} unit="pctile"
-                       size="xl"
-                       color={stats.target.seasonal_percentile >= 90 ? "#FF7A45" : "#3FD1A0"} />
-              <div className="mt-3">
-                <KV k="Value" v={fmt(stats.target.value, 5)} />
-                <KV k="All-time pctile" v={fmt(stats.target.all_time_percentile, 1)} />
-                <KV k="Same-season n" v={fmtInt(stats.target.n_seasonal)} />
-                <KV k="Window" v={`±${stats.target.window_days} days of day-of-year`} />
-                <KV k="Matched date"
-                    v={`${stats.target.matched_date} (${stats.target.days_from_target} d off)`} />
-                <KV k="State" v={stats.target.state}
-                    color={stats.target.state === "NORMAL" ? "#3FD1A0" : "#F5C451"} />
-              </div>
-              <Caveat>
-                Comparing a June observation against a full-year record would
-                confuse a seasonal cycle with an event, so the comparison is
-                restricted to observations within {stats.target.window_days} days
-                of the same day-of-year.
-              </Caveat>
-            </>
-          ) : (
-            <p className="text-[11px] text-dim leading-relaxed">
-              No matched observation within the tolerance for this variable.
-            </p>
-          )}
-        </Panel>
-
-        <Panel title="Distribution" delay={120}>
-          {stats ? (
-            <>
-              <KV k="Observations" v={fmtInt(stats.n)} />
-              <KV k="Record span" v={`${stats.range?.[0]} → ${stats.range?.[1]}`} />
-              <KV k="P5" v={fmt(stats.p05, 5)} />
-              <KV k="Median" v={fmt(stats.median, 5)} color="#3FD1A0" />
-              <KV k="P90" v={fmt(stats.p90, 5)} />
-              <KV k="P95" v={fmt(stats.p95, 5)} color="#F5C451" />
-              <KV k="P99" v={fmt(stats.p99, 5)} color="#FF7A45" />
-            </>
-          ) : <p className="text-[11px] text-dim">Baseline report not loaded.</p>}
-        </Panel>
-
-        <Panel title="Long-term trend" delay={180}>
-          {stats?.trend?.slope_per_year !== null && stats?.trend ? (
-            <>
-              <Readout label="Slope" value={`${fmt(stats.trend.slope_per_year, 6)} /yr`}
-                       size="md" />
-              <div className="mt-3">
-                <KV k="R²" v={fmt(stats.trend.r_squared, 4)} />
-                <KV k="n" v={fmtInt(stats.trend.n)} />
-                <KV k="Span" v={`${fmt(stats.trend.span_years, 1)} years`} />
-              </div>
-              <Caveat>
-                With an R² this low the slope is not a meaningful trend. It is
-                reported so a reviewer can see that we checked, rather than
-                omitted because it was inconvenient.
-              </Caveat>
-            </>
-          ) : <p className="text-[11px] text-dim">Insufficient observations for a trend.</p>}
-        </Panel>
-      </div>
-
-      <Panel title="Seasonal structure" delay={240}>
-        {stats?.seasonal && Object.keys(stats.seasonal).length ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[11px]">
-              <thead>
-                <tr className="hud-label border-b border-edge">
-                  <th className="text-left py-2 font-normal">Month</th>
-                  {Object.keys(stats.seasonal).map((mo) => (
-                    <th key={mo} className="text-right py-2 font-normal px-2">{mo}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="hud-value">
-                {(["n", "median", "p90", "p95"] as const).map((row) => (
-                  <tr key={row} className="border-b border-edge/35">
-                    <td className="py-2 text-muted hud-label">{row}</td>
-                    {Object.values(stats.seasonal).map((s: any, i) => (
-                      <td key={i} className="text-right px-2 text-ink">
-                        {row === "n" ? fmtInt(s[row]) : fmt(s[row], 4)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : <p className="text-[11px] text-dim">No seasonal breakdown available.</p>}
+      <Panel title={cur ? `${cur.a.name} · ${FEATS.find((f) => f[0] === feat)?.[1]}` : "Series"} right={
+        <div className="flex gap-1">{FEATS.map(([k, l]) => <button key={k} onClick={() => setFeat(k)} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${feat === k ? "bg-beam text-white" : "text-muted hover:text-ink"}`}>{l.split(" (")[0].split(" P")[0]}</button>)}</div>
+      } bodyClass="flex min-h-0 flex-col p-3">
+        <div className="min-h-0 flex-1">{cur?.s ? <SeriesChart s={cur.s} feat={feat} det={det[cur.a.id] || null} /> : <div className="grid h-full place-items-center text-muted">Select an AOI with a screened archive</div>}</div>
+        <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-muted">
+          <span><span className="text-beam2">●</span> acquisition (zone P95 over valid water)</span><span><span className="text-critical">●</span> DETECT candidate on that date</span><span><span className="text-caution">—</span> seasonal P90 envelope</span>
+          {cur?.s && <span>{cur.s.n_ok}/{cur.s.n_datatakes} datatakes processed · window {cur.s.window.join(" → ")}</span>}
+          <Link href="/incidents" className="ml-auto text-beam2">Open verification queue →</Link>
+        </div>
       </Panel>
     </div>
   );

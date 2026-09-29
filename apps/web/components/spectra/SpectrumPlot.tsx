@@ -1,5 +1,6 @@
 "use client";
 import React, { useMemo, useRef, useState } from "react";
+import { useElementSize } from "@/lib/useSize";
 
 export interface Spectrum {
   wavelengths_nm: number[]; event: (number | null)[]; background: (number | null)[];
@@ -9,12 +10,26 @@ export interface Spectrum {
 const S2_BANDS: [string, number, number][] = [["B1", 443, 21], ["B2", 492, 66], ["B3", 560, 36], ["B4", 665, 31], ["B5", 704, 15], ["B6", 740, 15], ["B7", 783, 20], ["B8", 833, 106], ["B8A", 865, 21], ["B11", 1610, 91]];
 export const DIAGNOSTIC: [number, string][] = [[443, "Chl-a Soret"], [620, "Phycocyanin"], [665, "Sediment / red"], [675, "Chl-a red absorption"], [705, "Red-edge peak"]];
 
-export default function SpectrumPlot({ spec, height = 240, showBands = true, showDiff = false, range = [400, 900], highlight }: {
-  spec: Spectrum; height?: number; showBands?: boolean; showDiff?: boolean; range?: [number, number]; highlight?: number | null;
+export default function SpectrumPlot(props: {
+  spec: Spectrum; height?: number; fill?: boolean; showBands?: boolean; showDiff?: boolean; range?: [number, number]; highlight?: number | null;
+}) {
+  const box = useElementSize<HTMLDivElement>();
+  if (props.fill) {
+    return (
+      <div ref={box.ref} className="h-full w-full min-h-[120px]">
+        {box.width > 0 && box.height > 0 && <SpectrumPlotInner {...props} W={Math.max(240, box.width)} height={Math.max(110, box.height)} />}
+      </div>
+    );
+  }
+  return <SpectrumPlotInner {...props} />;
+}
+
+function SpectrumPlotInner({ spec, height = 240, showBands = true, showDiff = false, range = [400, 900], highlight, W: Wp }: {
+  spec: Spectrum; height?: number; fill?: boolean; showBands?: boolean; showDiff?: boolean; range?: [number, number]; highlight?: number | null; W?: number;
 }) {
   const ref = useRef<SVGSVGElement>(null);
   const [hover, setHover] = useState<number | null>(null);
-  const W = 560, H = height, L = 44, R = 12, T = 12, B = 26;
+  const W = Wp ?? 560, H = height, L = 44, R = 12, T = 12, B = 26;
   const idx = useMemo(() => spec.wavelengths_nm.map((w, i) => i).filter((i) => spec.wavelengths_nm[i] >= range[0] && spec.wavelengths_nm[i] <= range[1]), [spec, range]);
   const vals = idx.flatMap((i) => [spec.event[i], spec.background[i], spec.background_p95?.[i]]).filter((v): v is number => v != null && Number.isFinite(v));
   const ymax = Math.max(0.01, ...vals) * 1.08, ymin = Math.min(0, ...vals);

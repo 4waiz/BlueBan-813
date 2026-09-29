@@ -56,15 +56,15 @@ export default function SensorCard({ incident }: { incident: Incident | null }) 
           </svg>
         )}
       </div>
-      <p className="mt-2 line-clamp-2 text-[10.5px] leading-snug text-muted" title={s.note}>{s.note}</p>
+      <p className="mt-2 line-clamp-2 text-[10.5px] leading-snug text-muted short:hidden" title={s.note}>{s.note}</p>
       <div className="mt-2 grid grid-cols-5 gap-1">
         {(Object.keys(SENSORS) as Key[]).map((key) => (
           <button key={key} onClick={() => setK(key)} className={`rounded-md border px-1 py-1.5 text-[11px] font-semibold ${k === key ? "border-beam bg-beam/20 text-ink shadow-beam" : "border-edge text-muted hover:text-ink"}`}>
-            {key === "LS" ? "Landsat" : key === "813" ? "813" : SENSORS[key].name.split(" ")[0]}
+            {key === "LS" ? "Landsat" : key === "813" ? "813" : SENSORS[key].name.split(" ")[0].replace("Sentinel-", "S-")}
           </button>
         ))}
       </div>
-      {incident && <div className="mt-1 text-[10px] text-dim">Incident observed {fmt.utc(incident.observation_time)}</div>}
+      {incident && <div className="mt-1 text-[10px] text-dim short:hidden">Incident observed {fmt.utc(incident.observation_time)}</div>}
     </div>
   );
 }

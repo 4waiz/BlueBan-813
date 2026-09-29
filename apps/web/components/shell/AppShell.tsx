@@ -54,11 +54,11 @@ function TopBar({ aois, models }: { aois: Aoi[]; models: ModelRecord[] }) {
   const np = useMemo(() => (now ? nextPass(uae, now) : null), [uae, now]);
   const fresh = last && now ? (now.getTime() - new Date(last).getTime()) / 86400e3 : null;
   return (
-    <header className="flex h-[74px] items-center gap-4 border-b border-edge/80 bg-void/70 px-4 backdrop-blur">
+    <header className="flex h-[74px] shrink-0 items-center gap-4 border-b border-edge/80 bg-void/70 px-4 backdrop-blur short:h-[60px]">
       <Link href="/" className="flex items-center gap-3 pr-4">
-        <Image src={`${BASE_PATH}/brand/mark-96.png`} alt="BLUEBAN 813" width={46} height={46} priority />
+        <Image src={`${BASE_PATH}/brand/mark-96.png`} alt="BLUEBAN 813" width={46} height={46} priority className="short:h-9 short:w-9" />
         <div className="leading-tight">
-          <div className="font-display text-[22px] font-extrabold tracking-[0.12em] text-ink">BLUEBAN <span className="text-cyan">813</span></div>
+          <div className="font-display text-[22px] font-extrabold tracking-[0.12em] text-ink short:text-[19px]">BLUEBAN <span className="text-cyan">813</span></div>
           <div className="text-[10.5px] font-semibold tracking-[0.34em] text-muted">UAE COASTAL INTELLIGENCE</div>
         </div>
       </Link>
@@ -96,12 +96,12 @@ function TopBar({ aois, models }: { aois: Aoi[]; models: ModelRecord[] }) {
 
 function TopStat({ icon, k, v, sub }: { icon: React.ReactNode; k: string; v: React.ReactNode; sub?: React.ReactNode }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-lg border border-edge/70 bg-panel/60 px-3 py-2">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-edge bg-deep">{icon}</div>
+    <div className="flex min-w-0 items-center gap-3 rounded-lg border border-edge/70 bg-panel/60 px-3 py-2 short:py-1">
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-edge bg-deep short:h-8 short:w-8">{icon}</div>
       <div className="min-w-0 leading-tight">
         <div className="hud-kicker">{k}</div>
         <div className="truncate text-[13.5px] font-semibold text-ink">{v}</div>
-        {sub && <div className="truncate text-[10.5px] text-muted">{sub}</div>}
+        {sub && <div className="truncate text-[10.5px] text-muted tiny:hidden">{sub}</div>}
       </div>
     </div>
   );
@@ -136,7 +136,7 @@ function MissionRail({ incidents, aois, models, labels }: { incidents: IncidentS
     { href: "/settings", label: "SETTINGS", icon: <Settings size={16} /> },
   ];
   return (
-    <nav className="flex w-[228px] shrink-0 flex-col gap-2 overflow-y-auto border-r border-edge/70 bg-void/40 p-3">
+    <nav className="flex w-[228px] shrink-0 flex-col gap-2 overflow-y-auto border-r border-edge/70 bg-void/40 p-3 short:gap-1.5 short:p-2">
       <Link href="/" className={`flex items-center gap-2 rounded-md px-3 py-2 text-[11.5px] font-bold tracking-[0.14em] ${path === "/" ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
         <LayoutDashboard size={16} /> INCIDENT CONTROL
       </Link>
@@ -144,20 +144,20 @@ function MissionRail({ incidents, aois, models, labels }: { incidents: IncidentS
         const active = path === it.href || (it.href !== "/" && path.startsWith(it.href));
         return (
           <Link key={it.label} href={it.href}
-            className={`group relative flex items-center gap-3 rounded-lg border px-3 py-3 transition ${active ? "border-beam/70 bg-beam/10 shadow-beam" : "border-edge/70 bg-panel/50 hover:border-line"}`}>
+            className={`group relative flex items-center gap-3 rounded-lg border px-3 py-3 transition short:py-2 ${active ? "border-beam/70 bg-beam/10 shadow-beam" : "border-edge/70 bg-panel/50 hover:border-line"}`}>
             <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r" style={{ background: RAIL_COLOR[it.state] }} />
-            <span className="grid h-10 w-10 place-items-center rounded-md border border-edge bg-deep" style={{ color: RAIL_COLOR[it.state] === "#5D7299" ? "#93A6CB" : RAIL_COLOR[it.state] }}>{it.icon}</span>
+            <span className="grid h-10 w-10 place-items-center rounded-md border border-edge bg-deep short:h-8 short:w-8" style={{ color: RAIL_COLOR[it.state] === "#5D7299" ? "#93A6CB" : RAIL_COLOR[it.state] }}>{it.icon}</span>
             <span className="min-w-0 leading-tight">
               <span className="block font-display text-[14px] font-bold tracking-[0.1em] text-ink">{it.label}</span>
               <span className="block truncate text-[11px] text-muted">{it.sub}</span>
-              <span className="block truncate text-[10px]" style={{ color: RAIL_COLOR[it.state] }}>{it.note}</span>
+              <span className="block truncate text-[10px] tiny:hidden" style={{ color: RAIL_COLOR[it.state] }}>{it.note}</span>
             </span>
           </Link>
         );
       })}
       <div className="rule-h my-2" />
       {nav.map((n) => (
-        <Link key={n.label} href={n.href} className={`flex items-center gap-3 rounded-md px-3 py-2 text-[11.5px] font-bold tracking-[0.12em] ${path.startsWith(n.href) ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
+        <Link key={n.label} href={n.href} className={`flex items-center gap-3 rounded-md px-3 py-2 short:py-1.5 text-[11.5px] font-bold tracking-[0.12em] ${path.startsWith(n.href) ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
           {n.icon}<span className="flex-1">{n.label}</span>
           {n.badge ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-critical px-1.5 text-[10px] font-bold text-white">{n.badge}</span> : null}
         </Link>
@@ -177,7 +177,7 @@ function Footer({ incidents, aois, labels, models }: { incidents: IncidentSummar
     ["AOI observations (7d)", scenes7, "#EAF1FF"], ["Labels queued for LEARN", queued, "#27C3F3"],
   ];
   return (
-    <footer className="flex h-[44px] items-center gap-5 border-t border-edge/70 bg-void/80 px-4 text-[11px]">
+    <footer className="flex h-[44px] shrink-0 items-center gap-5 border-t border-edge/70 bg-void/80 px-4 text-[11px] short:h-[38px]">
       <div className="flex items-center gap-2 font-bold tracking-[0.16em] text-muted"><UaeFlag size={12} /> UAE COASTAL MONITORING</div>
       <div className="hidden items-center gap-6 md:flex">
         {stats.map(([k, v, c]) => (

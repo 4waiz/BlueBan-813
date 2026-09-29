@@ -103,6 +103,7 @@ export default function IncidentMap(props: Props) {
   const pixels = useRef<{ meta: { bounds: number[]; shape: [number, number]; fields: string[]; scale?: Record<string, number> } | null; data: Record<string, Float32Array> }>({ meta: null, data: {} });
   const toolRef = useRef(tool);
   toolRef.current = tool;
+  const lastMode = useRef<MapMode | null>(null);
 
   const rasters: LayerRef[] = useMemo(() => incident?.layers?.rasters || [], [incident]);
   const timeline = incident?.layers?.timeline || [];
@@ -152,9 +153,13 @@ export default function IncidentMap(props: Props) {
   useEffect(() => {
     const m = map.current;
     if (!m || !ready) return;
+    const changed = lastMode.current !== null && lastMode.current !== mode;
+    lastMode.current = mode;
     try {
-      if (mode === "3d") { m.setProjection({ type: "globe" }); m.setTerrain({ source: "dem", exaggeration: 1.3 }); m.easeTo({ pitch: 50, bearing: -12, duration: 600 }); }
-      else { m.setTerrain(null); m.setProjection({ type: "mercator" }); m.easeTo({ pitch: 0, bearing: 0, duration: 400 }); }
+      // Only animate when the operator actually switches mode: an ease on first
+      // load would cancel the fit-to-incident flight and strand the camera.
+      if (mode === "3d") { m.setProjection({ type: "globe" }); m.setTerrain({ source: "dem", exaggeration: 1.3 }); if (changed) m.easeTo({ pitch: 50, bearing: -12, duration: 600 }); }
+      else { m.setTerrain(null); m.setProjection({ type: "mercator" }); if (changed) m.easeTo({ pitch: 0, bearing: 0, duration: 400 }); }
     } catch { /* ignore */ }
     if (mode === "split" && elB.current && !mapB.current) {
       const b = new maplibregl.Map({ container: elB.current, style: baseStyle(), center: m.getCenter(), zoom: m.getZoom(), attributionControl: false });
@@ -262,7 +267,7 @@ export default function IncidentMap(props: Props) {
     const m = map.current;
     if (!m || !ready || !incident) return;
     const b = incident.layers?.bounds;
-    if (b) m.fitBounds([[b[0], b[1]], [b[2], b[3]]] as LngLatBoundsLike, { padding: compact ? 20 : 60, duration: 1400, pitch: mode === "3d" ? 45 : 0, bearing: mode === "3d" ? -10 : 0 });
+    if (b) m.fitBounds([[b[0], b[1]], [b[2], b[3]]] as LngLatBoundsLike, { padding: compact ? 20 : { top: 70, bottom: 40, left: 40, right: 70 }, duration: 1400, maxZoom: 13, pitch: mode === "3d" ? 40 : 0, bearing: mode === "3d" ? -10 : 0 });
     else if (incident.centroid) m.flyTo({ center: incident.centroid, zoom: 10.5, duration: 1400 });
     setTIdx(timeline.length ? timeline.length - 1 : null);
     const defaults = (incident.layers as unknown as { default?: string[] })?.default;

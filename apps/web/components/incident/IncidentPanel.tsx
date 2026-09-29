@@ -78,15 +78,15 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
       </header>
       <AnimatePresence mode="wait">
         <motion.div key={inc.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex min-h-0 flex-1 flex-col">
-          <div className="mx-4 flex items-start gap-3 rounded-lg border p-3" style={{ borderColor: `${color}55`, background: `linear-gradient(90deg, ${color}22, transparent)` }}>
-            <AlertTriangle size={30} style={{ color }} className="mt-0.5 shrink-0" />
+          <div className="mx-4 flex items-start gap-3 rounded-lg border p-3 short:p-2" style={{ borderColor: `${color}55`, background: `linear-gradient(90deg, ${color}22, transparent)` }}>
+            <AlertTriangle size={30} style={{ color }} className="mt-0.5 shrink-0 short:hidden" />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-display text-[19px] font-extrabold tracking-wide">{inc.id}</span>
+                <span className="font-display text-[19px] font-extrabold tracking-wide short:text-[16px]">{inc.id}</span>
                 <Chip label={inc.status} />
                 {inc.role === "negative_control" && <Chip label="NEGATIVE CONTROL" color="#8B7BFF" />}
               </div>
-              <div className="text-[13px] font-semibold" style={{ color }}>{inc.title || EVENT_TYPES[inc.event_type_hypothesis]}</div>
+              <div className="text-[13px] font-semibold leading-snug short:text-[12px]" style={{ color }}>{inc.title || EVENT_TYPES[inc.event_type_hypothesis]}</div>
               <div className="text-[11px] text-muted">{inc.aoi_name} · {fmt.utc(inc.observation_time)}</div>
             </div>
           </div>
@@ -173,7 +173,7 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
             )}
           </div>
           <div className="border-t border-edge p-2.5">
-            <input name="review-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional review note (saved with your decision)" className="mb-2 w-full rounded-md border border-line bg-deep px-3 py-1.5 text-[12px] outline-none focus:border-beam2" maxLength={400} />
+            <input name="review-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional review note (saved with your decision)" className="mb-2 short:mb-1.5 short:py-1 w-full rounded-md border border-line bg-deep px-3 py-1.5 text-[12px] outline-none focus:border-beam2" maxLength={400} />
             <div className="grid grid-cols-3 gap-2">
               <button disabled={!!busy} onClick={() => act("CONFIRM")} className="btn btn-good whitespace-nowrap px-2"><Check size={15} /> Confirm Event</button>
               <button disabled={!!busy} onClick={() => act("FALSE_POSITIVE")} className="btn btn-bad whitespace-nowrap px-2"><X size={15} /> False Positive</button>

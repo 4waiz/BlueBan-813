@@ -89,7 +89,7 @@ function Slices({ meta, data, sel, onPick, scanning }: { meta: CubeMeta; data: U
 }
 
 export default function CubeViewer({ name, height = 300, onSpectrum, compact = false }: {
-  name: string; height?: number; compact?: boolean;
+  name: string; height?: number | string; compact?: boolean;
   onSpectrum?: (s: { wavelengths_nm: number[]; values: (number | null)[]; row: number; col: number }) => void;
 }) {
   const [meta, setMeta] = useState<CubeMeta | null>(null);

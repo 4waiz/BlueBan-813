@@ -12,6 +12,10 @@ export default {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      screens: {
+        short: { raw: "(max-height: 980px)" },
+        tiny: { raw: "(max-height: 820px)" },
+      },
       colors: {
         void: "#040915",
         deep: "#071024",

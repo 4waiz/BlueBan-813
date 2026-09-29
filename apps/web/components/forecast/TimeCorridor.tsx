@@ -44,7 +44,7 @@ function Corridor({ steps, sel }: { steps: DriftStep[]; sel: number }) {
   );
 }
 
-export default function TimeCorridor({ steps, height = 260, wind }: { steps: DriftStep[] | null; height?: number; wind?: { speed_kmh?: number; from?: string } | null }) {
+export default function TimeCorridor({ steps, height = 260, wind }: { steps: DriftStep[] | null; height?: number | string; wind?: { speed_kmh?: number; from?: string } | null }) {
   const [sel, setSel] = useState(0);
   const ok = useMemo(() => (steps || []).filter((s) => s.centroid && Number.isFinite(s.centroid[0])), [steps]);
   if (!ok.length) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>No drift scenario for this incident</div>;

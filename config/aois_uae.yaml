@@ -1,0 +1,75 @@
+# UAE monitoring AOIs for BLUEBAN 813.
+#
+# Boxes are drawn around the WATER in front of each coastal asset cluster and
+# extend 10-25 km offshore, so each AOI contains a real open-water population
+# as well as the nearshore zone. They are candidates in the AOI tournament
+# (docs/UAE_AOI_TOURNAMENT.md) and, whatever wins, all of them stay in the
+# WATCH list: monitoring several AOIs is the product; the hero incident is one
+# of them.
+#
+# The first version of the Abu Dhabi box (54.30-54.62 E, 24.28-24.55 N) is kept
+# as AE-AUH-LAGOON because the audit showed it is mostly land, sabkha and
+# optically very shallow lagoon, where red-edge indices respond to bright bottom
+# and seagrass rather than to chlorophyll. It is the cautionary case.
+
+aois:
+  AE-AUH-LAGOON:
+    name: Abu Dhabi / Musaffah lagoons
+    emirate: Abu Dhabi
+    coast: Arabian Gulf
+    bbox: [54.30, 24.28, 54.62, 24.55]
+    optical_regime: optically shallow lagoon, extensive intertidal flats
+  AE-AUH-NORTH:
+    name: Abu Dhabi island north coast / Saadiyat
+    emirate: Abu Dhabi
+    coast: Arabian Gulf
+    bbox: [54.20, 24.45, 54.55, 24.70]
+    optical_regime: shallow shelf, mixed
+  AE-AUH-TAWEELAH:
+    name: Al Taweelah / Khalifa Port
+    emirate: Abu Dhabi
+    coast: Arabian Gulf
+    bbox: [54.55, 24.70, 54.90, 24.95]
+    optical_regime: shallow shelf, mixed
+  AE-DXB-JEBELALI:
+    name: Dubai / Jebel Ali
+    emirate: Dubai
+    coast: Arabian Gulf
+    bbox: [54.85, 24.95, 55.20, 25.20]
+    optical_regime: shelf, dredged harbours and reclaimed islands
+  AE-SHJ-AJM:
+    name: Sharjah / Ajman
+    emirate: Sharjah / Ajman
+    coast: Arabian Gulf
+    bbox: [55.25, 25.30, 55.55, 25.55]
+    optical_regime: shelf
+  AE-UAQ-RAK:
+    name: Umm Al Quwain / Ras Al Khaimah
+    emirate: Umm Al Quwain / Ras Al Khaimah
+    coast: Arabian Gulf
+    bbox: [55.55, 25.50, 55.95, 25.85]
+    optical_regime: shelf with lagoons (Khor Al Beida)
+  AE-FUJ:
+    name: Fujairah / Qidfa / anchorage
+    emirate: Fujairah
+    coast: Gulf of Oman
+    bbox: [56.33, 25.05, 56.60, 25.35]
+    optical_regime: narrow shelf, optically deep within a few km of shore
+  AE-SHJ-KALBA:
+    name: Kalba
+    emirate: Sharjah
+    coast: Gulf of Oman
+    bbox: [56.33, 24.95, 56.55, 25.10]
+    optical_regime: narrow shelf, optically deep offshore
+  AE-SHJ-KHORFAKKAN:
+    name: Khor Fakkan
+    emirate: Sharjah
+    coast: Gulf of Oman
+    bbox: [56.33, 25.30, 56.55, 25.45]
+    optical_regime: narrow shelf, optically deep offshore
+  AE-FUJ-DIBBA:
+    name: Dibba
+    emirate: Fujairah
+    coast: Gulf of Oman
+    bbox: [56.25, 25.55, 56.50, 25.70]
+    optical_regime: narrow shelf, optically deep offshore

@@ -109,6 +109,9 @@ export interface Incident {
   layers?: IncidentLayers;
   spectral?: { wavelengths_nm: number[]; event: (number | null)[]; background: (number | null)[]; background_p05?: (number | null)[]; background_p95?: (number | null)[]; sensor: string; simulated?: boolean; bands?: string[] };
   context?: { title: string; source: string; url?: string; note?: string }[];
+  forecast?: { steps: { hours: number; centroid: [number, number]; spread_radius_m: number; particles?: [number, number][]; bearing_deg?: number; displacement_m?: number }[]; wind?: { speed_kmh?: number; from?: string } | null; label?: string; is_hydrodynamic_model?: boolean };
+  cube?: string | null;
+  aliases?: string[];
   disposition?: string | null;
   reviews?: Review[];
   samples?: Sample[];

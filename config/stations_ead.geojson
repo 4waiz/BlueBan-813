@@ -1,0 +1,961 @@
+{
+ "type": "FeatureCollection",
+ "properties": {
+  "source": "Abu Dhabi Spatial Data Infrastructure open data, MapServer layers 170 (MarineWaterQuality_AutomatedBuoys) and 171 (MarineWaterQualitySampleSites)",
+  "created_by": "Environment Agency - Abu Dhabi (per layer copyright text)",
+  "retrieved_utc": "2026-09-29T21:44:59Z",
+  "policy": "Locations only; displayed as monitoring stations, never as measurements."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.11586100000005,
+     24.358111000000065
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:1",
+    "name": "Al Zubaya",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     52.37891700000006,
+     24.05194400000005
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:2",
+    "name": "Barakah",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.373717000000056,
+     24.42477800000006
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:3",
+    "name": "Bateen Public Beach",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.05191700000006,
+     24.54841700000003
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:4",
+    "name": "Bu Tinah",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.41161900000003,
+     24.44817800000004
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:5",
+    "name": "Eastern Corniche",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.34991700000006,
+     24.23025000000007
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:6",
+    "name": "Marawah",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.50151400000004,
+     24.314625000000035
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:7",
+    "name": "Mussafah South Channel",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.689306000000045,
+     24.849806000000058
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:8",
+    "name": "Ras Ghanada",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Inactive",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.41650000000004,
+     24.500361000000055
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:9",
+    "name": "Reem Island",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.422056000000055,
+     24.596806000000072
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:10",
+    "name": "Sadiyat",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Inactive",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     51.857139000000075,
+     24.208278000000064
+    ]
+   },
+   "properties": {
+    "id": "adsdi:170:11",
+    "name": "Umm Al Hatab",
+    "kind": "AUTOMATED_BUOY",
+    "category": null,
+    "status": "Active",
+    "period": null,
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.39036111100006,
+     24.260888889000057
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:1",
+    "name": "S001",
+    "kind": "SAMPLE_SITE",
+    "category": "Confined Areas",
+    "status": "Active",
+    "period": "2008-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.509027778000075,
+     24.31511111100008
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:2",
+    "name": "S002",
+    "kind": "SAMPLE_SITE",
+    "category": "Confined Areas",
+    "status": "Active",
+    "period": "2008-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.46308333300004,
+     24.37088888900007
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:3",
+    "name": "S003",
+    "kind": "SAMPLE_SITE",
+    "category": "Confined Areas",
+    "status": "Active",
+    "period": "2008-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.44572222200003,
+     24.44825000000003
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:4",
+    "name": "S004",
+    "kind": "SAMPLE_SITE",
+    "category": "Natural Habitats",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.41930555600004,
+     24.444833333000076
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:5",
+    "name": "S005",
+    "kind": "SAMPLE_SITE",
+    "category": "Point Sources",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.502944444000036,
+     24.40144444400005
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:6",
+    "name": "S006",
+    "kind": "SAMPLE_SITE",
+    "category": "Point Sources",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.37505555600006,
+     24.428500000000042
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:7",
+    "name": "S007",
+    "kind": "SAMPLE_SITE",
+    "category": "Public Beaches",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.304416667000055,
+     24.465555556000027
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:8",
+    "name": "S008",
+    "kind": "SAMPLE_SITE",
+    "category": "Public Beaches",
+    "status": "Inactive",
+    "period": "2008-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.34325000000007,
+     24.477333333000047
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:9",
+    "name": "S009",
+    "kind": "SAMPLE_SITE",
+    "category": "Public Beaches",
+    "status": "Active",
+    "period": "2008-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.32844444400007,
+     24.45508333300006
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:10",
+    "name": "S0010",
+    "kind": "SAMPLE_SITE",
+    "category": "Port and Marinas",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.373055556000054,
+     24.509694444000047
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:11",
+    "name": "S0011",
+    "kind": "SAMPLE_SITE",
+    "category": "Port and Marinas",
+    "status": "Active",
+    "period": "2008-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     52.629138889000046,
+     24.24188888900005
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:12",
+    "name": "S0012",
+    "kind": "SAMPLE_SITE",
+    "category": "Port and Marinas",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.49030555600007,
+     24.470877778000045
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:13",
+    "name": "S0013",
+    "kind": "SAMPLE_SITE",
+    "category": "Desalination Plants",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.645194444000026,
+     24.756638889000044
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:14",
+    "name": "S0014",
+    "kind": "SAMPLE_SITE",
+    "category": "Desalination Plants",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.439916667000034,
+     24.144305556000063
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:15",
+    "name": "S0015",
+    "kind": "SAMPLE_SITE",
+    "category": "Desalination Plants",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.150166667000065,
+     24.291527778000045
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:16",
+    "name": "S0016",
+    "kind": "SAMPLE_SITE",
+    "category": "Marine Protected Areas",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.141000000000076,
+     24.277750000000026
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:17",
+    "name": "S0017",
+    "kind": "SAMPLE_SITE",
+    "category": "Marine Protected Areas",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.04230555600003,
+     24.62813888900007
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:18",
+    "name": "S0018",
+    "kind": "SAMPLE_SITE",
+    "category": "Marine Protected Areas",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     52.034138889000076,
+     24.24202777800008
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:19",
+    "name": "S0019",
+    "kind": "SAMPLE_SITE",
+    "category": "Marine Protected Areas",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.141000000000076,
+     24.277750000000026
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:20",
+    "name": "S0020",
+    "kind": "SAMPLE_SITE",
+    "category": "Natural Habitats",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     53.04230555600003,
+     24.62813888900007
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:21",
+    "name": "S0021",
+    "kind": "SAMPLE_SITE",
+    "category": "Natural Habitats",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     52.034138889000076,
+     24.24202777800008
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:22",
+    "name": "S0022",
+    "kind": "SAMPLE_SITE",
+    "category": "Natural Habitats",
+    "status": "Active",
+    "period": "2011-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.28541666700005,
+     24.533833333000075
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:23",
+    "name": "S0023",
+    "kind": "SAMPLE_SITE",
+    "category": "Reference",
+    "status": "Inactive",
+    "period": "2011-2015",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.48608611100008,
+     24.384861111000077
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:24",
+    "name": "S0027",
+    "kind": "SAMPLE_SITE",
+    "category": "Channels",
+    "status": "Inactive",
+    "period": "2008-2010",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.418236111000056,
+     24.416111112000067
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:25",
+    "name": "S0028",
+    "kind": "SAMPLE_SITE",
+    "category": "Channels",
+    "status": "Inactive",
+    "period": "2008-2010",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.485105556000065,
+     24.42536111100003
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:26",
+    "name": "S0029",
+    "kind": "SAMPLE_SITE",
+    "category": "Desalination Plants",
+    "status": "Inactive",
+    "period": "2008-2010",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.56741944400005,
+     24.444666667000035
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:27",
+    "name": "S0030",
+    "kind": "SAMPLE_SITE",
+    "category": "Public Beaches",
+    "status": "Inactive",
+    "period": "2008-2010",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.46756944400005,
+     24.501194444000078
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:28",
+    "name": "S0031",
+    "kind": "SAMPLE_SITE",
+    "category": "Channels",
+    "status": "Inactive",
+    "period": "2008-2010",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.50885277800006,
+     24.315708333000032
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:29",
+    "name": "S0104",
+    "kind": "SAMPLE_SITE",
+    "category": "Point Sources",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.40756388900007,
+     24.450941667000052
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:30",
+    "name": "S0105",
+    "kind": "SAMPLE_SITE",
+    "category": "Point Sources",
+    "status": "Inactive",
+    "period": "2016",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.462166667000076,
+     24.407858333000036
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:31",
+    "name": "S0106",
+    "kind": "SAMPLE_SITE",
+    "category": "Point Sources",
+    "status": "Inactive",
+    "period": "2016",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.48886111100006,
+     24.414305556000045
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:32",
+    "name": "S0107",
+    "kind": "SAMPLE_SITE",
+    "category": "Public Beaches",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.32786111100006,
+     24.476055556000063
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:33",
+    "name": "S0111",
+    "kind": "SAMPLE_SITE",
+    "category": "Port and Marinas",
+    "status": "Inactive",
+    "period": "2016",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.416091667000046,
+     24.49862222200005
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:34",
+    "name": "S0117",
+    "kind": "SAMPLE_SITE",
+    "category": "Development Areas",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.60011111100005,
+     24.454972222000038
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:35",
+    "name": "S0118",
+    "kind": "SAMPLE_SITE",
+    "category": "Development Areas",
+    "status": "Inactive",
+    "period": "2016",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.38066666700007,
+     24.396027778000075
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:36",
+    "name": "S0119",
+    "kind": "SAMPLE_SITE",
+    "category": "Development Areas",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.69500000000005,
+     24.856119444000058
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:37",
+    "name": "S0123",
+    "kind": "SAMPLE_SITE",
+    "category": "Natural Habitats",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     52.30397222200003,
+     24.074722222000048
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:38",
+    "name": "S0125",
+    "kind": "SAMPLE_SITE",
+    "category": "Nuclear Power Plant ",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.188000000000045,
+     24.851861111000062
+    ]
+   },
+   "properties": {
+    "id": "adsdi:171:39",
+    "name": "S0126",
+    "kind": "SAMPLE_SITE",
+    "category": "Reference",
+    "status": "Active",
+    "period": "2016-till date",
+    "note": "Monitoring LOCATION only. No measurement values are public (EAD records are confidential)."
+   }
+  }
+ ]
+}

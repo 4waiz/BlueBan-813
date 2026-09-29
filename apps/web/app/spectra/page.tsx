@@ -1,469 +1,106 @@
 "use client";
-
 /**
- * SPECTRA - the hyperspectral oscilloscope.
- *
- * This is where the difference between 11 broad bands and a continuous
- * spectrum becomes visible rather than asserted. The cursor reads out the
- * exact value, uncertainty and significance at any wavelength, and the
- * Sentinel-2 band overlay shows precisely what a multispectral sensor would
- * and would not have measured.
+ * SPECTRAL LAB: 2D scientific plot + 3D spectral data cube + "What did 813 add?".
  */
+import React, { Suspense, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Box, LineChart } from "lucide-react";
+import { useEngineQuery, useStatic } from "@/lib/engine";
+import SpectrumPlot, { DIAGNOSTIC } from "@/components/spectra/SpectrumPlot";
+import { Chip, fmt, Panel, SimBadge } from "@/components/ui";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Panel, Loading, ErrorBox, KV, Chip, Caveat, SimulatedBadge, Readout,
-} from "@/components/hud";
-import { api, SpectraPayload, WaterEvent, CLASS_COLOR, fmt, fmtInt } from "@/lib/api";
+const CubeViewer = dynamic(() => import("@/components/spectra/CubeViewer"), { ssr: false });
 
-/**
- * Sentinel-2 MSI bands drawn on the spectrum.
- *
- * Centres and bandwidths are the ESA Sentinel-2 User Handbook / MSI spectral
- * response values, and they are the same numbers pipeline/satellite813.py uses
- * to build the multispectral arm of the ablation. B9 (945 nm water vapour) and
- * B10 (1375 nm cirrus) are omitted: they carry atmosphere, not water-leaving
- * signal. B11/B12 sit outside the water-informative range plotted here.
- */
-const S2_BANDS: { name: string; nm: number; w: number }[] = [
-  { name: "B1", nm: 443, w: 21 }, { name: "B2", nm: 492, w: 66 },
-  { name: "B3", nm: 560, w: 36 }, { name: "B4", nm: 665, w: 31 },
-  { name: "B5", nm: 704, w: 15 }, { name: "B6", nm: 740, w: 15 },
-  { name: "B7", nm: 783, w: 20 }, { name: "B8A", nm: 865, w: 21 },
-];
+type Arm = { f1: number; precision: number; recall: number; roc_auc: number; confusion_matrix: { tp: number; fp: number; fn: number; tn: number }; n_features: number };
+type Lift = { results: { spatial_blocked: Record<string, Arm> }; hyperspectral_lift?: Record<string, unknown>; caveats?: string[]; n_samples: number; n_positive: number; n_spatial_blocks: number };
+type OlciLift = { targets: Record<string, { n: number; units: string; spatial_blocked: Record<string, { r2: number; rmse: number; r2_ci95: { lo: number; hi: number } }> }>; matchup_dt_hours: { median: number }; n_matchups: number };
 
-type Mode = "reflectance" | "difference" | "zscore" | "snr";
-
-export default function Spectra() {
-  const [sp, setSp] = useState<SpectraPayload | null>(null);
-  const [ev, setEv] = useState<WaterEvent | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [cursor, setCursor] = useState<number | null>(null);
-  const [mode, setMode] = useState<Mode>("reflectance");
-  const [showS2, setShowS2] = useState(true);
-  const [showEnv, setShowEnv] = useState(true);
-  const [showRegions, setShowRegions] = useState(false);
-  const [zoom, setZoom] = useState<[number, number] | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const idx = await api.events();
-        const id = idx.events[0].event_id;
-        const [s, e] = await Promise.all([api.spectrum(id), api.event(id)]);
-        setSp(s); setEv(e);
-      } catch (e: any) { setErr(e.message ?? String(e)); }
-    })();
-  }, []);
-
-  const W = 1180, H = 470, M = { l: 66, r: 24, t: 20, b: 44 };
-
-  const view = useMemo(() => {
-    if (!sp) return null;
-    const wl = sp.wavelengths_nm;
-    const lo = zoom?.[0] ?? wl[0];
-    const hi = zoom?.[1] ?? wl[wl.length - 1];
-    const idxs = wl.map((w, i) => ({ w, i })).filter((d) => d.w >= lo && d.w <= hi);
-
-    const pick = (arr: (number | null)[]) => idxs.map((d) => arr[d.i]);
-    let series: { key: string; color: string; label: string; v: (number | null)[] }[] = [];
-
-    if (mode === "reflectance") {
-      series = [
-        { key: "bg", color: "#4A93FF", label: "Background water", v: pick(sp.background.mean) },
-        { key: "ev", color: "#FF7A45", label: "Event", v: pick(sp.event.mean) },
-      ];
-      if (showRegions) {
-        Object.entries(sp.regions).forEach(([k, r], i) => {
-          series.push({
-            key: k, color: CLASS_COLOR[r.class] ?? "#8A93B8",
-            label: `${k} (${r.class.replace(/_/g, " ").toLowerCase()})`,
-            v: pick(r.mean),
-          });
-        });
-      }
-    } else if (mode === "difference") {
-      series = [{ key: "diff", color: "#F5C451", label: "Event - background", v: pick(sp.difference) }];
-    } else if (mode === "zscore") {
-      series = [{ key: "z", color: "#3FD1A0", label: "z of difference", v: pick(sp.z_score) }];
-    } else {
-      series = [{ key: "snr", color: "#C77DFF", label: "Signal-to-noise", v: pick(sp.snr) }];
-    }
-
-    const all = series.flatMap((s) => s.v).filter((v): v is number => v !== null && Number.isFinite(v));
-    let ymin = Math.min(...all), ymax = Math.max(...all);
-    if (mode === "reflectance") ymin = Math.min(0, ymin);
-    if (mode === "zscore" || mode === "difference") {
-      const m = Math.max(Math.abs(ymin), Math.abs(ymax));
-      ymin = -m; ymax = m;
-    }
-    const pad = (ymax - ymin) * 0.08 || 0.01;
-    ymin -= pad; ymax += pad;
-
-    const x = (w: number) => M.l + ((w - lo) / (hi - lo)) * (W - M.l - M.r);
-    const y = (v: number) => H - M.b - ((v - ymin) / (ymax - ymin)) * (H - M.t - M.b);
-
-    const envelope = showEnv && mode === "reflectance"
-      ? { lo: pick(sp.background.p05), hi: pick(sp.background.p95) }
-      : null;
-
-    return { wl: idxs.map((d) => d.w), idxs, series, x, y, lo, hi, ymin, ymax, envelope };
-  }, [sp, mode, zoom, showEnv, showRegions]);
-
-  if (err) return <div className="p-6"><ErrorBox error={err} /></div>;
-  if (!sp || !ev || !view) return <Loading what="spectral cube" />;
-
-  const ci = cursor !== null
-    ? view.wl.reduce((best, w, i) => Math.abs(w - cursor) < Math.abs(view.wl[best] - cursor) ? i : best, 0)
-    : null;
-  const cw = ci !== null ? view.wl[ci] : null;
-  const gi = ci !== null ? view.idxs[ci].i : null;
-
-  const s2Covers = (nm: number) =>
-    S2_BANDS.some((b) => Math.abs(b.nm - nm) <= b.w / 2);
-
-  function toPath(v: (number | null)[]) {
-    let d = "", pen = false;
-    v.forEach((val, i) => {
-      if (val === null || !Number.isFinite(val)) { pen = false; return; }
-      const px = view!.x(view!.wl[i]), py = view!.y(val);
-      d += `${pen ? "L" : "M"}${px.toFixed(1)},${py.toFixed(1)}`;
-      pen = true;
-    });
-    return d;
-  }
-
-  const yTicks = 5, xTicks = 8;
-
+function What813Added() {
+  const hard = useStatic<Lift>("validation/detectability_lift_hard.json").data;
+  const easy = useStatic<Lift>("validation/detectability_lift_easy.json").data;
+  const olci = useStatic<OlciLift>("validation/hyperspectral_lift.json").data;
+  const arms = (l: Lift | null | undefined) => l?.results?.spatial_blocked || {};
+  const h = arms(hard), e = arms(easy);
+  const s2 = h["S2_multispectral_11band"], h813 = h["813_hyperspectral_205band"];
+  const fpCut = s2 && h813 ? 1 - h813.confusion_matrix.fp / s2.confusion_matrix.fp : null;
   return (
-    <div className="h-full overflow-y-auto p-3">
-      <div className="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_320px] gap-3">
-        {/* -------------------------------------------------- oscilloscope */}
-        <div className="flex flex-col gap-3 min-w-0">
-          <Panel
-            title="Hyperspectral oscilloscope"
-            right={
-              <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                {(["reflectance", "difference", "zscore", "snr"] as Mode[]).map((m) => (
-                  <button key={m} onClick={() => setMode(m)}
-                          className="chamfer-sm hud-label px-2 py-[3px] transition-colors"
-                          style={{
-                            color: mode === m ? "#4A93FF" : "#5A6490",
-                            border: `1px solid ${mode === m ? "#3186FF" : "#1B2444"}`,
-                            background: mode === m ? "rgba(49,134,255,0.14)" : "transparent",
-                          }}>
-                    {m === "zscore" ? "Z-SCORE" : m.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            }>
-            <div className="relative">
-              <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full select-none"
-                   style={{ display: "block" }}
-                   onMouseMove={(e) => {
-                     const r = svgRef.current!.getBoundingClientRect();
-                     const px = ((e.clientX - r.left) / r.width) * W;
-                     if (px < M.l || px > W - M.r) { setCursor(null); return; }
-                     const frac = (px - M.l) / (W - M.l - M.r);
-                     setCursor(view.lo + frac * (view.hi - view.lo));
-                   }}
-                   onMouseLeave={() => setCursor(null)}
-                   onDoubleClick={() => setZoom(null)}>
-                {/* bad-band regions from the product's own flags */}
-                {sp.bad_band_ranges_nm.map(([a, b], i) => {
-                  if (b < view.lo || a > view.hi) return null;
-                  const xa = view.x(Math.max(a, view.lo)), xb = view.x(Math.min(b, view.hi));
-                  return (
-                    <g key={i}>
-                      <rect x={xa} y={M.t} width={Math.max(xb - xa, 1)} height={H - M.t - M.b}
-                            fill="rgba(255,77,77,0.07)" />
-                      <text x={(xa + xb) / 2} y={M.t + 12} textAnchor="middle"
-                            className="hud-label" style={{ fontSize: 8, fill: "#FF4D4D" }}>
-                        SENSOR BAD BANDS
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {/* Sentinel-2 band footprints */}
-                {showS2 && S2_BANDS.map((b) => {
-                  const a = b.nm - b.w / 2, c = b.nm + b.w / 2;
-                  if (c < view.lo || a > view.hi) return null;
-                  const xa = view.x(Math.max(a, view.lo)), xb = view.x(Math.min(c, view.hi));
-                  return (
-                    <g key={b.name}>
-                      <rect x={xa} y={M.t} width={Math.max(xb - xa, 1.5)} height={H - M.t - M.b}
-                            fill="rgba(63,209,160,0.10)" stroke="rgba(63,209,160,0.3)"
-                            strokeWidth={0.5} />
-                      <text x={(xa + xb) / 2} y={H - M.b + 24} textAnchor="middle"
-                            className="hud-value" style={{ fontSize: 8, fill: "#3FD1A0" }}>
-                        {b.name}
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {/* grid */}
-                {Array.from({ length: yTicks + 1 }).map((_, i) => {
-                  const v = view.ymin + (i / yTicks) * (view.ymax - view.ymin);
-                  const yy = view.y(v);
-                  return (
-                    <g key={i}>
-                      <line x1={M.l} y1={yy} x2={W - M.r} y2={yy}
-                            stroke="#1B2444" strokeWidth={0.6}
-                            strokeDasharray={Math.abs(v) < 1e-9 ? "" : "2 4"} />
-                      <text x={M.l - 8} y={yy + 3} textAnchor="end" className="hud-value"
-                            style={{ fontSize: 9, fill: "#5A6490" }}>
-                        {mode === "reflectance" ? v.toFixed(3)
-                          : mode === "snr" ? v.toFixed(0) : v.toFixed(3)}
-                      </text>
-                    </g>
-                  );
-                })}
-                {Array.from({ length: xTicks + 1 }).map((_, i) => {
-                  const w = view.lo + (i / xTicks) * (view.hi - view.lo);
-                  const xx = view.x(w);
-                  return (
-                    <g key={i}>
-                      <line x1={xx} y1={M.t} x2={xx} y2={H - M.b}
-                            stroke="#1B2444" strokeWidth={0.6} strokeDasharray="2 5" />
-                      <text x={xx} y={H - M.b + 14} textAnchor="middle" className="hud-value"
-                            style={{ fontSize: 9, fill: "#5A6490" }}>
-                        {w.toFixed(0)}
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {/* diagnostic wavelengths */}
-                {Object.entries(sp.diagnostic_features).map(([k, f]) => {
-                  if (f.centre_nm < view.lo || f.centre_nm > view.hi) return null;
-                  const xx = view.x(f.centre_nm);
-                  const covered = s2Covers(f.centre_nm);
-                  return (
-                    <g key={k}>
-                      <line x1={xx} y1={M.t} x2={xx} y2={H - M.b}
-                            stroke={covered ? "#3A4karma" : "#C77DFF"}
-                            style={{ stroke: covered ? "#2E3A63" : "#C77DFF" }}
-                            strokeWidth={0.9} strokeDasharray="3 3" opacity={covered ? 0.5 : 0.8} />
-                      <text x={xx + 3} y={M.t + 26} className="hud-label"
-                            style={{ fontSize: 7.5, fill: covered ? "#4A5478" : "#C77DFF" }}>
-                        {f.centre_nm}
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {/* background dispersion envelope */}
-                {view.envelope && (
-                  <path
-                    d={
-                      view.wl.map((w, i) => {
-                        const v = view.envelope!.hi[i];
-                        return v === null ? "" : `${i === 0 ? "M" : "L"}${view.x(w)},${view.y(v)}`;
-                      }).join("") +
-                      view.wl.slice().reverse().map((w, j) => {
-                        const i = view.wl.length - 1 - j;
-                        const v = view.envelope!.lo[i];
-                        return v === null ? "" : `L${view.x(w)},${view.y(v)}`;
-                      }).join("") + "Z"
-                    }
-                    fill="rgba(74,147,255,0.12)" stroke="none" />
-                )}
-
-                {/* series */}
-                {view.series.map((s) => (
-                  <path key={s.key} d={toPath(s.v)} fill="none" stroke={s.color}
-                        strokeWidth={s.key === "ev" || s.key === "bg" ? 1.9 : 1.1}
-                        strokeLinejoin="round"
-                        style={{ filter: `drop-shadow(0 0 4px ${s.color}44)` }} />
-                ))}
-
-                {/* axes */}
-                <line x1={M.l} y1={M.t} x2={M.l} y2={H - M.b} stroke="#243056" />
-                <line x1={M.l} y1={H - M.b} x2={W - M.r} y2={H - M.b} stroke="#243056" />
-                <text x={M.l} y={H - 6} className="hud-label" style={{ fontSize: 9 }}>
-                  WAVELENGTH (nm)
-                </text>
-                <text x={-((H - M.b + M.t) / 2)} y={14} transform="rotate(-90)"
-                      textAnchor="middle" className="hud-label" style={{ fontSize: 9 }}>
-                  {mode === "reflectance" ? "SURFACE REFLECTANCE (unitless)"
-                    : mode === "difference" ? "Δ REFLECTANCE"
-                    : mode === "zscore" ? "z (difference / SE)" : "SNR"}
-                </text>
-
-                {/* cursor */}
-                {cw !== null && (
-                  <g>
-                    <line x1={view.x(cw)} y1={M.t} x2={view.x(cw)} y2={H - M.b}
-                          stroke="#F4F6FF" strokeWidth={0.9} opacity={0.75} />
-                    {view.series.map((s) => {
-                      const v = s.v[ci!];
-                      if (v === null || !Number.isFinite(v)) return null;
-                      return <circle key={s.key} cx={view.x(cw)} cy={view.y(v)} r={3.4}
-                                     fill="#070A16" stroke={s.color} strokeWidth={1.6} />;
-                    })}
-                    <rect x={Math.min(view.x(cw) + 8, W - 120)} y={M.t + 4}
-                          width={112} height={20} fill="rgba(7,10,22,0.92)" stroke="#243056" />
-                    <text x={Math.min(view.x(cw) + 14, W - 114)} y={M.t + 18}
-                          className="hud-value" style={{ fontSize: 10, fill: "#F4F6FF" }}>
-                      {cw.toFixed(2)} nm
-                    </text>
-                  </g>
-                )}
-              </svg>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap mt-2 pt-2 border-t border-edge/50">
-              {view.series.map((s) => (
-                <span key={s.key} className="flex items-center gap-1.5">
-                  <span style={{ width: 14, height: 2, background: s.color, display: "inline-block" }} />
-                  <span className="hud-label" style={{ letterSpacing: "0.08em" }}>{s.label}</span>
-                </span>
-              ))}
-              <div className="flex-1" />
-              <Toggle on={showS2} set={setShowS2} label="Sentinel-2 bands" color="#3FD1A0" />
-              <Toggle on={showEnv} set={setShowEnv} label="P5-P95 envelope" color="#4A93FF" />
-              <Toggle on={showRegions} set={setShowRegions} label="All regions" color="#C77DFF" />
-              <div className="flex gap-1">
-                {([["Full", null], ["VIS 400-750", [400, 750]], ["Red-edge 640-760", [640, 760]],
-                   ["Blue 400-560", [400, 560]]] as [string, [number, number] | null][]).map(([l, z]) => (
-                  <button key={l} onClick={() => setZoom(z)}
-                          className="chamfer-sm hud-label px-2 py-[3px]"
-                          style={{
-                            color: JSON.stringify(zoom) === JSON.stringify(z) ? "#4A93FF" : "#5A6490",
-                            border: `1px solid ${JSON.stringify(zoom) === JSON.stringify(z) ? "#3186FF" : "#1B2444"}`,
-                          }}>{l}</button>
-                ))}
-              </div>
-            </div>
-          </Panel>
-
-          <Panel title="What a multispectral sensor would have measured here">
-            <p className="text-[11px] leading-[1.7] text-muted">
-              The green bands above are Sentinel-2&apos;s. Between them, a multispectral
-              sensor measures nothing. The violet markers are wavelengths that carry
-              diagnostic water information; those drawn in violet fall in the gaps,
-              and those drawn grey happen to land inside a Sentinel-2 band.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-x-6 mt-3">
-              {Object.entries(sp.diagnostic_features).map(([k, f]) => {
-                const covered = s2Covers(f.centre_nm);
-                return (
-                  <KV key={k}
-                      k={`${f.centre_nm} nm`}
-                      v={<span>
-                          <span style={{ color: covered ? "#8A93B8" : "#C77DFF" }}>
-                            {covered ? "in an S2 band" : "NOT in any S2 band"}
-                          </span>
-                          <span className="text-dim"> · {f.meaning}</span>
-                        </span>} />
-                );
-              })}
-            </div>
-            <Caveat>
-              A wavelength being measurable is not the same as a constituent being
-              identifiable. See the Validation screen for what hyperspectral
-              resolution measurably bought on this scene, and what it did not.
-            </Caveat>
-          </Panel>
+    <Panel title="What did 813 add?" kicker="Measured, not assumed · simulated 813 on real Tanager pixels" right={<SimBadge />} bodyClass="space-y-3 p-3 text-[12px]">
+      <div className="grid gap-2 md:grid-cols-3">
+        <div className="rounded-md border border-nominal/40 bg-nominal/5 p-3">
+          <div className="hud-kicker">Operational decision boundary</div>
+          <div className="hud-value mt-1 text-[22px] font-bold text-nominal">{fpCut != null ? `−${(fpCut * 100).toFixed(0)}%` : "…"}</div>
+          <div className="text-muted">false alarms at matched recall ({s2?.confusion_matrix.fp} → {h813?.confusion_matrix.fp} of {hard?.n_samples?.toLocaleString()} samples). F1 {fmt.num(s2?.f1, 4)} → {fmt.num(h813?.f1, 4)}.</div>
         </div>
-
-        {/* ---------------------------------------------------- side panel */}
-        <div className="flex flex-col gap-3 min-w-0">
-          <Panel title="Cursor readout" right={<Chip label={cw ? `${cw.toFixed(1)} nm` : "-"} color="#3186FF" />}>
-            {cw === null ? (
-              <p className="text-[11px] text-dim leading-relaxed">
-                Move the cursor across the spectrum to read exact values,
-                per-band uncertainty and significance at any wavelength.
-              </p>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-3 mb-2">
-                  <Readout label="Background" size="sm" color="#4A93FF"
-                           value={fmt(sp.background.mean[gi!], 5)} />
-                  <Readout label="Event" size="sm" color="#FF7A45"
-                           value={fmt(sp.event.mean[gi!], 5)} />
-                </div>
-                <KV k="Difference" v={fmt(sp.difference[gi!], 5)} color="#F5C451" />
-                <KV k="z of difference" v={fmt(sp.z_score[gi!], 2)}
-                    color={Math.abs(sp.z_score[gi!] ?? 0) > 2 ? "#3FD1A0" : "#8A93B8"} />
-                <KV k="Significant" v={Math.abs(sp.z_score[gi!] ?? 0) > 2 ? "yes (|z| > 2)" : "no"}
-                    color={Math.abs(sp.z_score[gi!] ?? 0) > 2 ? "#3FD1A0" : "#F5C451"} />
-                <KV k="Band SNR" v={fmt(sp.snr[gi!], 1)} />
-                <KV k="Background σ" v={fmt(sp.background.std[gi!], 5)} />
-                <KV k="In Sentinel-2 band" v={s2Covers(cw) ? "yes" : "NO"}
-                    color={s2Covers(cw) ? "#8A93B8" : "#C77DFF"} />
-              </>
-            )}
-          </Panel>
-
-          <Panel title="Spectral populations">
-            <KV k="Background pixels" v={fmtInt(sp.background.n_pixels)} />
-            <KV k="Event pixels" v={fmtInt(sp.event.n_pixels)} />
-            <KV k="Bands plotted" v={fmtInt(sp.wavelengths_nm.length)} />
-            <KV k="Range"
-                v={`${fmt(sp.wavelengths_nm[0], 1)}-${fmt(sp.wavelengths_nm.at(-1), 1)} nm`} />
-            <KV k="Sentinel-2 bands here"
-                v={String(S2_BANDS.filter(
-                     (b) => b.nm >= sp.wavelengths_nm[0]
-                         && b.nm <= (sp.wavelengths_nm.at(-1) ?? 0)).length)}
-                color="#3FD1A0" />
-            <KV k="813 bands here" v={fmtInt(sp.sensor_bands.n_813_bands_in_range)}
-                color="#4A93FF" />
-          </Panel>
-
-          <Panel title="Evidence used by the classifier"
-                 right={<Chip label={ev.classification.top_class.replace(/_/g, " ")}
-                              color={CLASS_COLOR[ev.classification.top_class]} />}>
-            <div className="space-y-2.5">
-              {ev.classification.evidence.slice(0, 6).map((e) => (
-                <div key={e.name} className="pb-2 border-b border-edge/40 last:border-0">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="hud-label truncate">{e.name.replace(/_/g, " ")}</span>
-                    <span className="hud-value text-[11px] shrink-0"
-                          style={{ color: e.supports === "none" ? "#5A6490"
-                                          : CLASS_COLOR[e.supports] ?? "#F4F6FF" }}>
-                      {fmt(e.value, 4)}
-                    </span>
-                  </div>
-                  {e.supports !== "none" && (
-                    <div className="hud-label mt-1" style={{ color: CLASS_COLOR[e.supports] }}>
-                      → supports {e.supports.replace(/_/g, " ").toLowerCase()}
-                    </div>
-                  )}
-                  <p className="text-[10px] leading-[1.55] text-dim mt-1.5">{e.description}</p>
-                </div>
-              ))}
-            </div>
-          </Panel>
-
-          <Panel title="813 simulation" right={<SimulatedBadge compact />}>
-            <p className="text-[10.5px] leading-[1.65] text-beam2/80">
-              The spectrum above is real Planet Tanager-1 data. The 813 product is
-              generated from it by convolving onto the published 813 band table.
-              No Satellite 813 pixels exist in this system.
-            </p>
-            <Caveat>
-              The simulator was validated against a real Sentinel-2 acquisition
-              38 minutes apart: r = 0.95-0.97 over land in the visible. See
-              Validation.
-            </Caveat>
-          </Panel>
+        <div className="rounded-md border border-edge bg-deep/60 p-3">
+          <div className="hud-kicker">Gross plume detection</div>
+          <div className="hud-value mt-1 text-[22px] font-bold text-muted">no gain</div>
+          <div className="text-muted">Both saturate: F1 {fmt.num(e["S2_multispectral_11band"]?.f1, 4)} vs {fmt.num(e["813_hyperspectral_205band"]?.f1, 4)}. An obvious plume does not need hyperspectral data.</div>
+        </div>
+        <div className="rounded-md border border-critical/40 bg-critical/5 p-3">
+          <div className="hud-kicker">Concentration vs OLCI products</div>
+          <div className="hud-value mt-1 text-[22px] font-bold text-critical">not shown</div>
+          <div className="text-muted">CHL_NN R² {fmt.num(olci?.targets?.CHL_NN_log10?.spatial_blocked?.S2_multispectral_11band?.r2, 3)} (S2) vs {fmt.num(olci?.targets?.CHL_NN_log10?.spatial_blocked?.["813_hyperspectral_205band"]?.r2, 3)} (813); both near zero, {olci?.n_matchups} matchups at {fmt.num(olci?.matchup_dt_hours?.median, 1)} h offset. Underpowered, reported anyway.</div>
         </div>
       </div>
+      <p className="text-dim">All three experiments use the SAME real Tanager pixels over the Gulf of Annaba, convolved to Sentinel-2 bands and to the published 813 band set, with spatially blocked cross-validation ({hard?.n_spatial_blocks} blocks) - so spectral configuration is the only variable. Reference labels are a full-spectrum RX judgment, not ground truth. The UAE repeat of this experiment needs the Tarif Tanager scene (download pending approval) and in-situ labels (not public).</p>
+    </Panel>
+  );
+}
+
+function Lab() {
+  const router = useRouter();
+  const id = useSearchParams().get("id");
+  const list = useEngineQuery((e) => e.listIncidents());
+  const iid = id || list.data?.[0]?.id || null;
+  const q = useEngineQuery((e) => (iid ? e.getIncident(iid) : Promise.resolve(null)), [iid]);
+  const inc = q.data;
+  const [mode, setMode] = useState<"2d" | "3d">("2d");
+  const [showDiff, setShowDiff] = useState(true);
+  const [hl, setHl] = useState<number | null>(675);
+  const [pick, setPick] = useState<{ wavelengths_nm: number[]; values: (number | null)[]; row: number; col: number } | null>(null);
+  const hyper = (inc?.spectral?.wavelengths_nm?.length || 0) > 30;
+  const range: [number, number] = hyper ? [400, 900] : [430, 900];
+  const pickSpec = useMemo(() => pick ? { wavelengths_nm: pick.wavelengths_nm, event: pick.values, background: pick.values.map(() => null) } : null, [pick]);
+  return (
+    <div className="grid h-full min-h-0 gap-3 p-3 short:gap-2 short:p-2 grid-rows-[minmax(0,1fr)_auto]">
+      <div className="grid min-h-0 gap-3 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <Panel title="Spectral Lab" kicker={inc ? `${inc.id} · ${inc.spectral?.sensor || "no spectrum"}` : ""} right={
+          <div className="flex items-center gap-2">
+            <select value={iid || ""} onChange={(e) => router.replace(`/spectra?id=${e.target.value}`)} className="rounded-md border border-line bg-deep px-2 py-1 text-[12px]">{(list.data || []).map((i) => <option key={i.id} value={i.id}>{i.id}</option>)}</select>
+            <button onClick={() => setMode("2d")} className={`btn px-2 py-1 text-[11px] ${mode === "2d" ? "border-beam" : ""}`}><LineChart size={13} /> 2D plot</button>
+            <button onClick={() => setMode("3d")} className={`btn px-2 py-1 text-[11px] ${mode === "3d" ? "border-beam" : ""}`}><Box size={13} /> 3D cube</button>
+          </div>} bodyClass="min-h-0 p-3">
+          {mode === "2d" ? (inc?.spectral ? (
+            <div className="flex h-full min-h-0 flex-col">
+              <div className="min-h-0 flex-1"><SpectrumPlot spec={inc.spectral} fill range={range} showDiff={showDiff} highlight={hl} /></div>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-[11.5px]">
+                <label className="flex items-center gap-1.5"><input type="checkbox" checked={showDiff} onChange={(e) => setShowDiff(e.target.checked)} className="accent-[#FFC23D]" /> difference (event − background)</label>
+                <span className="text-muted">Diagnostic wavelengths:</span>
+                {DIAGNOSTIC.map(([c, n]) => <button key={c} onClick={() => setHl(c)} className={`rounded px-2 py-0.5 ${hl === c ? "bg-caution/20 text-caution" : "text-muted hover:text-ink"}`}>{c} nm · {n}</button>)}
+              </div>
+            </div>) : <p className="text-muted">No spectrum for this incident.</p>)
+            : inc?.cube ? <div className="grid h-full min-h-0 grid-cols-[1.3fr_1fr] gap-3">
+                <div className="min-h-[300px] overflow-hidden rounded-md border border-edge"><CubeViewer name={inc.cube} height="100%" onSpectrum={setPick} /></div>
+                <div className="flex min-h-0 flex-col">{pickSpec ? <><div className="hud-kicker mb-1">Pixel r{pick!.row} c{pick!.col} spectrum</div><div className="min-h-0 flex-1"><SpectrumPlot spec={pickSpec} fill range={[400, pick!.wavelengths_nm[pick!.wavelengths_nm.length - 1] > 1000 ? 1700 : 900]} showBands={false} /></div></> : <p className="text-[12px] text-muted">Click the highlighted slice to extract a pixel spectrum. Scrub the wavelength slider or press Scan to sweep the bands. Red dashed frames are bad bands (no valid data), shown as gaps rather than interpolated.</p>}</div>
+              </div>
+            : <p className="text-muted">No display cube for this incident. Hyperspectral cubes are built offline (scripts/build_incidents.py for Sentinel-2; the Tanager / 813-simulated cube needs the Tanager scene).</p>}
+        </Panel>
+        <Panel title="Evidence notes" bodyClass="space-y-2 p-3 text-[12px]">
+          {inc && <div className="flex items-center gap-2"><Chip label={inc.status} />{inc.spectral?.simulated ? <SimBadge /> : <Chip label={hyper ? "REAL HYPERSPECTRAL" : "REAL MULTISPECTRAL"} color="#23D484" />}</div>}
+          <p className="text-muted">Background water is the median of water pixels outside the event (and away from its edge); the band shows the 5-95 % spread of that population. The difference trace isolates what the event adds.</p>
+          <ul className="list-disc space-y-1 pl-5 text-muted">
+            <li><b className="text-ink">675 nm dip + 705 nm peak</b>: chlorophyll absorption and the red-edge peak - bloom-like.</li>
+            <li><b className="text-ink">Broad rise 560-665 nm</b>, weak at 443: mineral scattering - sediment-like.</li>
+            <li><b className="text-ink">620 nm feature</b>: phycocyanin; needs narrow bands (Sentinel-2 has none there).</li>
+            <li><b className="text-ink">NIR above the red-SWIR baseline</b>: material at the surface (FAI).</li>
+          </ul>
+          <p className="text-[11px] text-dim">A spectrum is optical evidence. It does not identify a species or a toxin; that requires a water sample.</p>
+        </Panel>
+      </div>
+      <What813Added />
     </div>
   );
 }
 
-function Toggle({ on, set, label, color }:
-  { on: boolean; set: (v: boolean) => void; label: string; color: string }) {
-  return (
-    <button onClick={() => set(!on)} className="flex items-center gap-1.5 group">
-      <span className="w-[9px] h-[9px] chamfer-sm transition-colors"
-            style={{ background: on ? color : "transparent", border: `1px solid ${on ? color : "#243056"}` }} />
-      <span className="hud-label" style={{ color: on ? color : "#5A6490" }}>{label}</span>
-    </button>
-  );
-}
+export default function Page() { return <Suspense><Lab /></Suspense>; }

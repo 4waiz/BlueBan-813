@@ -19,7 +19,7 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from pipeline import detect  # noqa: E402
+from pipeline import detect, temporal  # noqa: E402
 
 
 def main():
@@ -52,12 +52,37 @@ def main():
                 return self.arr[idx].astype("float32")
 
         s32 = _S(stacks)
+        # Stage 1 - zone screen: a date goes to the pixel-level detector only if
+        # the P95 of at least one feature over the AOI's water sits at or above
+        # its own 80th seasonal percentile (other years, +/- window days).
+        # Stage 2 - per-pixel seasonal anomaly (detect.detect_at).
+        ws = json.load(open(os.path.join(ROOT, "outputs", "watch", f"{aoi}.json"), encoding="utf-8"))
+        by_file = {r.get("cache_file"): r for r in ws["rows"] if r.get("cache_file")}
+        zone = {}
+        for f in ("NDCI", "MCI", "TUR_NECHAD2016", "FAI"):
+            zone[f] = {}
+            vals = [(r["date"], ((r.get("all") or {}).get(f) or {}).get("p95")) for r in ws["rows"]
+                    if "error" not in r and (r.get("all") or {}).get("n_water", 0) >= 500]
+            vals = [(d, v) for d, v in vals if v is not None]
+            for d, v in vals:
+                sp = temporal.seasonal_percentile(v, [x for dd, x in vals if dd[:4] != d[:4]],
+                                                  [dd for dd, x in vals if dd[:4] != d[:4]], d, a.window)
+                zone[f][d] = sp["seasonal_percentile"]
         dates, cands = [], []
+        n_pix = 0
         for t in range(len(ci.files)):
+            row = by_file.get(ci.files[t], {})
+            zp = {f: zone[f].get(row.get("date")) for f in zone}
+            screen = any(v is not None and v >= 80 for v in zp.values())
+            if not screen:
+                dates.append({"date": ci.dates[t].isoformat(), "cache_file": ci.files[t],
+                              "screened_out": True, "zone_pct": zp})
+                continue
+            n_pix += 1
             r = detect.detect_at(ci, t, a.res, a.window, dshore, s32)
             summ = {"date": r["date"], "cache_file": r["cache_file"],
                     "n_climatology": r["n_climatology"], "water_px": r["water_px"],
-                    "skipped": r.get("skipped")}
+                    "skipped": r.get("skipped"), "zone_pct": zp}
             for hyp in detect.HYPOTHESIS_FEATURES:
                 cs = [c for c in r["candidates"] if c.hypothesis == hyp]
                 summ[hyp] = {"n": len(cs),
@@ -66,10 +91,11 @@ def main():
                                           default=None)}
             dates.append(summ)
             cands.extend(c.to_dict() for c in r["candidates"])
-            if (t + 1) % 50 == 0:
-                print(f"  {t + 1}/{len(ci.files)} ({time.time() - t0:.0f}s), "
-                      f"{len(cands)} candidates", flush=True)
+            if n_pix % 20 == 0:
+                print(f"  {t + 1}/{len(ci.files)} dates, {n_pix} pixel-level "
+                      f"({time.time() - t0:.0f}s), {len(cands)} candidates", flush=True)
         out = {"aoi_id": aoi, "resolution_m": a.res, "window_days": a.window,
+               "two_stage": {"zone_screen_pct": 80, "n_pixel_level": n_pix},
                "thresholds": {"z_min": detect.Z_MIN, "pct_min": detect.PCT_MIN,
                               "min_area_km2": detect.MIN_AREA_KM2,
                               "min_climatology_n": detect.MIN_CLIM_N,

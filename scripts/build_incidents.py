@@ -382,6 +382,25 @@ def main():
                "resolution_m": a.res * step},
               open(os.path.join(out_dir, "pixels.json"), "w"))
 
+    # display cube: Sentinel-2 multispectral, uint8-quantised, <= 160 px (SPECTRAL DATA CUBE viewer)
+    cube_bands = ["B01", "B02", "B03", "B04", "B05", "B06", "B8A", "B11", "B12"]
+    cube_nm = [443, 492, 560, 665, 704, 740, 865, 1610, 2190]
+    cstep = max(1, int(math.ceil(max(grid.shape) / 160)))
+    stack = np.stack([np.where(water, ev["refl"][b] - (ev["refl"]["B12"] if b not in ("B11", "B12") else 0), np.nan)[::cstep, ::cstep]
+                      for b in cube_bands])
+    lo_c, hi_c = 0.0, float(np.nanpercentile(stack[:7], 99.5)) if np.isfinite(stack[:7]).any() else 0.1
+    stepv = (hi_c - lo_c) / 254.0 if hi_c > lo_c else 1e-4
+    q = np.where(np.isfinite(stack), np.clip(np.round((stack - lo_c) / stepv) + 1, 1, 255), 0).astype("uint8")
+    os.makedirs(os.path.join(ROOT, "outputs", "cube"), exist_ok=True)
+    q.tofile(os.path.join(ROOT, "outputs", "cube", f"{a.id}_s2.bin"))
+    json.dump({"name": f"{a.id}_s2", "sensor": "Sentinel-2 L2A multispectral (9 bands, SWIR-offset corrected)",
+               "simulated": False, "source": ",".join(ev["meta"]["item_ids"]), "shape": list(q.shape),
+               "wavelengths_nm": cube_nm, "valid_band": [True] * len(cube_bands),
+               "scale": {"offset": lo_c - stepv, "step": stepv}, "units": "reflectance",
+               "date": a.date, "bounds": grid.lonlat_bounds(),
+               "note": "Multispectral: 9 broad bands, not a hyperspectral cube."},
+              open(os.path.join(ROOT, "outputs", "cube", f"{a.id}_s2.json"), "w"))
+
     # ---- provenance ----------------------------------------------------------------
     prov = Provenance(result_id=a.id, result_kind="coastal_incident")
     for iid in ev["meta"]["item_ids"]:
@@ -471,7 +490,7 @@ def main():
         "risk": assess.to_dict(),
         "samples": samples,
         "context": json.loads(a.context) if a.context else [],
-        "cube": None,
+        "cube": f"{a.id}_s2",
     }
     from pipeline import incidents as inc_mod
     problems = inc_mod.validate_payload(inc)

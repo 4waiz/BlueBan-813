@@ -50,4 +50,5 @@ export class HttpEngine implements Engine {
   addAoi = (aoi: Omit<Aoi, "id"> & { id?: string }, actor: string) => post<Aoi>(`${this.base}/aois`, { ...aoi, actor });
   assets = async () => (await j<{ assets: AssetRow[] }>(`${this.base}/assets`)).assets;
   addAsset = (a: Omit<AssetRow, "id" | "source"> & { id?: string }, actor: string) => post<AssetRow>(`${this.base}/assets`, { ...a, actor });
+  transition = (id: string, to: IncidentStatus, actor: string, reason = "") => post<Incident>(`${this.base}/incidents/${encodeURIComponent(id)}/transition`, { to, actor, reason });
 }

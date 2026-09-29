@@ -225,5 +225,6 @@ export interface Engine {
   addAoi(aoi: Omit<Aoi, "id"> & { id?: string }, actor: string): Promise<Aoi>;
   assets(): Promise<AssetRow[]>;
   addAsset(a: Omit<AssetRow, "id" | "source"> & { id?: string }, actor: string): Promise<AssetRow>;
+  transition(id: string, to: IncidentStatus, actor: string, reason?: string): Promise<Incident>;
   reset?(): Promise<void>;
 }

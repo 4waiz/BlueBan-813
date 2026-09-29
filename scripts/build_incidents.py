@@ -149,7 +149,7 @@ def main():
     water = ev["water"]
     F = ev["feats"]
     zmaps, pmaps, meds, scales = {}, {}, {}, {}
-    for name in ("NDCI", "MCI", "TUR_NECHAD2016", "FAI"):
+    for name in ("NDCI", "MCI", "TUR_NECHAD2016", "FAI", "HUE_ANGLE"):
         stack = np.stack([np.where(cc["water"], cc["feats"][name], np.nan) for cc in clim])
         z, pct, n, med, sc = detect.robust_anomaly(np.where(water, F[name], np.nan), stack,
                                                    detect.FLOORS.get(name, 0.01))
@@ -292,7 +292,8 @@ def main():
                   "ndci_delta": med(F["NDCI"] - meds["NDCI"], event),
                   "mci_delta": med(F["MCI"] - meds["MCI"], event),
                   "tur_delta": med(F["TUR_NECHAD2016"] - meds["TUR_NECHAD2016"], event),
-                  "fai_mean": med(F["FAI"], event), "swir_b11_mean": med(ev["refl"]["B11"], event)})
+                  "fai_mean": med(F["FAI"], event),
+                  "hue_delta_deg": med(F["HUE_ANGLE"] - meds["HUE_ANGLE"], event)})
 
     # ---- layers ------------------------------------------------------------------
     out_dir = os.path.join(ROOT, "outputs", "incidents", a.id)
@@ -463,7 +464,9 @@ def main():
                                "seasonal_percentile": med(pmaps["TUR_NECHAD2016"], event),
                                "baseline_median": med(meds["TUR_NECHAD2016"], event)},
             "HUE_ANGLE": {"value": med(F["HUE_ANGLE"], event), "units": "degrees", "quantity_kind": "COLORIMETRIC",
-                          "label": "Water-colour hue angle"}}},
+                          "label": "Water-colour hue angle", "z": med(zmaps["HUE_ANGLE"], event),
+                          "seasonal_percentile": med(pmaps["HUE_ANGLE"], event),
+                          "baseline_median": med(meds["HUE_ANGLE"], event)}}},
         "temporal": {"seasonal_percentile": pmed, "n_seasonal": int(np.nanmedian(nclim[event])),
                      "persistence_frac": cand["features"].get("persistence_frac"),
                      "note": f"Per-pixel robust z and percentile of {prim} against {len(clim)} same-season "

@@ -58,16 +58,21 @@ def main():
         # Stage 2 - per-pixel seasonal anomaly (detect.detect_at).
         ws = json.load(open(os.path.join(ROOT, "outputs", "watch", f"{aoi}.json"), encoding="utf-8"))
         by_file = {r.get("cache_file"): r for r in ws["rows"] if r.get("cache_file")}
+        # P95 alone misses a patch covering < 5 % of the water, so P99 is
+        # screened too and a date passes on the higher of the two.
         zone = {}
         for f in ("NDCI", "MCI", "TUR_NECHAD2016", "FAI"):
             zone[f] = {}
-            vals = [(r["date"], ((r.get("all") or {}).get(f) or {}).get("p95")) for r in ws["rows"]
-                    if "error" not in r and (r.get("all") or {}).get("n_water", 0) >= 500]
-            vals = [(d, v) for d, v in vals if v is not None]
-            for d, v in vals:
-                sp = temporal.seasonal_percentile(v, [x for dd, x in vals if dd[:4] != d[:4]],
-                                                  [dd for dd, x in vals if dd[:4] != d[:4]], d, a.window)
-                zone[f][d] = sp["seasonal_percentile"]
+            for stat in ("p95", "p99"):
+                vals = [(r["date"], ((r.get("all") or {}).get(f) or {}).get(stat)) for r in ws["rows"]
+                        if "error" not in r and (r.get("all") or {}).get("n_water", 0) >= 500]
+                vals = [(d, v) for d, v in vals if v is not None]
+                for d, v in vals:
+                    sp = temporal.seasonal_percentile(v, [x for dd, x in vals if dd[:4] != d[:4]],
+                                                      [dd for dd, x in vals if dd[:4] != d[:4]], d, a.window)
+                    p = sp["seasonal_percentile"]
+                    if p is not None:
+                        zone[f][d] = max(p, zone[f].get(d) or 0)
         dates, cands = [], []
         n_pix = 0
         for t in range(len(ci.files)):
@@ -95,7 +100,7 @@ def main():
                 print(f"  {t + 1}/{len(ci.files)} dates, {n_pix} pixel-level "
                       f"({time.time() - t0:.0f}s), {len(cands)} candidates", flush=True)
         out = {"aoi_id": aoi, "resolution_m": a.res, "window_days": a.window,
-               "two_stage": {"zone_screen_pct": 80, "n_pixel_level": n_pix},
+               "two_stage": {"zone_screen_pct": 80, "zone_screen_stats": ["p95", "p99"], "n_pixel_level": n_pix},
                "thresholds": {"z_min": detect.Z_MIN, "pct_min": detect.PCT_MIN,
                               "min_area_km2": detect.MIN_AREA_KM2,
                               "min_climatology_n": detect.MIN_CLIM_N,
@@ -110,7 +115,7 @@ def main():
         with open(p, "w", encoding="utf-8") as f:
             json.dump(out, f, separators=(",", ":"))
         print(f"  -> {p}: {len(cands)} candidates on "
-              f"{sum(1 for d in dates if any(d[h]['n'] for h in detect.HYPOTHESIS_FEATURES))}"
+              f"{sum(1 for d in dates if any((d.get(h) or {}).get('n') for h in detect.HYPOTHESIS_FEATURES))}"
               f" dates, {time.time() - t0:.0f}s", flush=True)
 
 

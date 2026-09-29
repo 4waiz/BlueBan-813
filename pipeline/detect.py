@@ -257,7 +257,8 @@ def detect_at(ci: CacheIndex, t: int, resolution_m: float, window_days: int = 45
                 "tur_delta": (reg_med(feats["TUR_NECHAD2016"] - meds["TUR_NECHAD2016"])
                               if "TUR_NECHAD2016" in meds else np.nan),
                 "fai_mean": reg_med(feats["FAI"]) if "FAI" in feats else np.nan,
-                "swir_b11_mean": np.nan,
+                "hue_delta_deg": (reg_med(feats["HUE_ANGLE"] - meds["HUE_ANGLE"])
+                                  if "HUE_ANGLE" in meds else np.nan),
                 "cloud_adjacent_frac": cloud_adj,
                 "valid_frac_aoi": float(water.mean()),
             }

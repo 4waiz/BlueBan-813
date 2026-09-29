@@ -49,7 +49,7 @@ TRIAGE_FEATURES = [
     "mci_delta",
     "tur_delta",
     "fai_mean",
-    "swir_b11_mean",          # glint / floating-material / adjacency indicator
+    "hue_delta_deg",          # water-colour change vs own seasonal median (deg; <0 = greener/browner)
     "cloud_adjacent_frac",
     "valid_frac_aoi",
 ]
@@ -210,10 +210,11 @@ def fit_ridge_log10(X, y, w=None, features=None, alpha: float = 1.0,
 def rules_score(X, features=TRIAGE_FEATURES) -> np.ndarray:
     """Score of the rule-based triage used to raise incidents (model v1.0).
 
-    High seasonal percentile raises it; a persistent location, cloud adjacency
-    or a floating/glint SWIR signal lowers it. Written as a function of the same
-    feature vector so it can be scored on the frozen validation set exactly like
-    a learned candidate.
+    High seasonal percentile raises it; a persistent location or cloud adjacency
+    lowers it. Written as a function of the same feature vector so it can be
+    scored on the frozen validation set exactly like a learned candidate. It
+    deliberately ignores the colour-change feature: whether that feature helps
+    is for a learned candidate to show on the frozen validation set.
     """
     idx = {f: i for i, f in enumerate(features)}
     X = np.asarray(X, dtype="float64")
@@ -225,10 +226,8 @@ def rules_score(X, features=TRIAGE_FEATURES) -> np.ndarray:
     pct = col("seasonal_pct_primary", 50.0)
     persist = col("persistence_frac", 0.0)
     cloud = col("cloud_adjacent_frac", 0.0)
-    swir = col("swir_b11_mean", 0.0)
     s = np.clip((pct - 80.0) / 20.0, 0, 1)
     s = s * (1 - np.clip(persist, 0, 1)) * (1 - 0.6 * np.clip(cloud, 0, 1))
-    s = np.where(swir > 0.03, s * 0.5, s)
     return np.clip(0.05 + 0.9 * s, 0, 1)
 
 

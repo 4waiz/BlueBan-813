@@ -13,7 +13,7 @@ import type { GateCheck, GateReport, LabelRow, ModelArtifact } from "./engine/ty
 export const TRIAGE_FEATURES = [
   "seasonal_pct_primary", "robust_z_primary", "rx_pct", "log10_area_km2",
   "persistence_frac", "dist_shore_km", "ndci_delta", "mci_delta", "tur_delta",
-  "fai_mean", "swir_b11_mean", "cloud_adjacent_frac", "valid_frac_aoi",
+  "fai_mean", "hue_delta_deg", "cloud_adjacent_frac", "valid_frac_aoi",
 ];
 
 export type Matrix = number[][];
@@ -142,10 +142,8 @@ export function rulesScore(X: Matrix, features = TRIAGE_FEATURES): number[] {
     const pct = col(r, "seasonal_pct_primary", 50);
     const persist = Math.min(Math.max(col(r, "persistence_frac", 0), 0), 1);
     const cloud = Math.min(Math.max(col(r, "cloud_adjacent_frac", 0), 0), 1);
-    const swir = col(r, "swir_b11_mean", 0);
     let s = Math.min(Math.max((pct - 80) / 20, 0), 1);
     s = s * (1 - persist) * (1 - 0.6 * cloud);
-    if (swir > 0.03) s *= 0.5;
     return Math.min(Math.max(0.05 + 0.9 * s, 0), 1);
   });
 }

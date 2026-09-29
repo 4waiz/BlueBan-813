@@ -70,7 +70,7 @@ def annaba_incident() -> dict | None:
         "mci_delta": None,
         "tur_delta": idx["TURBIDITY_PROXY"]["event_median"] - idx["TURBIDITY_PROXY"]["background_median"],
         "fai_mean": idx["FAI"]["event_median"],
-        "swir_b11_mean": None,
+        "hue_delta_deg": None,
         "cloud_adjacent_frac": 0.0,
         "valid_frac_aoi": e["quality"]["scene"]["valid_fraction"],
     }

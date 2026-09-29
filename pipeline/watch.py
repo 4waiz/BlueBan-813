@@ -131,7 +131,9 @@ def _read_band_to_grid(href: str, grid: AoiGrid, resampling_name: str):
 
     categorical = resampling_name in ("nearest", "mode")
     resampling = getattr(Resampling, resampling_name)
-    with rasterio.open(href) as src:
+    with rasterio.Env(GDAL_HTTP_TIMEOUT=60, GDAL_HTTP_CONNECTTIMEOUT=20,
+                      GDAL_HTTP_MAX_RETRY=3, GDAL_HTTP_RETRY_DELAY=2), \
+            rasterio.open(href) as src:
         l, b, r, t = transform_bounds("EPSG:4326", src.crs, *grid.bbox, densify_pts=21)
         pad = 2 * grid.resolution_m
         win = from_bounds(l - pad, b - pad, r + pad, t + pad, src.transform)
@@ -156,7 +158,7 @@ def _read_band_to_grid(href: str, grid: AoiGrid, resampling_name: str):
     return dst
 
 
-def load_datatake(items, grid: AoiGrid, bands=SCREEN_BANDS, band_workers: int = 5):
+def load_datatake(items, grid: AoiGrid, bands=SCREEN_BANDS, band_workers: int = 3):
     """Mosaic one datatake's tiles onto ``grid``.
 
     Returns ``(reflectance_dict, scl, meta)``. Reflectance is decoded per tile
@@ -315,12 +317,37 @@ def screen_aoi(aoi_id: str, bbox, start: str, end: str, resolution_m: float = 60
                     "item_ids": [i.id for i in items]}
 
     rows = []
-    with ThreadPoolExecutor(max_workers=workers) as ex:
-        for i, row in enumerate(ex.map(one, groups), 1):
-            rows.append(row)
-            if i % 25 == 0:
-                progress(f"  {aoi_id}: {i}/{len(groups)} datatakes "
+    # A watchdog instead of ex.map: one blocked network read must not stall the
+    # whole screen. A datatake that has not finished after ``stall_s`` seconds is
+    # recorded as an error and abandoned (its thread may linger; the run goes on).
+    from concurrent.futures import FIRST_COMPLETED, wait
+    ex = ThreadPoolExecutor(max_workers=workers)
+    pending = {}
+    queue = list(groups)
+    started = {}
+    stall_s = 240.0
+    done_n = 0
+    while queue or pending:
+        while queue and len(pending) < workers:
+            kv = queue.pop(0)
+            f = ex.submit(one, kv)
+            pending[f] = kv
+            started[f] = time.time()
+        finished, _ = wait(list(pending), timeout=10, return_when=FIRST_COMPLETED)
+        for f in finished:
+            rows.append(f.result())
+            pending.pop(f)
+            done_n += 1
+            if done_n % 25 == 0:
+                progress(f"  {aoi_id}: {done_n}/{len(groups)} datatakes "
                          f"({time.time() - t0:.0f}s)")
+        now = time.time()
+        for f in [f for f in pending if now - started[f] > stall_s]:
+            key, items = pending.pop(f)
+            rows.append({"date": key[0], "error": f"stalled > {stall_s:.0f}s (abandoned)",
+                         "item_ids": [i.id for i in items]})
+            done_n += 1
+    ex.shutdown(wait=False, cancel_futures=True)
     rows.sort(key=lambda r: r.get("datetime", r["date"]))
     return {
         "aoi_id": aoi_id, "bbox": list(bbox), "grid": {

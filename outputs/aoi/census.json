@@ -1,0 +1,829 @@
+{
+ "generated_utc": "2026-09-29T20:19:18Z",
+ "sources": {
+  "planetary_computer": "https://planetarycomputer.microsoft.com/api/stac/v1",
+  "tanager": "https://www.planet.com/data/stac/tanager-core-imagery"
+ },
+ "window": [
+  "2023-01-01",
+  "2026-09-30"
+ ],
+ "tanager_items_in_uae": [
+  {
+   "id": "20250511_074311_00_4001",
+   "collection": "coastal-water-bodies",
+   "datetime": "2025-05-11T07:43:11Z",
+   "cloud_percent": 51,
+   "bbox": [
+    53.63200686177432,
+    23.990203106931855,
+    53.89428889725334,
+    24.192030163555803
+   ],
+   "href": "https://www.planet.com/data/stac/tanager-core-imagery/coastal-water-bodies/20250511_074311_00_4001/20250511_074311_00_4001.json"
+  }
+ ],
+ "candidates": {
+  "AE-AUH-MUSAFFAH": {
+   "id": "AE-AUH-MUSAFFAH",
+   "name": "Abu Dhabi / Musaffah - Umm Al Nar coastal waters",
+   "coast": "Arabian Gulf",
+   "bbox": [
+    54.3,
+    24.28,
+    54.62,
+    24.55
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 2734,
+    "n_dates": 563,
+    "first": "2023-01-01",
+    "last": "2026-09-29",
+    "query_seconds": 18.5,
+    "n_items_cloud_le_10": 1590,
+    "n_dates_cloud_le_10": 396,
+    "median_cloud": 5.233584,
+    "latest_clear": [
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T39QZG_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.217414,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2A_MSIL2A_20260929T070321_R063_T40RBN_20260929T103026",
+      "datetime": "2026-09-29T07:03:21.024000Z",
+      "cloud": 0.159074,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2A_MSIL2A_20260929T070321_R063_T40QBM_20260929T103026",
+      "datetime": "2026-09-29T07:03:21.024000Z",
+      "cloud": 0.14009,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2A_MSIL2A_20260929T070321_R063_T39RZH_20260929T103026",
+      "datetime": "2026-09-29T07:03:21.024000Z",
+      "cloud": 0.164585,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2A_MSIL2A_20260929T070321_R063_T39QZG_20260929T103026",
+      "datetime": "2026-09-29T07:03:21.024000Z",
+      "cloud": 0.136008,
+      "platform": "Sentinel-2A"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 536,
+    "n_dates": 464,
+    "first": "2023-01-01",
+    "last": "2026-02-23",
+    "query_seconds": 6.3,
+    "n_items_cloud_le_10": 260,
+    "n_dates_cloud_le_10": 252,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 839,
+    "n_dates": 567,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 4.0
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 329,
+    "n_dates": 329,
+    "first": "2023-01-02",
+    "last": "2026-09-23",
+    "query_seconds": 4.0,
+    "n_items_cloud_le_10": 236,
+    "n_dates_cloud_le_10": 236,
+    "median_cloud": 1.8
+   },
+   "tanager": []
+  },
+  "AE-AUH-TAWEELAH": {
+   "id": "AE-AUH-TAWEELAH",
+   "name": "Al Taweelah / Khalifa Port",
+   "coast": "Arabian Gulf",
+   "bbox": [
+    54.6,
+    24.68,
+    54.92,
+    24.9
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 1370,
+    "n_dates": 561,
+    "first": "2023-01-01",
+    "last": "2026-09-29",
+    "query_seconds": 10.8,
+    "n_items_cloud_le_10": 719,
+    "n_dates_cloud_le_10": 303,
+    "median_cloud": 8.726609,
+    "latest_clear": [
+     {
+      "id": "S2C_MSIL2A_20260927T065641_R063_T39RZH_20260927T121710",
+      "datetime": "2026-09-27T06:56:41.025000Z",
+      "cloud": 0.128252,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T40RBN_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.246189,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T39RZH_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.266378,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2A_MSIL2A_20260929T070321_R063_T40RBN_20260929T103026",
+      "datetime": "2026-09-29T07:03:21.024000Z",
+      "cloud": 0.159074,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2A_MSIL2A_20260929T070321_R063_T39RZH_20260929T103026",
+      "datetime": "2026-09-29T07:03:21.024000Z",
+      "cloud": 0.164585,
+      "platform": "Sentinel-2A"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 536,
+    "n_dates": 464,
+    "first": "2023-01-01",
+    "last": "2026-02-23",
+    "query_seconds": 7.0,
+    "n_items_cloud_le_10": 260,
+    "n_dates_cloud_le_10": 252,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 338,
+    "n_dates": 296,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 2.7
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 329,
+    "n_dates": 329,
+    "first": "2023-01-02",
+    "last": "2026-09-23",
+    "query_seconds": 3.9,
+    "n_items_cloud_le_10": 236,
+    "n_dates_cloud_le_10": 236,
+    "median_cloud": 1.8
+   },
+   "tanager": []
+  },
+  "AE-DXB-JEBELALI": {
+   "id": "AE-DXB-JEBELALI",
+   "name": "Dubai / Jebel Ali",
+   "coast": "Arabian Gulf",
+   "bbox": [
+    54.95,
+    24.95,
+    55.22,
+    25.12
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 1033,
+    "n_dates": 291,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 8.2,
+    "n_items_cloud_le_10": 634,
+    "n_dates_cloud_le_10": 205,
+    "median_cloud": 3.976275,
+    "latest_clear": [
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RBN_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.224297,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T39RZH_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.255754,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T40RCN_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.024237,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T40RBN_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.246189,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T39RZH_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.266378,
+      "platform": "Sentinel-2B"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 534,
+    "n_dates": 462,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 8.1,
+    "n_items_cloud_le_10": 257,
+    "n_dates_cloud_le_10": 250,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 338,
+    "n_dates": 296,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 2.6
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 165,
+    "n_dates": 165,
+    "first": "2023-01-03",
+    "last": "2026-09-16",
+    "query_seconds": 3.0,
+    "n_items_cloud_le_10": 124,
+    "n_dates_cloud_le_10": 124,
+    "median_cloud": 1.59
+   },
+   "tanager": []
+  },
+  "AE-SHJ-AJM": {
+   "id": "AE-SHJ-AJM",
+   "name": "Sharjah / Ajman",
+   "coast": "Arabian Gulf",
+   "bbox": [
+    55.3,
+    25.3,
+    55.55,
+    25.48
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 692,
+    "n_dates": 291,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 6.3,
+    "n_items_cloud_le_10": 431,
+    "n_dates_cloud_le_10": 210,
+    "median_cloud": 4.061357,
+    "latest_clear": [
+     {
+      "id": "S2B_MSIL2A_20260919T064619_R020_T40RCN_20260919T104621",
+      "datetime": "2026-09-19T06:46:19.024000Z",
+      "cloud": 0.027916,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RCP_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.041417,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RCN_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.17558,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T40RCP_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.24992,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T40RCN_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.024237,
+      "platform": "Sentinel-2B"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 545,
+    "n_dates": 473,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 7.9,
+    "n_items_cloud_le_10": 265,
+    "n_dates_cloud_le_10": 258,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 338,
+    "n_dates": 296,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 2.9
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 330,
+    "n_dates": 166,
+    "first": "2023-01-03",
+    "last": "2026-09-16",
+    "query_seconds": 4.4,
+    "n_items_cloud_le_10": 238,
+    "n_dates_cloud_le_10": 129,
+    "median_cloud": 2.14
+   },
+   "tanager": []
+  },
+  "AE-UAQ-RAK": {
+   "id": "AE-UAQ-RAK",
+   "name": "Umm Al Quwain / Ras Al Khaimah",
+   "coast": "Arabian Gulf",
+   "bbox": [
+    55.55,
+    25.5,
+    55.95,
+    25.85
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 351,
+    "n_dates": 290,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 3.5,
+    "n_items_cloud_le_10": 216,
+    "n_dates_cloud_le_10": 179,
+    "median_cloud": 4.340198,
+    "latest_clear": [
+     {
+      "id": "S2B_MSIL2A_20260909T064619_R020_T40RCP_20260909T101755",
+      "datetime": "2026-09-09T06:46:19.024000Z",
+      "cloud": 0.004694,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260914T064621_R020_T40RCP_20260914T114711",
+      "datetime": "2026-09-14T06:46:21.025000Z",
+      "cloud": 0.54112,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RCP_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 2.128241,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RCP_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.041417,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2B_MSIL2A_20260929T064629_R020_T40RCP_20260929T105217",
+      "datetime": "2026-09-29T06:46:29.024000Z",
+      "cloud": 0.24992,
+      "platform": "Sentinel-2B"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 531,
+    "n_dates": 459,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 6.2,
+    "n_items_cloud_le_10": 256,
+    "n_dates_cloud_le_10": 249,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 671,
+    "n_dates": 438,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 3.8
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 165,
+    "n_dates": 165,
+    "first": "2023-01-03",
+    "last": "2026-09-16",
+    "query_seconds": 2.8,
+    "n_items_cloud_le_10": 114,
+    "n_dates_cloud_le_10": 114,
+    "median_cloud": 3.68
+   },
+   "tanager": []
+  },
+  "AE-FUJ": {
+   "id": "AE-FUJ",
+   "name": "Fujairah / Qidfa / anchorage",
+   "coast": "Gulf of Oman",
+   "bbox": [
+    56.3,
+    25.05,
+    56.55,
+    25.4
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 694,
+    "n_dates": 291,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 5.6,
+    "n_items_cloud_le_10": 295,
+    "n_dates_cloud_le_10": 157,
+    "median_cloud": 13.574886,
+    "latest_clear": [
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RDP_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 2.769725,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RDN_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 1.86654,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2B_MSIL2A_20260919T064619_R020_T40RDN_20260919T104621",
+      "datetime": "2026-09-19T06:46:19.024000Z",
+      "cloud": 3.979874,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RDP_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.271953,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RDN_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.002681,
+      "platform": "Sentinel-2C"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 532,
+    "n_dates": 461,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 6.6,
+    "n_items_cloud_le_10": 253,
+    "n_dates_cloud_le_10": 243,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 668,
+    "n_dates": 578,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 3.9
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 596,
+    "n_dates": 327,
+    "first": "2023-01-03",
+    "last": "2026-09-25",
+    "query_seconds": 6.6,
+    "n_items_cloud_le_10": 404,
+    "n_dates_cloud_le_10": 237,
+    "median_cloud": 3.25
+   },
+   "tanager": []
+  },
+  "AE-SHJ-KALBA": {
+   "id": "AE-SHJ-KALBA",
+   "name": "Kalba",
+   "coast": "Gulf of Oman",
+   "bbox": [
+    56.33,
+    24.95,
+    56.5,
+    25.1
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 348,
+    "n_dates": 290,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 3.3,
+    "n_items_cloud_le_10": 134,
+    "n_dates_cloud_le_10": 117,
+    "median_cloud": 19.390751,
+    "latest_clear": [
+     {
+      "id": "S2B_MSIL2A_20260909T064619_R020_T40RDN_20260909T103111",
+      "datetime": "2026-09-09T06:46:19.024000Z",
+      "cloud": 0.072306,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260914T064621_R020_T40RDN_20260914T114711",
+      "datetime": "2026-09-14T06:46:21.025000Z",
+      "cloud": 4.133964,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RDN_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 1.86654,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2B_MSIL2A_20260919T064619_R020_T40RDN_20260919T104621",
+      "datetime": "2026-09-19T06:46:19.024000Z",
+      "cloud": 3.979874,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RDN_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.002681,
+      "platform": "Sentinel-2C"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 532,
+    "n_dates": 461,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 6.8,
+    "n_items_cloud_le_10": 253,
+    "n_dates_cloud_le_10": 243,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 668,
+    "n_dates": 578,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 3.7
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 161,
+    "n_dates": 161,
+    "first": "2023-01-12",
+    "last": "2026-09-25",
+    "query_seconds": 3.1,
+    "n_items_cloud_le_10": 109,
+    "n_dates_cloud_le_10": 109,
+    "median_cloud": 3.06
+   },
+   "tanager": []
+  },
+  "AE-SHJ-KHORFAKKAN": {
+   "id": "AE-SHJ-KHORFAKKAN",
+   "name": "Khor Fakkan",
+   "coast": "Gulf of Oman",
+   "bbox": [
+    56.33,
+    25.3,
+    56.45,
+    25.42
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 688,
+    "n_dates": 291,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 6.2,
+    "n_items_cloud_le_10": 295,
+    "n_dates_cloud_le_10": 157,
+    "median_cloud": 13.464232,
+    "latest_clear": [
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RDP_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 2.769725,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RDN_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 1.86654,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2B_MSIL2A_20260919T064619_R020_T40RDN_20260919T104621",
+      "datetime": "2026-09-19T06:46:19.024000Z",
+      "cloud": 3.979874,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RDP_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.271953,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RDN_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.002681,
+      "platform": "Sentinel-2C"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 517,
+    "n_dates": 446,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 6.5,
+    "n_items_cloud_le_10": 249,
+    "n_dates_cloud_le_10": 239,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 668,
+    "n_dates": 578,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 3.2
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 477,
+    "n_dates": 316,
+    "first": "2023-01-03",
+    "last": "2026-09-25",
+    "query_seconds": 6.1,
+    "n_items_cloud_le_10": 315,
+    "n_dates_cloud_le_10": 222,
+    "median_cloud": 3.78
+   },
+   "tanager": []
+  },
+  "AE-FUJ-DIBBA": {
+   "id": "AE-FUJ-DIBBA",
+   "name": "Dibba",
+   "coast": "Gulf of Oman",
+   "bbox": [
+    56.25,
+    25.55,
+    56.4,
+    25.68
+   ],
+   "window": [
+    "2023-01-01",
+    "2026-09-30"
+   ],
+   "s2": {
+    "collection": "sentinel-2-l2a",
+    "n_items": 345,
+    "n_dates": 289,
+    "first": "2023-01-03",
+    "last": "2026-09-29",
+    "query_seconds": 3.9,
+    "n_items_cloud_le_10": 163,
+    "n_dates_cloud_le_10": 132,
+    "median_cloud": 10.63668,
+    "latest_clear": [
+     {
+      "id": "S2C_MSIL2A_20260825T064621_R020_T40RDP_20260825T115811",
+      "datetime": "2026-08-25T06:46:21.025000Z",
+      "cloud": 4.829526,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2B_MSIL2A_20260909T064619_R020_T40RDP_20260909T103111",
+      "datetime": "2026-09-09T06:46:19.024000Z",
+      "cloud": 0.024467,
+      "platform": "Sentinel-2B"
+     },
+     {
+      "id": "S2C_MSIL2A_20260914T064621_R020_T40RDP_20260914T114711",
+      "datetime": "2026-09-14T06:46:21.025000Z",
+      "cloud": 4.363927,
+      "platform": "Sentinel-2C"
+     },
+     {
+      "id": "S2A_MSIL2A_20260916T065321_R020_T40RDP_20260916T114652",
+      "datetime": "2026-09-16T06:53:21.024000Z",
+      "cloud": 2.769725,
+      "platform": "Sentinel-2A"
+     },
+     {
+      "id": "S2C_MSIL2A_20260924T064621_R020_T40RDP_20260924T114716",
+      "datetime": "2026-09-24T06:46:21.025000Z",
+      "cloud": 0.271953,
+      "platform": "Sentinel-2C"
+     }
+    ]
+   },
+   "s3": {
+    "collection": "sentinel-3-olci-wfr-l2-netcdf",
+    "n_items": 534,
+    "n_dates": 463,
+    "first": "2023-01-01",
+    "last": "2026-02-22",
+    "query_seconds": 7.0,
+    "n_items_cloud_le_10": 261,
+    "n_dates_cloud_le_10": 251,
+    "median_cloud": 11.0
+   },
+   "s1": {
+    "collection": "sentinel-1-grd",
+    "n_items": 710,
+    "n_dates": 580,
+    "first": "2023-01-03",
+    "last": "2026-09-27",
+    "query_seconds": 3.3
+   },
+   "landsat": {
+    "collection": "landsat-c2-l2",
+    "n_items": 457,
+    "n_dates": 326,
+    "first": "2023-01-03",
+    "last": "2026-09-25",
+    "query_seconds": 6.4,
+    "n_items_cloud_le_10": 300,
+    "n_dates_cloud_le_10": 224,
+    "median_cloud": 3.89
+   },
+   "tanager": []
+  }
+ }
+}

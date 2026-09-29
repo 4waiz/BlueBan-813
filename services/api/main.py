@@ -27,12 +27,13 @@ CONFIG = os.path.join(ROOT, "config")
 
 app = FastAPI(
     title="BLUEBAN 813 API",
-    version="0.1.0",
+    version="0.2.0",
     description=(
-        "Water Threat Intelligence for the Arab region. Every value served "
-        "here is produced by the offline pipeline from real Earth observation "
-        "data; nothing is hardcoded. Satellite 813 data is SIMULATED from "
-        "Planet Tanager-1 measurements and is labelled as such everywhere."
+        "Closed-loop coastal incident intelligence for the UAE. Pipeline "
+        "artefacts are served read-only; operator reviews, field samples, "
+        "measurements, labels, training jobs and model promotions are persisted "
+        "(SQLite by default) and every write is recorded in a hash-chained "
+        "audit log. Simulated Satellite 813 data is labelled as such everywhere."
     ),
 )
 app.add_middleware(
@@ -40,6 +41,10 @@ app.add_middleware(
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_methods=["*"], allow_headers=["*"],
 )
+
+from .loop import router as loop_router  # noqa: E402
+
+app.include_router(loop_router)
 
 
 def _read(path: str) -> Any:
@@ -79,7 +84,7 @@ class AssetIn(BaseModel):
 # --------------------------------------------------------------------------- #
 @app.get("/api/health", tags=["system"])
 def health():
-    return {"status": "ok", "service": "blueban-813", "version": "0.1.0"}
+    return {"status": "ok", "service": "blueban-813", "version": "0.2.0"}
 
 
 @app.get("/api/status", tags=["system"])

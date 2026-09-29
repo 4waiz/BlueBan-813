@@ -52,6 +52,9 @@ os.environ.setdefault("GDAL_HTTP_MULTIRANGE", "YES")
 os.environ.setdefault("GDAL_HTTP_MERGE_CONSECUTIVE_RANGES", "YES")
 os.environ.setdefault("GDAL_HTTP_MAX_RETRY", "4")
 os.environ.setdefault("GDAL_HTTP_RETRY_DELAY", "2")
+# Without these a stalled blob read blocks a worker forever.
+os.environ.setdefault("GDAL_HTTP_TIMEOUT", "60")
+os.environ.setdefault("GDAL_HTTP_CONNECTTIMEOUT", "20")
 
 PC_STAC = "https://planetarycomputer.microsoft.com/api/stac/v1"
 SCREEN_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B8A", "B11", "B12"]

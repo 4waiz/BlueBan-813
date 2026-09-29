@@ -42,3 +42,8 @@ apps/web/public/pipeline/
 apps/web/out/
 .wrangler/
 *.tsbuildinfo
+
+# Operational database (local SQLite; the hosted demo seeds its own)
+data/blueban.sqlite*
+# Authenticated / restricted downloads never leave this folder
+data/raw/private/

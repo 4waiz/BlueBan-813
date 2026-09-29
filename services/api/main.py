@@ -360,8 +360,10 @@ def add_asset(asset: AssetIn = Body(...)):
 # Documentation passthrough (the Evidence screen links to these)
 # --------------------------------------------------------------------------- #
 DOCS = {
-    "data-access-audit": "DATA_ACCESS_AUDIT.md",
-    "aoi-selection": "AOI_SELECTION.md",
+    "mentor-revamp-audit": "MENTOR_REVAMP_AUDIT.md",
+    "authenticated-data-audit": "AUTHENTICATED_DATA_AUDIT.md",
+    "public-uae-data": "PUBLIC_UAE_DATA.md",
+    "uae-aoi-tournament": "UAE_AOI_TOURNAMENT.md",
     "813-product-notes": "813_PRODUCT_NOTES.md",
     "methodology": "METHODOLOGY.md",
     "validation-report": "VALIDATION_REPORT.md",
@@ -369,6 +371,10 @@ DOCS = {
     "data-lineage": "DATA_LINEAGE.md",
     "business-case": "BUSINESS_CASE.md",
     "judging-matrix": "JUDGING_MATRIX.md",
+    "roadmap": "ROADMAP.md",
+    "archive-data-access-audit-2026-09-15": "archive/DATA_ACCESS_AUDIT_2026-09-15.md",
+    "archive-official-resource-audit-2026-09-17": "archive/OFFICIAL_RESOURCE_AUDIT_2026-09-17.md",
+    "archive-aoi-selection-tanager": "archive/AOI_SELECTION_TANAGER_2026-09-15.md",
 }
 
 

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "services.api.main:app", "--port", "8813"],
+      "port": 8813
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "apps/web", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

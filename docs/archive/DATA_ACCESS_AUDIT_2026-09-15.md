@@ -1,3 +1,5 @@
+> **HISTORICAL - SUPERSEDED (2026-09-30).** This audit's conclusions that gIQ, Satellite 813 and the in-situ records were unavailable predate the team's authenticated gIQ access and the current Cockpit dataset cards. They are kept for the record and are **not** current. The live audit is [`../AUTHENTICATED_DATA_AUDIT.md`](../AUTHENTICATED_DATA_AUDIT.md).
+
 # Data Access Audit
 
 **Project:** BLUEBAN 813 · Team Kanban

@@ -1,3 +1,5 @@
+> **HISTORICAL (2026-09-30).** The repository and notebook findings in sections 1, 5 and 6 remain valid. The platform-access conclusions in sections 2-4 and 9 predate the team's authenticated gIQ access and are superseded by [`../AUTHENTICATED_DATA_AUDIT.md`](../AUTHENTICATED_DATA_AUDIT.md).
+
 # Official Resource Audit
 
 Everything the programme publishes, inspected rather than assumed. Audited

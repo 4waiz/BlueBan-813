@@ -1,3 +1,5 @@
+> **HISTORICAL (2026-09-30).** This selection was made under the constraint that the only hyperspectral source was the Tanager open archive. Under the mentor brief the primary AOI is now chosen in the UAE by the tournament in [`../UAE_AOI_TOURNAMENT.md`](../UAE_AOI_TOURNAMENT.md). The Gulf of Annaba case is retained as the **negative control**.
+
 # Area of Interest Selection
 
 **Selected AOI: Gulf of Annaba, Algeria**

@@ -166,7 +166,9 @@ def fit_logistic(X, y, w=None, features=None, C: float = 1.0) -> LinearArtifact:
     if pos == 0 or neg == 0:
         raise ValueError("need both classes to train a triage model")
     bal = np.where(y == 1, (pos + neg) / (2 * pos), (pos + neg) / (2 * neg))
-    m = LogisticRegression(C=C, max_iter=2000, solver="lbfgs")
+    # Tight tolerance: the default (1e-4) stops lbfgs visibly short of the optimum,
+    # and the browser trainer (Newton-IRLS on the same objective) must agree.
+    m = LogisticRegression(C=C, max_iter=10000, tol=1e-10, solver="lbfgs")
     m.fit(Z, y.astype(int), sample_weight=ww * bal)
     return LinearArtifact("logistic", list(features or []), med.tolist(), mu.tolist(),
                           sd.tolist(), m.coef_[0].tolist(), float(m.intercept_[0]),

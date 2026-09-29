@@ -94,16 +94,22 @@ def test_dogliotti_blend_is_continuous_across_the_switch():
     assert jumps.max() < 5 * np.median(jumps) + 1.0
 
 
-def test_swir_surface_correction_only_touches_semi_analytical_outputs():
-    r = _flat()
-    r["B04"][:] = 0.03
-    r["B12"][:] = 0.01
-    a = s2.compute_features(r, surface_correction=None)
-    b = s2.compute_features(r, surface_correction="swir_b12")
-    assert np.allclose(a["NDCI"], b["NDCI"])              # ratios unchanged
-    assert np.all(b["TUR_NECHAD2016"] < a["TUR_NECHAD2016"])
+def test_flat_glint_offset_is_removed_and_baseline_heights_are_invariant():
+    lam = s2.S2_CENTRES_NM["Sentinel-2A"]
+    clean = {b: np.full((2, 2), 0.01 + 1e-5 * (lam[b] - 400)) for b in s2.WATER_BANDS}
+    clean["B05"] = clean["B05"] + 0.004              # a real red-edge signal
+    clean["B11"][:] = 0.0
+    clean["B12"][:] = 0.0
+    glinty = {b: v + 0.035 for b, v in clean.items()}  # spectrally flat glint
+    a = s2.compute_features(clean, surface_correction="swir_b12")
+    b = s2.compute_features(glinty, surface_correction="swir_b12")
+    assert np.allclose(a["NDCI"], b["NDCI"], atol=1e-6)   # glint removed
+    assert np.allclose(a["MCI"], b["MCI"], atol=1e-9)     # offset-invariant
+    assert np.allclose(a["FAI"], b["FAI"], atol=1e-9)
+    raw = s2.compute_features(glinty, surface_correction=None)
+    assert np.all(np.abs(raw["NDCI"]) < np.abs(a["NDCI"]))  # glint shrinks NDCI
     with pytest.raises(ValueError):
-        s2.compute_features(r, surface_correction="magic")
+        s2.compute_features(clean, surface_correction="magic")
 
 
 def test_hue_angle_orders_blue_green_brown_water():
@@ -162,6 +168,19 @@ def test_native_resolution_is_the_coarsest_band_used():
 # --------------------------------------------------------------------------- #
 # Masks
 # --------------------------------------------------------------------------- #
+def test_glinty_water_is_kept_and_flagged_not_discarded():
+    n = 30
+    r = _flat(0.02, shape=(n, n))
+    r["B03"][:] = 0.06
+    r["B11"][:] = 0.037                               # typical Sen2Cor glint residual
+    r["B12"][:] = 0.034
+    r["B04"][:] = 0.045
+    m, rep_ = s2.water_quality_mask(r, np.full((n, n), 6), pixel_size_m=20)
+    d = rep_.to_dict()
+    assert m.sum() > 0.5 * n * n
+    assert d["glint_or_float_px"] == d["water_px"]
+
+
 def test_water_mask_rejects_cloud_land_and_the_shoreline():
     n = 40
     r = _flat(0.02, shape=(n, n))

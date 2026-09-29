@@ -36,9 +36,22 @@ sun light + residual atmospheric error. Liquid water leaves essentially no signa
 at 2190 nm, so B12 estimates that residual under a spectrally flat assumption
 (Kay et al. 2009 review of glint correction; Harmel et al. 2018 use SWIR for the
 same purpose). ``surface_correction="swir_b12"`` subtracts it; the choice is
-recorded on every output. Sen2Cor is a land processor (ESA S2 MPC L2A ATBD), and
-this correction does not turn it into a water processor; it removes the largest
+recorded on every output. Sen2Cor is a land processor (Warren et al. 2019, RSE
+225:267-289: "designed for land with no water application"), and this
+correction does not turn it into a water processor; it removes the largest
 first-order bias only.
+
+Glint. Over the UAE, and especially the Gulf of Oman in spring and summer,
+Sen2Cor L2A B11 over open water is typically 0.03-0.05 (measured: median 0.037
+over the Fujairah sea on 2026-04-02, SCL = water for 99.6 % of it). ACOLITE's
+non-water threshold rho_s(1600) > 0.0215 assumes ACOLITE's own glint-corrected
+output; applied to raw L2A it discards almost all water. Here SWIR is therefore
+used only to reject land, cloud, whitecaps and strong glint (B11 >= 0.10), pixels
+with B11 > 0.0215 are FLAGGED as glint-affected, and every water-colour feature is
+computed on the SWIR-offset-corrected reflectance. MCI and FAI are baseline
+heights and are unchanged by a spectrally flat offset; normalised differences and
+ratios (NDCI, RE_RATIO, CDOM_RATIO) are biased toward zero by it, which is why
+they are computed after the correction.
 """
 from __future__ import annotations
 
@@ -401,10 +414,11 @@ def compute_features(refl: dict, platform: str = "Sentinel-2A",
     """All features for one acquisition.
 
     ``refl`` maps band name -> surface-reflectance array (already decoded with
-    :func:`dn_to_reflectance`). Indices that are ratios of reflectance are
-    computed on the uncorrected values (a flat offset changes ratios, and the
-    literature defines them on L2 reflectance); the semi-analytical retrievals
-    and the hue angle use ``surface_correction``.
+    :func:`dn_to_reflectance`). MNDWI and SWIR_B11 (mask inputs) and FAI (which
+    needs the SWIR band itself) use the uncorrected reflectance; every other
+    water-colour feature uses the ``surface_correction`` reflectance, because the
+    indices are defined on water-leaving reflectance and a flat glint offset
+    biases every ratio.
 
     Returns ``{name: array}``. Values outside a feature's valid range become NaN
     rather than being clamped, so a processing problem stays visible.
@@ -415,14 +429,14 @@ def compute_features(refl: dict, platform: str = "Sentinel-2A",
     out = {}
     out["MNDWI"] = _nd(r["B03"], r["B11"])
     out["SWIR_B11"] = r["B11"]
-    out["NDCI"] = _nd(r["B05"], r["B04"])
-    out["MCI"] = _baseline_height(r["B05"], r["B04"], r["B06"],
+    out["NDCI"] = _nd(w["B05"], w["B04"])
+    out["MCI"] = _baseline_height(w["B05"], w["B04"], w["B06"],
                                   lam["B05"], lam["B04"], lam["B06"])
     out["FAI"] = _baseline_height(r["B8A"], r["B04"], r["B11"],
                                   lam["B8A"], lam["B04"], lam["B11"])
     with np.errstate(invalid="ignore", divide="ignore"):
-        out["RE_RATIO"] = np.where(r["B04"] > EPS, r["B05"] / r["B04"], np.nan)
-        out["CDOM_RATIO"] = np.where(r["B04"] > EPS, r["B03"] / r["B04"], np.nan)
+        out["RE_RATIO"] = np.where(w["B04"] > 1e-3, w["B05"] / w["B04"], np.nan)
+        out["CDOM_RATIO"] = np.where(w["B04"] > 1e-3, w["B03"] / w["B04"], np.nan)
     A, C = NECHAD2016_MSI["TUR"]["B04"]
     out["TUR_NECHAD2016"] = _nechad(w["B04"], A, C)
     A, C = NECHAD2016_MSI["SPM"]["B04"]
@@ -467,16 +481,19 @@ class S2QualityReport:
 
 
 def water_quality_mask(refl: dict, scl: np.ndarray | None,
-                       mndwi_min: float = 0.0, swir_max: float = 0.0215,
+                       mndwi_min: float = 0.0, swir_reject: float = 0.10,
+                       glint_flag: float = 0.0215,
                        shoreline_buffer_m: float = 40.0,
                        pixel_size_m: float = 20.0):
     """Open-water mask for water-colour work, plus an auditable report.
 
     A pixel is analysable water when it is valid, not flagged unusable by SCL,
-    has MNDWI above ``mndwi_min`` AND SWIR reflectance below ``swir_max`` (the
-    ACOLITE default non-water threshold at 1600 nm), is at least
-    ``shoreline_buffer_m`` from any non-water pixel, and has a non-negative red
-    reflectance (negative red over water is atmospheric over-correction).
+    has MNDWI above ``mndwi_min`` and SWIR reflectance below ``swir_reject``
+    (land, cloud, whitecaps, strong glint), is at least ``shoreline_buffer_m``
+    from any non-water pixel, and keeps a non-negative red reflectance after the
+    SWIR offset correction (negative corrected red is atmospheric
+    over-correction). Pixels with B11 above ``glint_flag`` (the ACOLITE non-water
+    threshold) stay in the mask but are counted as glint-affected.
 
     Returns ``(mask, report)``.
     """
@@ -485,24 +502,29 @@ def water_quality_mask(refl: dict, scl: np.ndarray | None,
     valid = np.isfinite(refl["B03"]) & np.isfinite(refl["B11"]) & np.isfinite(refl["B04"])
     usable = scl_usable(scl) if scl is not None else np.ones_like(valid)
     mndwi = _nd(refl["B03"], refl["B11"])
-    swir_ok = refl["B11"] < swir_max
+    swir_ok = refl["B11"] < swir_reject
     raw = valid & usable & (mndwi > mndwi_min) & swir_ok
-    neg_red = raw & (refl["B04"] < 0)
+    red_corr = refl["B04"] - refl["B12"] if "B12" in refl else refl["B04"]
+    neg_red = raw & (red_corr < -0.002)
     raw &= ~neg_red
     raw = _label_and_filter(raw, 25)
     buf_px = int(round(shoreline_buffer_m / pixel_size_m))
     water = _erode(raw, buf_px)
-    rep = S2QualityReport(
+    glinty = water & (refl["B11"] > glint_flag)
+    rep_ = S2QualityReport(
         total_px=int(valid.size), valid_px=int(valid.sum()),
         scl_unusable_px=int((valid & ~usable).sum()),
         water_px=int(water.sum()),
-        glint_or_float_px=int((valid & usable & (mndwi > mndwi_min) & ~swir_ok).sum()),
+        glint_or_float_px=int(glinty.sum()),
         negative_red_px=int(neg_red.sum()),
-        params={"mndwi_min": mndwi_min, "swir_max": swir_max,
+        params={"mndwi_min": mndwi_min, "swir_reject": swir_reject,
+                "glint_flag_b11": glint_flag,
                 "shoreline_buffer_m": shoreline_buffer_m,
-                "pixel_size_m": pixel_size_m, "scl_unusable": list(SCL_UNUSABLE)},
+                "pixel_size_m": pixel_size_m, "scl_unusable": list(SCL_UNUSABLE),
+                "median_b11_water": (float(np.nanmedian(refl["B11"][water]))
+                                     if water.any() else None)},
     )
-    return water, rep
+    return water, rep_
 
 
 def feature_table() -> list:

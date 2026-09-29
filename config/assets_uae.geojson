@@ -1,0 +1,2733 @@
+{
+ "type": "FeatureCollection",
+ "properties": {
+  "source": "OpenStreetMap via Overpass API",
+  "licence": "ODbL",
+  "attribution": "(c) OpenStreetMap contributors",
+  "queried_utc": "2026-09-29T21:43:23Z",
+  "bbox": [
+   54.2,
+   24.28,
+   56.6,
+   25.85
+  ],
+  "policy": "Real, publicly mapped facilities only; facility centroids, never estimated intake locations. Operators replace this register."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.475308,
+     25.446438
+    ]
+   },
+   "properties": {
+    "id": "osm:way/167823078",
+    "name": "Al Zawra Power and Desalination Plant",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/167823078",
+    "operator": "Federal Electricity & Water Authority",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.371464,
+     25.301308
+    ]
+   },
+   "properties": {
+    "id": "osm:way/441112677",
+    "name": "Fujairah F2 power and desalination plant",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-FUJ",
+    "source": "osm:way/441112677",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.372758,
+     25.314111
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288012",
+    "name": "Fujairah Qidfa F1 power and desalination plant",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-FUJ",
+    "source": "osm:way/895288012",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.115785,
+     25.056356
+    ]
+   },
+   "properties": {
+    "id": "osm:way/592115432",
+    "name": "Jebel Ali Power and Desalination Plant",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/592115432",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.679733,
+     24.760654
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288011",
+    "name": "Taweelah A1 IWPP",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/895288011",
+    "operator": "Total Tractebel Emirates O&M Company",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.682638,
+     24.762811
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288009",
+    "name": "Taweelah A2 IWPP",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/895288009",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.67616,
+     24.758949
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1244230073",
+    "name": "Taweelah Reverse Osmosis",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1244230073",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "water_works": "desalination"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.747388,
+     25.655047
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1084467819",
+    "name": "Water desalination plant UAQ",
+    "type": "DESALINATION_PLANT",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/1084467819",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.579977,
+     25.587442
+    ]
+   },
+   "properties": {
+    "id": "osm:way/166254432",
+    "name": "AHMED BIN RASHID PORT",
+    "type": "PORT",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/166254432",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.660583,
+     24.818442
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1079832161",
+    "name": "CSP Abu Dhabi Terminal",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1079832161",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.271433,
+     25.652692
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/19260597",
+    "name": "Dibba Port",
+    "type": "PORT",
+    "aoi_id": "AE-FUJ-DIBBA",
+    "source": "osm:relation/19260597",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.357536,
+     25.178691
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1135530101",
+    "name": "Fujairah Port Terminals",
+    "type": "PORT",
+    "aoi_id": "AE-FUJ",
+    "source": "osm:way/1135530101",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.453678,
+     25.419512
+    ]
+   },
+   "properties": {
+    "id": "osm:way/545695462",
+    "name": "HutchinsonPorts Ajman",
+    "type": "PORT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/545695462",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.801713,
+     25.712723
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330883275",
+    "name": "Jazeera Port",
+    "type": "PORT",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330883275",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.069493,
+     24.994404
+    ]
+   },
+   "properties": {
+    "id": "osm:way/914508042",
+    "name": "Jebel Ali Container Terminal 1",
+    "type": "PORT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/914508042",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.058689,
+     25.021747
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360048210",
+    "name": "Jebel Ali Container Terminal 2",
+    "type": "PORT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360048210",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.04949,
+     24.988906
+    ]
+   },
+   "properties": {
+    "id": "osm:way/914508043",
+    "name": "Jebel Ali Container Terminal 3",
+    "type": "PORT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/914508043",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.046596,
+     25.032912
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/10016553",
+    "name": "Jebel Ali Container Terminal 4",
+    "type": "PORT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:relation/10016553",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.065893,
+     24.986528
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/18471647",
+    "name": "Jebel Ali North Free Zone",
+    "type": "PORT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:relation/18471647",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.653311,
+     24.812068
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1303931592",
+    "name": "Khalifa Port",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1303931592",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.714766,
+     24.784935
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1079456651",
+    "name": "Khalifa Port CFS",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1079456651",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.648418,
+     24.809495
+    ]
+   },
+   "properties": {
+    "id": "osm:way/243045263",
+    "name": "Khalifa Port Container Terminal",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/243045263",
+    "operator": "Abu Dhabi Terminals",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.661008,
+     24.799874
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1079459994",
+    "name": "Khalifa Port General Cargo",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1079459994",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.693308,
+     24.796626
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1079452939",
+    "name": "Khalifa Port Logistics Terminal",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1079452939",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.667499,
+     24.823602
+    ]
+   },
+   "properties": {
+    "id": "osm:way/542906657",
+    "name": "Khalifa Port RoRo Terminal",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/542906657",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.368912,
+     25.353497
+    ]
+   },
+   "properties": {
+    "id": "osm:way/166809993",
+    "name": "Khorfakkan Port",
+    "type": "PORT",
+    "aoi_id": "AE-SHJ-KHORFAKKAN",
+    "source": "osm:way/166809993",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.469639,
+     24.382017
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1359255731",
+    "name": "MAUSAFFAH PORT",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1359255731",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.376544,
+     24.52789
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/1858703",
+    "name": "Mina Zayed",
+    "type": "PORT",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:relation/1858703",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.367193,
+     25.186102
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1135530100",
+    "name": "Port of Fujairah",
+    "type": "PORT",
+    "aoi_id": "AE-FUJ",
+    "source": "osm:way/1135530100",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.372044,
+     25.360223
+    ]
+   },
+   "properties": {
+    "id": "osm:way/546091853",
+    "name": "Sharjah Container Terminal",
+    "type": "PORT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/546091853",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "landuse": "industrial",
+     "industrial": "port"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.450558,
+     25.402106
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288007",
+    "name": "Ajman Water & Electricity Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/895288007",
+    "operator": "Federal Electricity & Water Authority",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.710456,
+     24.798956
+    ]
+   },
+   "properties": {
+    "id": "osm:way/332856582",
+    "name": "Emirates Global Aluminium Al Taweelah power plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/332856582",
+    "operator": "Emirates Global Aluminium",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.08775,
+     25.025147
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288008",
+    "name": "Emirates Global Aluminium Jebel Ali power plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/895288008",
+    "operator": "Emirates Global Aluminium",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.372187,
+     25.308418
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1263592438",
+    "name": "Fujairah F3 power plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-FUJ",
+    "source": "osm:way/1263592438",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.479829,
+     25.459639
+    ]
+   },
+   "properties": {
+    "id": "osm:way/820425913",
+    "name": "Hamriyah Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/820425913",
+    "operator": "Sharjah Electricity and Water Authority",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.155839,
+     25.078426
+    ]
+   },
+   "properties": {
+    "id": "osm:way/381429500",
+    "name": "JLT District Cooling Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/381429500",
+    "operator": "Emirates Central Cooling Systems Corporation (EMPOWER)",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.348877,
+     25.056487
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288005",
+    "name": "Kalba Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-FUJ",
+    "source": "osm:way/895288005",
+    "operator": "هيئة كهرباء ومياه الشارقة",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.340994,
+     25.365593
+    ]
+   },
+   "properties": {
+    "id": "osm:way/101476355",
+    "name": "Khorfakkan Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-SHJ-KHORFAKKAN",
+    "source": "osm:way/101476355",
+    "operator": "Sharjah Electricity and Water Authority",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.369994,
+     25.354707
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288006",
+    "name": "Layyah Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/895288006",
+    "operator": "Sharjah Electricity and Water Authority",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.124249,
+     25.066172
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360062207",
+    "name": "Power Station D",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360062207",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.120815,
+     25.063066
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360062209",
+    "name": "Power Station E",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360062209",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.115035,
+     25.055668
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360064731",
+    "name": "Power Station G",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360064731",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.117135,
+     25.058653
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360062215",
+    "name": "Power Station K (F)",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360062215",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.111131,
+     25.051419
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360064732",
+    "name": "Power Station L",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360064732",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.106344,
+     25.046411
+    ]
+   },
+   "properties": {
+    "id": "osm:way/360052309",
+    "name": "Power Station M",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/360052309",
+    "operator": "DEWA",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.460614,
+     25.372611
+    ]
+   },
+   "properties": {
+    "id": "osm:way/47621573",
+    "name": "SEWA - Wasit Power Station",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/47621573",
+    "operator": "Sharjah Electricity and Water Authority",
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.685348,
+     24.766264
+    ]
+   },
+   "properties": {
+    "id": "osm:way/895288010",
+    "name": "Taweelah B1",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/895288010",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.687878,
+     24.768356
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1264647394",
+    "name": "Taweelah B2",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1264647394",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.688753,
+     24.770451
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1264647393",
+    "name": "Taweelah New B (TANE)",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:way/1264647393",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "man_made": "water_works",
+     "power": "plant",
+     "plant:source": "gas"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.684057,
+     24.765618
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/14447026",
+    "name": "Taweelah Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:relation/14447026",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.790269,
+     25.704402
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330879263",
+    "name": "UTICO Power Plant",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330879263",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.486619,
+     24.438091
+    ]
+   },
+   "properties": {
+    "id": "osm:way/217188137",
+    "name": "Umm Al Nar Power and Water Complex",
+    "type": "POWER_PLANT",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/217188137",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "power": "plant",
+     "plant:source": "gas",
+     "landuse": "industrial"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.303727,
+     25.609736
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1109899333",
+    "name": "Akamiya Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-FUJ-DIBBA",
+    "source": "osm:way/1109899333",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.330822,
+     24.468375
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1276780600",
+    "name": "Al Bahar Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1276780600",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.377929,
+     24.426806
+    ]
+   },
+   "properties": {
+    "id": "osm:way/91910629",
+    "name": "Al Bateen Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/91910629",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.919012,
+     25.769643
+    ]
+   },
+   "properties": {
+    "id": "osm:way/335855687",
+    "name": "Al Dahan Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/335855687",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.913011,
+     25.764037
+    ]
+   },
+   "properties": {
+    "id": "osm:way/335852834",
+    "name": "Al Dhait Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/335852834",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.780701,
+     25.700147
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330762556",
+    "name": "Al Hamra Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330762556",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.772679,
+     25.6877
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330027060",
+    "name": "Al Hamra Residence Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330027060",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.351666,
+     24.41236
+    ]
+   },
+   "properties": {
+    "id": "osm:way/603201039",
+    "name": "Al Hudayriyat Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/603201039",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.341267,
+     25.313678
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/9858415",
+    "name": "Al Mamzar",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:relation/9858415",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.352694,
+     25.305331
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/7601363",
+    "name": "Al Mamzar Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:relation/7601363",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.357247,
+     25.313571
+    ]
+   },
+   "properties": {
+    "id": "osm:way/210564153",
+    "name": "Al Mamzar Sea Island",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/210564153",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.604546,
+     24.452776
+    ]
+   },
+   "properties": {
+    "id": "osm:way/242708429",
+    "name": "Al Muneera Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/242708429",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.600878,
+     24.485933
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1121028067",
+    "name": "Al Raha Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1121028067",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.342962,
+     24.476381
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1276780609",
+    "name": "Al Sahil Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1276780609",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.167139,
+     25.117334
+    ]
+   },
+   "properties": {
+    "id": "osm:way/337780860",
+    "name": "Al Sufouh",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/337780860",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.612218,
+     24.456775
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/3231363",
+    "name": "Al Zeina Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:relation/3231363",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.34862,
+     25.32271
+    ]
+   },
+   "properties": {
+    "id": "osm:way/210558634",
+    "name": "Al-Mamzar Park - Danah Beach (3)",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/210558634",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.351371,
+     25.326407
+    ]
+   },
+   "properties": {
+    "id": "osm:node/12710626157",
+    "name": "Al-Mamzar Park - Flamingo Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:node/12710626157",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.350706,
+     25.318684
+    ]
+   },
+   "properties": {
+    "id": "osm:way/10573404",
+    "name": "Al-Mamzar Park - Sadaf Beach (5)",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/10573404",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.600281,
+     24.487824
+    ]
+   },
+   "properties": {
+    "id": "osm:way/286395409",
+    "name": "Amwaj Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/286395409",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.122786,
+     25.133607
+    ]
+   },
+   "properties": {
+    "id": "osm:way/94405226",
+    "name": "Aquaventure Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/94405226",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.773726,
+     25.690209
+    ]
+   },
+   "properties": {
+    "id": "osm:way/142780318",
+    "name": "Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/142780318",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.384849,
+     24.495441
+    ]
+   },
+   "properties": {
+    "id": "osm:node/1797114985",
+    "name": "Beach Rotana beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:node/1797114985",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.907232,
+     25.75628
+    ]
+   },
+   "properties": {
+    "id": "osm:way/335718793",
+    "name": "Bin Majid Beach Hotel Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/335718793",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.758676,
+     25.669073
+    ]
+   },
+   "properties": {
+    "id": "osm:way/231559301",
+    "name": "Bin Majid Resort Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/231559301",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.34063,
+     24.474192
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1276780607",
+    "name": "Corniche Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1276780607",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.34829,
+     24.485764
+    ]
+   },
+   "properties": {
+    "id": "osm:way/389533522",
+    "name": "Corniche Beach - Phase 2",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/389533522",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.336236,
+     24.471456
+    ]
+   },
+   "properties": {
+    "id": "osm:way/997755723",
+    "name": "Corniche Family Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/997755723",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.417631,
+     24.501909
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1013256382",
+    "name": "Cove Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1013256382",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.301504,
+     25.301208
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/11196431",
+    "name": "Deira Islands Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:relation/11196431",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.273353,
+     25.623345
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1109899334",
+    "name": "Dibba Hisn Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-FUJ-DIBBA",
+    "source": "osm:way/1109899334",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.272263,
+     25.624153
+    ]
+   },
+   "properties": {
+    "id": "osm:way/936375456",
+    "name": "Dibba Hisn Public Beach+",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-FUJ-DIBBA",
+    "source": "osm:way/936375456",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.273337,
+     25.622652
+    ]
+   },
+   "properties": {
+    "id": "osm:way/936375455",
+    "name": "Dibba Hisn Publlic Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-FUJ-DIBBA",
+    "source": "osm:way/936375455",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.913318,
+     25.764377
+    ]
+   },
+   "properties": {
+    "id": "osm:node/14066061361",
+    "name": "Flamingo Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:node/14066061361",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.852543,
+     24.888278
+    ]
+   },
+   "properties": {
+    "id": "osm:node/8661053567",
+    "name": "Flopster Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-TAWEELAH",
+    "source": "osm:node/8661053567",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.018271,
+     24.984574
+    ]
+   },
+   "properties": {
+    "id": "osm:node/4916625639",
+    "name": "Jebel Ali Open Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:node/4916625639",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.194279,
+     25.148205
+    ]
+   },
+   "properties": {
+    "id": "osm:way/89659245",
+    "name": "Jumeirah Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/89659245",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.1195,
+     25.13328
+    ]
+   },
+   "properties": {
+    "id": "osm:way/94404635",
+    "name": "Lagoons Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/94404635",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.624773,
+     25.534686
+    ]
+   },
+   "properties": {
+    "id": "osm:node/8258819150",
+    "name": "Mangrove Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:node/8258819150",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.645546,
+     25.541342
+    ]
+   },
+   "properties": {
+    "id": "osm:node/8258838601",
+    "name": "Mangrove Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:node/8258838601",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.132097,
+     25.080783
+    ]
+   },
+   "properties": {
+    "id": "osm:way/320162564",
+    "name": "Marina Beach Dubai",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/320162564",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.347872,
+     24.413299
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1274489568",
+    "name": "Marsana Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1274489568",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.828755,
+     25.714683
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330885895",
+    "name": "Mina Al Arab Granada Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330885895",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.845793,
+     25.719835
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330885896",
+    "name": "Mina Al Arab Malibu Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330885896",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.117959,
+     25.129562
+    ]
+   },
+   "properties": {
+    "id": "osm:way/94408337",
+    "name": "Nasimi Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/94408337",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.327573,
+     24.46634
+    ]
+   },
+   "properties": {
+    "id": "osm:way/389533520",
+    "name": "Nation Rivera Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/389533520",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.294061,
+     25.300182
+    ]
+   },
+   "properties": {
+    "id": "osm:node/11419884972",
+    "name": "Pet's Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:node/11419884972",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.890402,
+     25.742828
+    ]
+   },
+   "properties": {
+    "id": "osm:way/138423562",
+    "name": "Private Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/138423562",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.901468,
+     25.750811
+    ]
+   },
+   "properties": {
+    "id": "osm:way/185316760",
+    "name": "Private Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/185316760",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.946269,
+     25.800422
+    ]
+   },
+   "properties": {
+    "id": "osm:way/336023717",
+    "name": "RAK Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/336023717",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.121666,
+     25.134856
+    ]
+   },
+   "properties": {
+    "id": "osm:way/94404694",
+    "name": "Rapids Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:way/94404694",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.407888,
+     24.500269
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1112717556",
+    "name": "Reem Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1112717556",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.406234,
+     24.503703
+    ]
+   },
+   "properties": {
+    "id": "osm:way/791632169",
+    "name": "Reem Central Park Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/791632169",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.750076,
+     25.663989
+    ]
+   },
+   "properties": {
+    "id": "osm:way/336038611",
+    "name": "Rixos Bab Al Bahr Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/336038611",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.436554,
+     24.548738
+    ]
+   },
+   "properties": {
+    "id": "osm:way/234806973",
+    "name": "Saadiyat Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/234806973",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.750383,
+     25.678789
+    ]
+   },
+   "properties": {
+    "id": "osm:way/331014310",
+    "name": "Santorini Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/331014310",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.775101,
+     25.694125
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330032023",
+    "name": "The Ritz-Carlton Ras Al Khaimah, Al Hamra Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330032023",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.745838,
+     25.679702
+    ]
+   },
+   "properties": {
+    "id": "osm:way/336038626",
+    "name": "Turtle Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/336038626",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.771267,
+     25.685892
+    ]
+   },
+   "properties": {
+    "id": "osm:way/330027062",
+    "name": "Waldorf Astoria Ras Al Khaimah Private Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/330027062",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.324982,
+     24.465138
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1047452895",
+    "name": "West Bay Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1047452895",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.124389,
+     25.072636
+    ]
+   },
+   "properties": {
+    "id": "osm:node/12154642732",
+    "name": "Yacht Rental Dubai Marina",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-DXB-JEBELALI",
+    "source": "osm:node/12154642732",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.600976,
+     24.487807
+    ]
+   },
+   "properties": {
+    "id": "osm:way/1121028089",
+    "name": "Yadi Yas Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/1121028089",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     54.591995,
+     24.462409
+    ]
+   },
+   "properties": {
+    "id": "osm:way/285016928",
+    "name": "Yas Public Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-AUH-LAGOON",
+    "source": "osm:way/285016928",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.366363,
+     25.405427
+    ]
+   },
+   "properties": {
+    "id": "osm:node/12178301808",
+    "name": "Zubarah Beach",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-KHORFAKKAN",
+    "source": "osm:node/12178301808",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.364128,
+     25.342804
+    ]
+   },
+   "properties": {
+    "id": "osm:way/148174685",
+    "name": "Общественный/бесплатный пляж",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/148174685",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.562829,
+     25.587882
+    ]
+   },
+   "properties": {
+    "id": "osm:way/166382830",
+    "name": "شاطئ",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-UAQ-RAK",
+    "source": "osm:way/166382830",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.408239,
+     25.386408
+    ]
+   },
+   "properties": {
+    "id": "osm:relation/21047638",
+    "name": "شاطئ",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:relation/21047638",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.53234,
+     25.538497
+    ]
+   },
+   "properties": {
+    "id": "osm:way/267437429",
+    "name": "ممشى البيت المتوحد",
+    "type": "PUBLIC_BEACH",
+    "aoi_id": "AE-SHJ-AJM",
+    "source": "osm:way/267437429",
+    "operator": null,
+    "notes": "Mapped facility centroid; intake location is not public and is not estimated.",
+    "osm_tags": {
+     "natural": "beach"
+    }
+   }
+  }
+ ]
+}

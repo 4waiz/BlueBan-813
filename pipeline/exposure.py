@@ -29,6 +29,27 @@ ASSET_TYPES = {
                "of potable supply.",
         "primary_concerns": ["algal bloom", "turbidity", "hydrocarbon", "organics"],
     },
+    "DESALINATION_PLANT": {
+        "label": "Desalination plant (facility)",
+        "default_sensitivity": 1.0,
+        "why": "Seawater intake feeding potable supply; algal blooms and hydrocarbons "
+               "foul membranes and pre-treatment and can force load reduction.",
+        "primary_concerns": ["algal bloom", "hydrocarbon", "turbidity"],
+    },
+    "POWER_PLANT": {
+        "label": "Power plant (cooling-water intake)",
+        "default_sensitivity": 0.7,
+        "why": "Once-through cooling intakes are clogged by blooms, jellyfish and "
+               "floating material; most UAE plants also produce water.",
+        "primary_concerns": ["algal bloom", "floating material", "turbidity"],
+    },
+    "OIL_TERMINAL": {
+        "label": "Oil terminal / anchorage",
+        "default_sensitivity": 0.6,
+        "why": "Potential source and receptor of surface films; relevant to SAR "
+               "dark-anomaly screening.",
+        "primary_concerns": ["hydrocarbon", "surface film"],
+    },
     "AQUACULTURE": {
         "label": "Aquaculture facility",
         "default_sensitivity": 0.95,

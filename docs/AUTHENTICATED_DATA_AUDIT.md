@@ -10,26 +10,13 @@ authenticated gIQ account and Cockpit dataset cards for **813 Aquatic
 Hyperspectral**, **Sentinel-3 OLCI**, **Landsat 8/9** and **In-situ WQ records**,
 so every one of those conclusions is re-tested here.
 
-## Status: PENDING a team member's sign-in
+## Status: COMPLETED 2026-09-30 (team leader signed in; inspected by the team's automation browser)
 
-| Resource | Status on 2026-09-30 | Why |
-|---|---|---|
-| Hackathon platform (`spaceacademy-hackathons.space.gov.ae`) | **Not yet inspected** | The automation browser is a separate profile and lands on the sign-in page, which uses an emailed one-time code. Signing in is a team member's action. |
-| gIQ (`giq.ae`) | **Not yet inspected** | Same: redirected to `LOGIN`. |
-| Claude-in-Chrome (the team leader's own signed-in Chrome) | **Not connected** | The extension reported "not connected". |
-
-**What unblocks it** (either one):
-
-1. Connect the Claude in Chrome extension to the team leader's Chrome, where
-   both sites are already signed in; or
-2. Sign in by hand in the automation browser window: on the platform tab enter
-   the team e-mail, press **Send sign-in code**, enter the code; on the gIQ tab
-   press **LOGIN**.
-
-Until then **no conclusion about 813, gIQ or the in-situ card is drawn in
-either direction.** The product treats 813 as SIMULATED and in-situ data as
-ABSENT, and says so, because that is the state of the data the code can
-actually read today.
+| Resource | Result |
+|---|---|
+| Hackathon platform: Cockpit, Dashboard, Tasks, Onboarding, Prep Training | Inspected |
+| gIQ: Home, Explore, Data Directory (Uploaded / Sharing / Generated / Exports), Reference Data, Models, Acquire (view only) | Inspected |
+| Paid actions (gIQ Buy / Tasking / Orders, Marketplace purchases) | **Not touched** |
 
 ## Access rules for this audit
 
@@ -78,14 +65,83 @@ Lw → Rrs conversion (which needs downwelling irradiance) is in place;
 
 ## Results
 
-*To be completed during the authenticated session.* Sections to fill:
+### 1. Cockpit dataset cards: still informational only
 
-1. Cockpit: dataset cards, their controls, and what each control returns.
-2. Data / Tasks / Prep Training pages.
-3. gIQ: Explore & Visualize, Data Directory, available imagery and reference
-   data for the UAE AOIs.
-4. Satellite 813: accessible or not; if accessible, product, units, bands,
-   coverage and dates over the candidate AOIs.
-5. In-situ WQ records: accessible or not; if accessible, stations, dates,
-   parameters, units and QC, and how many matchups they yield with Sentinel-2.
-6. Revised conclusions vs the 2026-09-15 audit.
+The four cards read, verbatim: *813 Aquatic Hyperspectral - GeoTIFF - on-demand -
+Optimized bands for water-leaving radiance*; *Sentinel-3 OLCI - NetCDF -
+on-demand - Ocean colour and coastal water quality*; *Landsat-8/9 OLI-TIRS -
+GeoTIFF - on-demand - Thermal + optical for surface temperature*; *In-situ WQ
+records - CSV - variable - Ground-truth for select MENA water bodies*.
+
+Checked in the live DOM, not just the accessibility tree: each card's list item
+has **no anchor, no button or input, no pointer cursor, no inline handler and no
+data attributes**. There is nothing to click. "On-demand" can only mean a
+request to the organisers, whose channel on the platform is the Cockpit's
+*Mentor & Organizer Chat*. The Data providers & tools section links only to
+public providers (Copernicus Data Space, Planetary Computer, USGS, Planet,
+Planet STAC, EnMAP, ESA WorldCover, STAC spec, geojson.io).
+
+### 2. Programme rules: unchanged
+
+The Onboarding guide's phase table is unchanged since 15 September: in the PoC
+phase, open multispectral and hyperspectral data and the Planet Tanager open
+archive only; *no commercial Planet data*, *no gIQ access*, *no guaranteed
+Satellite 813 or MBZ-SAT data*. Section 07 still reads: *"Satellite 813 &
+MBZ-SAT - INCUBATION ONLY, UPON AVAILABILITY ... do not design a PoC that
+depends on this data."* The learning track now lists 6 items (two new since the
+last audit: a Week-2 time-series notebook and "Orientation session 29-9"
+slides, whose viewer reports *"No PDF URL configured"*). The Cockpit countdown
+put the PoC deadline at 16 d 22 h from 2026-09-30 01:21 GST, i.e. about
+**2026-10-17 00:00 GST**. Dashboard: no announcements. Tasks: the team's own
+empty board.
+
+### 3. gIQ: access works, but holds no 813 and no in-situ data
+
+Contrary to the programme table ("no gIQ access" in the PoC phase), the team
+leader's gIQ login works. What it contains:
+
+| Module | Content on 2026-09-30 |
+|---|---|
+| Data Directory - Uploaded files | 2 items, both uploaded by other accounts on the (apparently shared) hackathon tenant: a Sentinel-1C IW GRDH scene (VV+VH, 13 Sep 2026 15:56 UTC, 842.8 MB) whose footprint is the **Nile Delta, Egypt** (29.7-32.7 E, 30.1-32.6 N), ingested by the organiser; and a polygon GeoJSON belonging to another participant. Neither covers the UAE; the second is not ours and was not downloaded. |
+| Data Directory - Shared with us | Empty |
+| Explore | Only the two layers above |
+| Models | 0 |
+| Reference Data | Empty |
+| Acquire (viewed, nothing searched or ordered) | Vendors Airbus, Capella, ICEYE, Planet, Space42, Umbra and MBRSC, each priced (EUR/USD/AED), plus free archives for Sentinel-1, Sentinel-2 and Landsat. **No Satellite 813 vendor or product.** |
+
+### 4. Satellite 813: NOT accessible
+
+Neither the platform nor gIQ exposes any Satellite 813 product, file, layer,
+share or order path for this team on 2026-09-30. BLUEBAN 813 therefore keeps
+the 813 **simulator** as its hyperspectral path, labelled SIMULATED everywhere,
+and `pipeline/satellite813_real.py` stays a documented, tested reader waiting
+for a product.
+
+### 5. In-situ WQ records: NOT downloadable
+
+No file, link or API. The route is a request through the Cockpit chat. A draft
+request (below) is prepared for the team; **nothing has been sent on the team's
+behalf.** Public alternatives were exhausted separately in
+[`PUBLIC_UAE_DATA.md`](PUBLIC_UAE_DATA.md).
+
+### 6. Revised conclusions vs the 2026-09-15 audit
+
+| 2026-09-15 conclusion | 2026-09-30 re-test |
+|---|---|
+| gIQ unavailable | **Changed:** login works; nothing in it serves this project today |
+| Satellite 813 not practically available | **Confirmed** by direct inspection of both platforms |
+| In-situ records not downloadable | **Confirmed**; request route identified (Cockpit chat) |
+| Sentinel-3 OLCI via Planetary Computer | **New limitation:** Planetary Computer's OLCI WFR archive over the UAE ends 2026-02-23 (`outputs/aoi/census.json`); later OLCI needs the organisers' on-demand card or a CDSE account |
+
+### Draft organiser request (for the team to send in the Cockpit chat)
+
+> Hello, this is Team Kanban (Water Quality). We would like to request three
+> of the on-demand datasets listed in our Cockpit, for the UAE coast:
+> (1) **In-situ WQ records** for UAE coastal waters (chlorophyll-a, turbidity,
+> TSS, temperature, salinity; with station coordinates, sampling date/time,
+> units and QC), any period from 2019;
+> (2) **Sentinel-3 OLCI** Level-2 WFR for the Gulf of Oman coast (Fujairah,
+> Kalba, Khor Fakkan) and Abu Dhabi coast, March-September 2026;
+> (3) any **813 Aquatic Hyperspectral** acquisition over those coasts, with its
+> radiometric unit definition (Lw vs Rrs), band table and quality flags.
+> We will keep restricted data out of our public repository. Thank you!

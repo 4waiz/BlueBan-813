@@ -52,9 +52,15 @@ os.environ.setdefault("GDAL_HTTP_MULTIRANGE", "YES")
 os.environ.setdefault("GDAL_HTTP_MERGE_CONSECUTIVE_RANGES", "YES")
 os.environ.setdefault("GDAL_HTTP_MAX_RETRY", "4")
 os.environ.setdefault("GDAL_HTTP_RETRY_DELAY", "2")
-# Without these a stalled blob read blocks a worker forever.
-os.environ.setdefault("GDAL_HTTP_TIMEOUT", "60")
-os.environ.setdefault("GDAL_HTTP_CONNECTTIMEOUT", "20")
+# Without these a stalled blob read blocks a worker forever. GDAL's open() can
+# hold the Python GIL while it waits on HTTP, which freezes every thread in the
+# process; hence short timeouts, no HEAD requests, and PROCESS-level parallelism
+# in screen_aoi rather than threads.
+os.environ.setdefault("GDAL_HTTP_TIMEOUT", "20")
+os.environ.setdefault("GDAL_HTTP_CONNECTTIMEOUT", "10")
+os.environ.setdefault("CPL_VSIL_CURL_USE_HEAD", "NO")
+os.environ.setdefault("GDAL_INGESTED_BYTES_AT_OPEN", "32768")
+os.environ.setdefault("VSI_CACHE", "TRUE")
 
 PC_STAC = "https://planetarycomputer.microsoft.com/api/stac/v1"
 SCREEN_BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B8A", "B11", "B12"]
@@ -131,8 +137,9 @@ def _read_band_to_grid(href: str, grid: AoiGrid, resampling_name: str):
 
     categorical = resampling_name in ("nearest", "mode")
     resampling = getattr(Resampling, resampling_name)
-    with rasterio.Env(GDAL_HTTP_TIMEOUT=60, GDAL_HTTP_CONNECTTIMEOUT=20,
-                      GDAL_HTTP_MAX_RETRY=3, GDAL_HTTP_RETRY_DELAY=2), \
+    with rasterio.Env(GDAL_HTTP_TIMEOUT=20, GDAL_HTTP_CONNECTTIMEOUT=10,
+                      GDAL_HTTP_MAX_RETRY=3, GDAL_HTTP_RETRY_DELAY=2,
+                      CPL_VSIL_CURL_USE_HEAD="NO"), \
             rasterio.open(href) as src:
         l, b, r, t = transform_bounds("EPSG:4326", src.crs, *grid.bbox, densify_pts=21)
         pad = 2 * grid.resolution_m
@@ -158,7 +165,7 @@ def _read_band_to_grid(href: str, grid: AoiGrid, resampling_name: str):
     return dst
 
 
-def load_datatake(items, grid: AoiGrid, bands=SCREEN_BANDS, band_workers: int = 3):
+def load_datatake(items, grid: AoiGrid, bands=SCREEN_BANDS, band_workers: int = 1):
     """Mosaic one datatake's tiles onto ``grid``.
 
     Returns ``(reflectance_dict, scl, meta)``. Reflectance is decoded per tile
@@ -186,10 +193,13 @@ def load_datatake(items, grid: AoiGrid, bands=SCREEN_BANDS, band_workers: int = 
         ids.append(it.id)
         baselines.append(baseline)
         scl[fill] = s[fill].astype("uint8")
-        with ThreadPoolExecutor(max_workers=band_workers) as ex:
-            dns = dict(zip(bands, ex.map(
-                lambda b: _read_band_to_grid(signed.assets[b].href, grid, "average"),
-                bands)))
+        if band_workers <= 1:
+            dns = {b: _read_band_to_grid(signed.assets[b].href, grid, "average") for b in bands}
+        else:
+            with ThreadPoolExecutor(max_workers=band_workers) as ex:
+                dns = dict(zip(bands, ex.map(
+                    lambda b: _read_band_to_grid(signed.assets[b].href, grid, "average"),
+                    bands)))
         for b in bands:
             r = s2f.dn_to_reflectance(dns[b], baseline)
             m = np.isnan(refl[b]) & np.isfinite(r) & fill
@@ -274,80 +284,98 @@ def zone_statistics(refl: dict, scl: np.ndarray, platform: str,
     return out
 
 
+def _grid_to_dict(grid: AoiGrid) -> dict:
+    return {"aoi_id": grid.aoi_id, "bbox": list(grid.bbox), "epsg": grid.epsg,
+            "transform": list(grid.transform)[:6], "shape": list(grid.shape),
+            "resolution_m": grid.resolution_m}
+
+
+def _grid_from_dict(d: dict) -> AoiGrid:
+    from affine import Affine
+    return AoiGrid(d["aoi_id"], tuple(d["bbox"]), d["epsg"], Affine(*d["transform"]),
+                   tuple(d["shape"]), d["resolution_m"])
+
+
+def process_datatake(args) -> dict:
+    """One datatake -> one time-series row (+ cache file). Runs in a worker process."""
+    key, item_dicts, grid_d, cache_dir, zones_path = args
+    import pystac
+    items = [pystac.Item.from_dict(d) for d in item_dicts]
+    grid = _grid_from_dict(grid_d)
+    res = grid.resolution_m
+    try:
+        zmasks = ({k: v.astype(bool) for k, v in np.load(zones_path).items()}
+                  if zones_path else None)
+        refl, scl, meta = load_datatake(items, grid)
+        feats = s2f.compute_features(refl, platform=meta["platform"])
+        water, _ = s2f.water_quality_mask(refl, scl, pixel_size_m=res,
+                                          shoreline_buffer_m=max(40.0, res))
+        st = zone_statistics(refl, scl, meta["platform"], res, zmasks, feats=feats, water=water)
+        if cache_dir:
+            tag = f"{key[0]}_R{int(key[1]):03d}_{(key[2] or 'S2')[-2:]}"
+            np.savez_compressed(
+                os.path.join(cache_dir, f"{tag}.npz"), water=water, scl=scl,
+                **{f: np.where(water, feats[f], np.nan).astype("float16") for f in CACHE_FEATURES},
+                rgb=np.dstack([refl["B04"], refl["B03"], refl["B02"]]).astype("float16"))
+            st["cache_file"] = f"{tag}.npz"
+        return {"date": key[0], **meta, **st}
+    except Exception as e:                                    # recorded, not hidden
+        return {"date": key[0], "error": repr(e)[:300], "item_ids": [i.id for i in items]}
+
+
 def screen_aoi(aoi_id: str, bbox, start: str, end: str, resolution_m: float = 60.0,
-               max_cloud: float = 30.0, workers: int = 8, zones: str | None = "worldcover",
+               max_cloud: float = 30.0, workers: int = 6, zones: str | None = None,
                cache_dir: str | None = None, progress=print) -> dict:
     """Screen every usable acquisition over one AOI. Returns the time series.
 
-    With ``cache_dir`` set, each acquisition's water-masked feature rasters are
-    also written there (float16 ``.npz``, gitignored) so per-pixel seasonal
-    climatologies can be built later without re-reading the archive.
+    Datatakes are processed in separate PROCESSES: a network stall inside GDAL
+    can hold the GIL, and in a thread pool that freezes every worker. With
+    ``cache_dir`` set, each acquisition's water-masked feature rasters are also
+    written there (float16 ``.npz``, gitignored) for per-pixel climatologies.
     """
+    from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
+
     grid = AoiGrid.from_bbox(aoi_id, bbox, resolution_m)
     groups = search_items(bbox, start, end, max_cloud)
     zmasks = worldcover_zones(grid) if zones == "worldcover" else None
+    zones_path = None
     if cache_dir:
         os.makedirs(cache_dir, exist_ok=True)
         if zmasks is not None:
-            np.savez_compressed(os.path.join(cache_dir, "_zones.npz"), **zmasks)
+            zones_path = os.path.join(cache_dir, "_zones.npz")
+            np.savez_compressed(zones_path, **zmasks)
+    gd = _grid_to_dict(grid)
+    tasks = [(key, [it.to_dict() for it in items], gd, cache_dir, zones_path)
+             for key, items in groups]
     t0 = time.time()
-
-    def one(kv):
-        key, items = kv
-        try:
-            refl, scl, meta = load_datatake(items, grid)
-            feats = s2f.compute_features(refl, platform=meta["platform"])
-            water, _ = s2f.water_quality_mask(
-                refl, scl, pixel_size_m=resolution_m,
-                shoreline_buffer_m=max(40.0, resolution_m))
-            st = zone_statistics(refl, scl, meta["platform"], resolution_m, zmasks,
-                                 feats=feats, water=water)
-            if cache_dir:
-                tag = f"{key[0]}_R{int(key[1]):03d}_{(key[2] or 'S2')[-2:]}"
-                np.savez_compressed(
-                    os.path.join(cache_dir, f"{tag}.npz"),
-                    water=water, scl=scl,
-                    **{f: np.where(water, feats[f], np.nan).astype("float16")
-                       for f in CACHE_FEATURES},
-                    rgb=np.dstack([refl["B04"], refl["B03"], refl["B02"]]).astype("float16"))
-                st["cache_file"] = f"{tag}.npz"
-            return {"date": key[0], **meta, **st}
-        except Exception as e:                            # recorded, not hidden
-            return {"date": key[0], "error": repr(e)[:300],
-                    "item_ids": [i.id for i in items]}
-
-    rows = []
-    # A watchdog instead of ex.map: one blocked network read must not stall the
-    # whole screen. A datatake that has not finished after ``stall_s`` seconds is
-    # recorded as an error and abandoned (its thread may linger; the run goes on).
-    from concurrent.futures import FIRST_COMPLETED, wait
-    ex = ThreadPoolExecutor(max_workers=workers)
-    pending = {}
-    queue = list(groups)
-    started = {}
-    stall_s = 240.0
-    done_n = 0
-    while queue or pending:
-        while queue and len(pending) < workers:
-            kv = queue.pop(0)
-            f = ex.submit(one, kv)
-            pending[f] = kv
-            started[f] = time.time()
-        finished, _ = wait(list(pending), timeout=10, return_when=FIRST_COMPLETED)
-        for f in finished:
-            rows.append(f.result())
-            pending.pop(f)
-            done_n += 1
-            if done_n % 25 == 0:
-                progress(f"  {aoi_id}: {done_n}/{len(groups)} datatakes "
-                         f"({time.time() - t0:.0f}s)")
-        now = time.time()
-        for f in [f for f in pending if now - started[f] > stall_s]:
-            key, items = pending.pop(f)
-            rows.append({"date": key[0], "error": f"stalled > {stall_s:.0f}s (abandoned)",
-                         "item_ids": [i.id for i in items]})
-            done_n += 1
-    ex.shutdown(wait=False, cancel_futures=True)
+    rows, pending, started = [], {}, {}
+    stall_s, done_n = 300.0, 0
+    ex = ProcessPoolExecutor(max_workers=workers)
+    queue = list(tasks)
+    try:
+        while queue or pending:
+            while queue and len(pending) < workers:
+                t = queue.pop(0)
+                f = ex.submit(process_datatake, t)
+                pending[f], started[f] = t, time.time()
+            finished, _ = wait(list(pending), timeout=10, return_when=FIRST_COMPLETED)
+            for f in finished:
+                t = pending.pop(f)
+                try:
+                    rows.append(f.result())
+                except Exception as e:                        # worker crash
+                    rows.append({"date": t[0][0], "error": f"worker failed: {e!r}"[:300]})
+                done_n += 1
+                if done_n % 25 == 0:
+                    progress(f"  {aoi_id}: {done_n}/{len(tasks)} datatakes "
+                             f"({time.time() - t0:.0f}s)")
+            now = time.time()
+            for f in [f for f in pending if now - started[f] > stall_s]:
+                t = pending.pop(f)
+                rows.append({"date": t[0][0], "error": f"stalled > {stall_s:.0f}s (abandoned)"})
+                done_n += 1
+    finally:
+        ex.shutdown(wait=False, cancel_futures=True)
     rows.sort(key=lambda r: r.get("datetime", r["date"]))
     return {
         "aoi_id": aoi_id, "bbox": list(bbox), "grid": {

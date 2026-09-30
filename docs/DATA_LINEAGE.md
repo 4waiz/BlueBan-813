@@ -17,6 +17,21 @@ it was used for. Nothing in the product depends on a source not listed here.
 | OpenStreetMap | Overpass + Nominatim | **ODbL** | None |
 | Satellite 813 | **not obtained** | — | incubation only |
 | In-situ water quality | **not obtained** | — | no mechanism |
+| Sentinel-2 L2A, UAE archive 2017–2026 | Microsoft Planetary Computer | Copernicus open | None (anonymous) |
+| Sentinel-3 OLCI WFR, UAE cross-sensor reference | Microsoft Planetary Computer (windowed reads) | Copernicus open | None |
+| OpenStreetMap UAE coastal assets (120) | Overpass | **ODbL** | None |
+| EAD marine monitoring station locations (50) | Abu Dhabi SDI open layers 170/171 | ADSDI open data | None; locations only |
+| Orbital elements (TLE) | CelesTrak GP | public | None |
+| Earth textures (Satellite View) | NASA Blue Marble / Black Marble via unpkg | public domain | None |
+
+**UAE revamp outputs** (all regenerable, all from open data):
+`outputs/watch/<AOI>.json` (per-datatake statistics), `data/cache/watch/<AOI>/`
+(per-acquisition feature rasters, gitignored), `outputs/detect/<AOI>.json`,
+`data/cache/olci/<AOI>/` (windowed OLCI extracts, gitignored),
+`outputs/labels/seed_labels.json`, `outputs/incidents/BB-AE-*.json` + layers,
+`outputs/workspace/seed.json`, `outputs/validation/validation_summary.json`,
+`config/tle_eo.json`. Restricted or authenticated downloads may only live in
+`data/raw/private/` (gitignored); none are used by any output.
 
 Permission confirmed: the Cockpit FAQ states *"Can we use external public
 datasets? Yes - any open dataset is allowed."*

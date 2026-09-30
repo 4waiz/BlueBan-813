@@ -3,6 +3,14 @@
 **BLUEBAN 813** - Water Threat Intelligence for the Arab region
 Team Kanban · Arab Youth Space Hackathon 2026, 813 Challenge
 
+> **UAE focus (September 2026 revamp).** The first customer is a UAE coastal
+> authority or desalination operator: most of the country's drinking water comes
+> from plants on the Arabian Gulf and the Gulf of Oman, where blooms have closed
+> intakes before (2008–2009). The demonstration case sits ~11–22 km from the
+> Port of Fujairah, the Kalba power plant and the Fujairah F2 power and
+> desalination plant. What BLUEBAN sells is fewer wasted boat dispatches and
+> earlier, auditable decisions, and a model that improves from every one of them.
+
 ---
 
 ## 1. The problem, as a buyer experiences it

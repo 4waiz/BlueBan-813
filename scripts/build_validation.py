@@ -268,6 +268,78 @@ def negative_control(seed, seed_labels):
     return out
 
 
+# --------------------------------------------------------------------------- markdown
+BEGIN = "<!-- BEGIN GENERATED: scripts/build_validation.py -->"
+END = "<!-- END GENERATED -->"
+
+
+def _n(v, d=3):
+    return "n/a" if v is None else f"{v:.{d}f}"
+
+
+def write_report(out: dict) -> None:
+    """Refresh the generated UAE section at the top of docs/VALIDATION_REPORT.md."""
+    A, B, C = out["A_data_quality"], out["B_matchups"], out["C_model_performance"]
+    E, F = out["E_spatial_holdout"], out["F_negative_control"]
+    L = [BEGIN, "", "## UAE closed-loop validation (generated)", "",
+         f"Recomputed from the pipeline outputs on {out['generated_utc']}. The same numbers drive the in-app "
+         "Validation screen (sections A-F). The Annaba and Tanager experiments below this section are unchanged.", ""]
+    tot = sum(a["n_ok"] for a in A["aois"])
+    use = sum(a["n_usable"] for a in A["aois"])
+    L += ["### A. Data quality", "",
+          f"{tot:,} Sentinel-2 L2A datatakes read over {len(A['aois'])} UAE AOIs, {use:,} usable (>= 500 water pixels).", "",
+          "| AOI | Period | Datatakes | Usable | Median valid | Glint-flagged water |", "|---|---|---|---|---|---|"]
+    for a in A["aois"]:
+        L.append(f"| {a['aoi_id']} | {a['date_range'][0]} to {a['date_range'][1]} | {a['n_ok']} | {a['n_usable']} | "
+                 f"{_n((a.get('median_valid_fraction') or 0) * 100, 0)} % | {_n((a.get('median_glint_fraction') or 0) * 100, 0)} % |")
+    cs = B["cross_sensor"]
+    L += ["", "### B. Matchups", "",
+          f"* **In situ: {B['in_situ']['n_matchups']}.** {B['in_situ']['reason']}",
+          f"* Physical units allowed: **{'yes' if B['in_situ']['quantification']['usable_for_physical_units'] else 'no'}** "
+          f"({'; '.join(B['in_situ']['quantification']['reasons'])}).",
+          f"* **Cross-sensor reference (Sentinel-3 OLCI, not in situ): {cs.get('n', 0)} labelled candidates**, median |dt| "
+          f"{_n(cs.get('median_abs_dt_minutes'), 0)} min."]
+    for h, v in (cs.get("per_hypothesis") or {}).items():
+        a = (cs.get("agreement") or {}).get(h, {})
+        L.append(f"  * {h}: {v['positive']} confirmed / {v['negative']} not ({v['variable']}); Spearman rho between the S2 change "
+                 f"and the OLCI contrast {_n(a.get('spearman_rho'), 2)} (p {_n(a.get('p_value'), 4)}, n {a.get('n', 0)}).")
+    if C.get("production"):
+        p_, c_ = C["production"]["metrics"], (C.get("candidate") or {}).get("metrics") or {}
+        bt = C.get("bootstrap") or {}
+        L += ["", "### C. Model performance (triage, frozen validation)", "",
+              f"{C['n_train']} train / {C['n_validation']} validation labels ({C['validation_positive']} positive), "
+              f"stratified by class and grouped by AOI-month; validation hash `{C['validation_hash']}`.", "",
+              "| Metric | Rule baseline (production) | Logistic candidate | Delta, grouped bootstrap 95 % CI |", "|---|---|---|---|"]
+        for k in ("auprc", "auroc", "f1", "precision", "recall", "brier", "ece"):
+            ci = (bt.get(k) or {}).get("ci")
+            L.append(f"| {k.upper()} | {_n(p_.get(k))} | {_n(c_.get(k))} | "
+                     + (f"[{_n(ci[0])}, {_n(ci[1])}]" if ci and ci[0] is not None else "") + " |")
+        L += ["", "The rule baseline has no skill against the cross-sensor reference; the learned candidate does, "
+                  "but the confidence interval is wide at this label count. Promotion still requires the gate and a named human."]
+    loao = E.get("triage_leave_one_aoi_out") or []
+    if loao:
+        L += ["", "### E. Spatial holdout (leave one AOI out)", "", "| Held-out AOI | n (positive) | AUPRC candidate | AUPRC rule |", "|---|---|---|---|"]
+        for r in loao:
+            L.append(f"| {r['held_out_aoi']} | {r['n_test']} ({r['test_positive']}) | {_n((r.get('candidate') or {}).get('auprc'))} | "
+                     f"{_n((r.get('production') or {}).get('auprc'))} |")
+    rej = F.get("cross_sensor_rejections") or {}
+    L += ["", "### F. Negative control", "",
+          f"* Annaba: RX {_n((F.get('annaba') or {}).get('rx_percentile'), 1)}th percentile in the scene, "
+          f"{_n((F.get('annaba') or {}).get('seasonal_percentile'), 1)}th seasonal percentile: stood down.",
+          f"* UAE: {rej.get('n', 0)} of {rej.get('of', 0)} referenced candidates were not confirmed by OLCI; "
+          "the largest are high-z Sentinel-2 anomalies over water OLCI saw as ordinary (e.g. AE-FUJ 2023-10-25).", "", END]
+    path = os.path.join(ROOT, "docs", "VALIDATION_REPORT.md")
+    doc = open(path, encoding="utf-8").read() if os.path.exists(path) else "# Validation Report\n"
+    block = "\n".join(L)
+    if BEGIN in doc and END in doc:
+        doc = doc[:doc.index(BEGIN)] + block + doc[doc.index(END) + len(END):]
+    else:
+        head, _, rest = doc.partition("\n")
+        doc = head + "\n\n" + block + "\n" + rest
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(doc)
+
+
 def main():
     seed = load("outputs/workspace/seed.json")
     seed_labels = load("outputs/labels/seed_labels.json")
@@ -283,7 +355,8 @@ def main():
     p = os.path.join(ROOT, "outputs", "validation", "validation_summary.json")
     with open(p, "w", encoding="utf-8") as f:
         json.dump(clean(out), f, separators=(",", ":"))
-    print("->", p)
+    write_report(clean(out))
+    print("->", p, "+ docs/VALIDATION_REPORT.md")
 
 
 if __name__ == "__main__":

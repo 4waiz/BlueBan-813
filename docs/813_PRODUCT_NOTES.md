@@ -1,5 +1,13 @@
 # Satellite 813: product notes and the sensor simulator
 
+> **Status, 30 September 2026.** Still no accessible 813 product (authenticated
+> audit). The simulated 813 band set drives the ablation: at the decision boundary
+> it cut false alarms from 159 to 84 (−47 %) at matched recall on the same Tanager
+> pixels; gross detection gained nothing; concentration skill against OLCI was not
+> demonstrated. A reader contract for real products now exists
+> (`pipeline/satellite813_real.py`): it accepts Rrs / rho_w and refuses water-leaving
+> radiance without the matching downwelling irradiance.
+
 This document states exactly what we know about Satellite 813, what we do not,
 what we built instead, and why that is a stronger contribution than pretending
 otherwise.

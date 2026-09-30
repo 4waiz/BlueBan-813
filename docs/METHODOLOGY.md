@@ -3,7 +3,126 @@
 Every algorithmic decision in BLUEBAN 813, with its source and the reason it was
 chosen over the obvious alternative.
 
+**Part A** describes the operational UAE pipeline built in the September 2026
+revamp (Sentinel-2 primary sensor, per-pixel seasonal detection, cross-sensor
+reference, closed loop). **Part B**, from "The sensor cascade" onward, is the
+hyperspectral characterisation developed on the Gulf of Annaba Tanager scene; it
+still powers the 813 simulation, the ablation and the negative control.
+
 ---
+
+# Part A — The operational UAE pipeline
+
+## A1. Sentinel-2 L2A ingestion (`pipeline/watch.py`, `pipeline/s2_features.py`)
+
+* **Source.** `sentinel-2-l2a` on the Microsoft Planetary Computer, all tiles of a
+  datatake (date + relative orbit + platform) mosaicked onto a fixed UTM grid per
+  AOI (UTM 39/40 handled by reprojection to the AOI's zone).
+* **Offset.** `BOA_ADD_OFFSET = -1000` is applied when the tile's
+  `s2:processing_baseline >= 04.00`, **per tile, before mosaicking**. Deciding by
+  acquisition date is wrong for reprocessed archives.
+* **Masks.** SCL classes 0, 1, 3, 8, 9, 10, 11 rejected (2/4/5 are *not*: dense
+  blooms and very clear water are often mislabelled there). Water requires
+  MNDWI > 0 and B11 < 0.10 (land, cloud, whitecaps, strong glint rejected).
+  Pixels with B11 > 0.0215 (ACOLITE's non-water threshold) are kept but
+  **flagged as glint-affected** and corrected by subtracting B12 from every band.
+  A pixel whose corrected red goes below -0.002 is over-corrected and dropped.
+* **Shoreline buffer.** WATCH erodes the water mask by max(40 m, one pixel). The
+  20 m incident analysis buffers only against land and SCL cloud areas of >= 25
+  pixels (`hole_buffer=False`), so a single noisy pixel in open water does not
+  become a 60 m hole.
+* **Resumable.** Each datatake writes its feature cache (`.npz`, float16) and a
+  sidecar row, so an interrupted multi-year screen resumes where it stopped.
+
+## A2. Features
+
+| Feature | Definition | Kind | Reference |
+|---|---|---|---|
+| NDCI | (R705 − R665) / (R705 + R665) | PROXY | Mishra & Mishra 2012 |
+| MCI | R705 − R665 − (R740 − R665)(705 − 665)/(740 − 665) | PROXY | Gower et al. 2005 |
+| FAI | R865 − baseline(R665, R1610) | PROXY | Hu 2009 |
+| TUR_NECHAD2016 | A·ρ/(1 − ρ/C), red band, generic coefficients (ACOLITE table) | GENERIC_CALIBRATION | Nechad et al. |
+| Hue angle | CIE chromaticity angle from the visible bands | COLORIMETRIC | van der Woerd & Wernand |
+
+No feature is ever printed with physical units unless a local calibration passes
+the calibration gate (A6). NDCI is unstable over very clear water where the
+corrected red reflectance approaches zero; the hue angle and MCI are the checks.
+
+## A3. DETECT: per-pixel seasonal anomaly (`pipeline/detect.py`)
+
+A spatial detector compares a pixel with its neighbours, so a bright bank or a
+dredged channel is flagged every clear day. DETECT compares every pixel with
+**itself**: its values at the same time of year in *other* years.
+
+    clim(p) = F at pixel p on acquisitions within ±45 days of day-of-year, other years
+    z(p)    = (F_t(p) − median(clim(p))) / (1.4826 · MAD(clim(p)) + floor_F)
+    pct(p)  = percentile of F_t(p) within clim(p)
+
+* Floors: NDCI 0.02, MCI 0.002, FAI 0.002, turbidity 1 FNU, hue 5°.
+* Candidate: connected region >= 0.5 km², z >= 3 and pct >= 95 on the
+  hypothesis' primary feature (NDCI bloom-like, turbidity sediment-like, FAI
+  surface material) and a secondary feature agreeing (MCI z >= 1 for bloom-like).
+* Two-stage for speed: a date reaches the pixel pass only if the AOI's P95 **or
+  P99** of some feature sits at or above its own 80th seasonal percentile. The
+  per-pixel median uses a sort-based NaN median (identical to `np.nanmedian`,
+  ~5x faster).
+* Persistence: the share of past same-season dates on which at least half the
+  region already exceeded half of today's threshold. Permanent features score high.
+* Each candidate carries 13 triage features (`pipeline/learning.py:TRIAGE_FEATURES`),
+  including the region's water-colour change `hue_delta_deg`.
+
+## A4. Cross-sensor reference (`scripts/build_labels.py`, `pipeline/sentinel3.py`)
+
+OLCI WFR granules from the same morning are read **windowed** around the AOI
+(the tie-point grid locates the hyperslab: ~14 s instead of the full granule).
+For each bloom-/sediment-like candidate the CHL_NN / TSM_NN median inside the
+region is compared with the surrounding water (25 km pad, minus a 360 m ring):
+
+* positive: ratio >= 1.5 and region >= 2 units, or region >= 10 units;
+* negative: ratio <= 1.15 and region < 5 units;
+* otherwise, or with < 8 valid OLCI pixels, unlabelled.
+
+Labels carry weight 0.5 and the OLCI values they came from. They are a model
+product, **never in-situ truth**. Incidents use footprint matching: an OLCI pixel
+belongs to the event when its 300 m footprint overlaps it.
+
+## A5. Incidents, verification and field work (`pipeline/incidents.py`, `services/api`)
+
+States: MONITORING → DETECTED → UNDER_REVIEW → FIELD_VALIDATION_REQUIRED →
+CONFIRMED / FALSE_POSITIVE → RESOLVED. CONFIRM, FALSE_POSITIVE and RECLASSIFY
+create labels (analyst weight 1.0; field results 2.0); NEEDS_FIELD_SAMPLE and
+INSUFFICIENT_EVIDENCE do not. The sampling plan is role-based (core, edge,
+background control, uncertainty, asset boundary). Alerts are factual ("New
+coastal anomaly detected near … 94th seasonal percentile … Analyst review
+required"). Every action is written to a SHA-256 hash-chained audit log.
+
+## A6. Learning loop and promotion gate (`pipeline/learning.py`, `apps/web/lib/learning.ts`)
+
+* Split: stratified by class and grouped by AOI-month (whole groups on one side),
+  ~20 % validation, frozen by hash on first training.
+* Candidate: L2 logistic regression (scikit-learn objective, Newton-IRLS in the
+  browser; parity 1e-7), class-balanced, weighted by label source.
+* Gate: model tests pass · validation hash unchanged · both classes present ·
+  primary metric (AUPRC) not worse (grouped bootstrap reported) · calibration
+  (ECE <= limit or Brier not worse) · no AOI regression · **named human approves**.
+* Quantification (when matchups exist): a model zoo (linear, PLSR, RF, GBM, SVR,
+  ridge-log10) compared under grouped CV with a parsimony rule; physical units
+  only when >= 20 matchups in >= 5 groups and grouped-CV R² >= 0.4 in log space
+  with a confidence interval above zero.
+
+## A7. Scenario trajectory and satellite passes
+
+* The drift is a **SCENARIO TRAJECTORY ESTIMATE**: particles advected by ERA5
+  10 m wind with a windage factor and random walk. It is not a hydrodynamic
+  model and never used to infer a source.
+* The Satellite View propagates public TLEs (CelesTrak) with SGP4
+  (satellite.js). Predicted Sentinel-2 passes over Fujairah were checked against
+  the archive: closest approach 07:02:31 UTC, 52 km west (relative orbit 20),
+  16 min after each datatake's recorded start.
+
+---
+
+# Part B — Hyperspectral characterisation (Tanager, 813 simulation)
 
 ## The sensor cascade
 

@@ -3,6 +3,31 @@
 Written so a reviewer does not have to find these themselves. Each entry states
 what the limitation is, what it means for the product, and what would remove it.
 
+## UAE revamp (September 2026): what changed and what did not
+
+* **Still true everywhere:** no public in-situ data (now checked for the UAE:
+  none per-sample; EAD publishes station locations only), no real Satellite 813
+  data, Sen2Cor is not a water processor, and the drift is wind-only.
+* **New limitations of the UAE pipeline:**
+  * *NDCI over very clear water.* When corrected red reflectance approaches zero
+    NDCI becomes unstable (BB-AE-2023-001). Only 10 of 49 OLCI-referenced
+    bloom-like candidates were confirmed, versus 70 of 90 sediment-like ones.
+    The hue angle, MCI and the learned triage model are the mitigation; a
+    water-specific atmospheric correction is the fix.
+  * *The cross-sensor reference is a model product.* OLCI CHL_NN/TSM_NN are
+    biased in optically shallow Gulf water, cannot see events smaller than a few
+    300 m pixels, and end on 2026-02-23 on the Planetary Computer.
+  * *Shallow-water agreement is weak evidence.* In the Arabian Gulf both sensors
+    can respond to the same seabed or resuspension signal.
+  * *Small validation set.* 34 frozen validation labels; the grouped bootstrap
+    interval on the AUPRC difference spans zero. More analyst and field labels
+    are the remedy, which is what the loop is for.
+  * *Screening coverage.* Arabian Gulf AOIs beyond Abu Dhabi North are still
+    being screened (`docs/UAE_AOI_TOURNAMENT.md` lists them as pending).
+
+The sections below were written for the Gulf of Annaba case and remain accurate
+for it.
+
 ---
 
 ## 1. No in-situ measurement exists for this AOI

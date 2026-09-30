@@ -176,3 +176,28 @@ historical rather than deleted:
 | 813 A/B/C ablation on UAE labels | `experiments/ablation_813_uae.py` |
 | Research paper on GitHub Pages | `paper/`, `.github/workflows/pages.yml` |
 | Reproducible Python environment | `pyproject.toml` |
+
+## 8. Status after the revamp (30 September 2026)
+
+| Brief item | Status | Where |
+|---|---|---|
+| Authenticated data audit | Done: no accessible 813 product, no downloadable in-situ data | `docs/AUTHENTICATED_DATA_AUDIT.md` |
+| Public UAE data search | Done: no public per-sample chl / turbidity / TSS; EAD station locations only | `docs/PUBLIC_UAE_DATA.md` |
+| UAE AOI tournament | Done for 5 AOIs from data; 5 Arabian Gulf AOIs pending screening (listed as pending, not guessed) | `docs/UAE_AOI_TOURNAMENT.md`, `scripts/build_tournament.py` |
+| UAE as the hero, Annaba as negative control | Done: BB-AE-2024-001 (Fujairah, OLCI ×4.1 same morning); Annaba stood down | `outputs/incidents/`, `outputs/workspace/seed.json` |
+| Sentinel-2 L2A primary sensor, documented indices | Done | `pipeline/s2_features.py`, `docs/METHODOLOGY.md` Part A |
+| Per-pixel seasonal detection | Done | `pipeline/detect.py` |
+| Cross-sensor reference (never ground truth) | Done: 139 OLCI labels, weight 0.5 | `scripts/build_labels.py`, `pipeline/sentinel3.py` |
+| Matchup engine, quantification zoo, calibration gate | Built and tested; 0 in-situ matchups exist, so no concentration is reported | `pipeline/matchup.py`, `pipeline/quantify.py` |
+| Real 813 reader | Built as a contract (refuses Lw without Ed); no product to read | `pipeline/satellite813_real.py` |
+| 813 A/B/C ablation | Done on the Annaba Tanager scene; UAE repeat awaits the Tarif scene download (approval pending) | `outputs/validation/detectability_lift_*.json` |
+| Incident entity, state machine, verification queue, field workflow, alerts | Done (alerts with optional webhook in the API) | `pipeline/incidents.py`, `services/api/` |
+| Governed LEARN loop | Done: stratified grouped frozen split, gate, human promotion, rollback; browser trainer parity 1e-7 | `pipeline/learning.py`, `apps/web/lib/learning.ts` |
+| SQLite + DATABASE_URL, audit everything | Done (`services/api/store.py`; hash-chained audit) | `services/db/schema.sql` |
+| Sentinel-1 (optional) | Module built and tested (surface dark anomaly with lookalikes); the Oct 2019 spill benchmark was not run | `pipeline/sentinel1.py` |
+| Forecast demoted to scenario | Done: SCENARIO TRAJECTORY ESTIMATE (wind-only) | incident view |
+| Source attribution, information-gain sampling | Deferred with reasons | `docs/ROADMAP.md` |
+| Mission-control UI, Judge Mode (11 steps), Validation A–F, provenance | Done; plus a full-screen 3D Satellite View with real orbits | `apps/web/` |
+| Repo cleanup, pyproject, tests, CI | Done | `pyproject.toml`, `tests/`, `.github/workflows/ci.yml` |
+| Research paper on GitHub Pages | Done (generated from outputs) | `paper/`, `.github/workflows/pages.yml` |
+| Deployment | blueban813.pages.dev; custom domain BlueBan813.kanbanstudios.ae to be attached in the Cloudflare dashboard | `scripts/deploy_cloudflare.sh` |

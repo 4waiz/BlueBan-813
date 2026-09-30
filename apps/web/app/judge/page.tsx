@@ -129,7 +129,7 @@ function Judge() {
   const olci = hero?.sensor_agreement?.["Sentinel-3 OLCI"] as (Record<string, unknown> & { agrees?: boolean | null; note?: string }) | undefined;
   const hue = f.HUE_ANGLE as unknown as { value?: number; baseline_median?: number } | undefined;
   const nDt = vs?.A_data_quality.aois.reduce((s, a) => s + a.n_ok, 0);
-  const uaeAois = vs?.A_data_quality.aois.filter((a) => a.aoi_id.startsWith("AE")) || [];
+  const uaeAois = aois.filter((a) => a.id.startsWith("AE"));
   const fpA = vs?.D_813_ablation.hard?.arms?.S2_multispectral_11band?.confusion_matrix?.fp, fpB = vs?.D_813_ablation.hard?.arms?.["813_hyperspectral_205band"]?.confusion_matrix?.fp;
   const showMap = ["coast", "sensors", "change"].includes(step.stage);
 

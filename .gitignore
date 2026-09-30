@@ -47,3 +47,4 @@ apps/web/out/
 data/blueban.sqlite*
 # Authenticated / restricted downloads never leave this folder
 data/raw/private/
+apps/web/.next-static/

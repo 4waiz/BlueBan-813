@@ -32,3 +32,5 @@ jobs:
       - run: npx tsc --noEmit -p .
       - name: Browser trainer matches scikit-learn (parity fixture)
         run: npx --yes tsx@4 ../../tests/parity/learning_parity.ts
+      - name: Closed loop on the real seed (review, retrain, gate, promote, rollback, audit)
+        run: npx --yes tsx@4 ../../tests/parity/engine_flow.mts

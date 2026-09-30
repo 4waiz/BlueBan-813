@@ -4,15 +4,16 @@
 
 ## UAE closed-loop validation (generated)
 
-Recomputed from the pipeline outputs on 2026-09-30T10:02:00Z. The same numbers drive the in-app Validation screen (sections A-F). The Annaba and Tanager experiments below this section are unchanged.
+Recomputed from the pipeline outputs on 2026-09-30T10:23:28Z. The same numbers drive the in-app Validation screen (sections A-F). The Annaba and Tanager experiments below this section are unchanged.
 
 ### A. Data quality
 
-2,204 Sentinel-2 L2A datatakes read over 5 UAE AOIs, 1,835 usable (>= 500 water pixels).
+2,860 Sentinel-2 L2A datatakes read over 6 UAE AOIs, 2,405 usable (>= 500 water pixels).
 
 | AOI | Period | Datatakes | Usable | Median valid | Glint-flagged water |
 |---|---|---|---|---|---|
 | AE-AUH-NORTH | 2021-01-01 to 2026-09-29 | 655 | 597 | 81 % | 40 % |
+| AE-AUH-TAWEELAH | 2021-01-01 to 2026-09-29 | 656 | 570 | 100 % | 51 % |
 | AE-FUJ-DIBBA | 2021-01-03 to 2026-09-29 | 333 | 278 | 100 % | 95 % |
 | AE-FUJ | 2017-01-04 to 2026-09-29 | 563 | 456 | 100 % | 49 % |
 | AE-SHJ-KALBA | 2021-01-03 to 2026-09-29 | 298 | 241 | 100 % | 20 % |

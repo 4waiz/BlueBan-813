@@ -21,8 +21,9 @@ Which UAE area of interest should carry the demonstration, decided from the data
 | 3 | **AE-SHJ-KALBA** Kalba | Gulf of Oman | 241 | 57 (12) | 11/3 | 1 | 0.40 | 1.00 | 1.00 | 0.12 | 0.79 | **0.70** |
 | 4 | **AE-FUJ-DIBBA** Dibba | Gulf of Oman | 278 | 57 (11) | 12/7 | 0 | 0.47 | 1.00 | 0.83 | 0.00 | 0.63 | **0.61** |
 | 5 | **AE-SHJ-KHORFAKKAN** Khor Fakkan | Gulf of Oman | 263 | 75 (8) | 5/10 | 4 | 0.44 | 1.00 | 0.42 | 0.50 | 0.33 | **0.54** |
+| 6 | **AE-AUH-TAWEELAH** Al Taweelah / Khalifa Port | Arabian Gulf | 570 | — (—) | —/— | 8 | 0.95 | 0.40 | 0.00 | 1.00 | 0.50 | **0.50** |
 
-**Pending (screening not finished; not scored, not guessed):** AE-AUH-LAGOON (Abu Dhabi / Musaffah lagoons), AE-AUH-TAWEELAH (Al Taweelah / Khalifa Port), AE-DXB-JEBELALI (Dubai / Jebel Ali), AE-SHJ-AJM (Sharjah / Ajman), AE-UAQ-RAK (Umm Al Quwain / Ras Al Khaimah).
+**Pending (screening not finished; not scored, not guessed):** AE-AUH-LAGOON (Abu Dhabi / Musaffah lagoons), AE-DXB-JEBELALI (Dubai / Jebel Ali), AE-SHJ-AJM (Sharjah / Ajman), AE-UAQ-RAK (Umm Al Quwain / Ras Al Khaimah).
 
 ## Result
 

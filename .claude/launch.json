@@ -4,20 +4,49 @@
     {
       "name": "api",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "uvicorn", "services.api.main:app", "--port", "8813"],
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "services.api.main:app",
+        "--port",
+        "8813"
+      ],
       "port": 8813
     },
     {
       "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "apps/web", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "apps/web",
+        "run",
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "static",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "apps/web/.next-static"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8090",
+        "--directory",
+        "apps/web/.next-static"
+      ],
       "port": 8090
+    },
+    {
+      "name": "paper",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8091",
+        "--directory",
+        "paper"
+      ],
+      "port": 8091
     }
   ]
 }

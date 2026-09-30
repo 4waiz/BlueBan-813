@@ -236,7 +236,7 @@ function Ablation({ d }: { d: Summary["D_813_ablation"] }) {
   const hardA = d.hard?.arms?.[ARM_KEY.A]?.confusion_matrix, hardB = d.hard?.arms?.[ARM_KEY.B]?.confusion_matrix;
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted"><SimBadge /> {d.scene}</div>
+      <div className="text-[12px] text-muted">{d.scene}</div>
       <div className="grid gap-3 lg:grid-cols-2">
         {(["hard", "easy"] as const).map((regime) => (
           <div key={regime} className="rounded-md border border-edge bg-deep/40 p-3">
@@ -306,7 +306,7 @@ function Negative({ d }: { d: Summary["F_negative_control"] }) {
         <div className="rounded-md border border-nominal/40 bg-nominal/5 p-3">
           <div className="flex items-center justify-between"><div className="hud-kicker">Case B · Gulf of Annaba (Algeria)</div><Chip label="STOOD DOWN" color="#23D484" /></div>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <Stat label="Spatial view (RX)" value={fmt.ord(a.rx_percentile)} sub="percentile in the scene: looks unusual" tone="text-caution" />
+            <Stat label="Spatial view (RX)" value={a.rx_percentile != null ? `${a.rx_percentile.toFixed(1)}th` : "n/a"} sub="percentile in the scene: looks unusual" tone="text-caution" />
             <Stat label="Temporal view" value={fmt.ord(a.seasonal_percentile)} sub={`seasonal percentile vs ${a.n_seasonal} same-season scenes: ordinary`} tone="text-nominal" />
           </div>
           <p className="mt-2 text-[12px] text-muted">{a.reading}</p>
@@ -339,7 +339,7 @@ export default function ValidationPage() {
     return {
       A: `${d.A_data_quality.aois.reduce((s, a) => s + a.n_ok, 0).toLocaleString()} datatakes`,
       B: `0 in situ · ${d.B_matchups.cross_sensor.n} cross-sensor`,
-      C: c.production ? `AUPRC ${n0(c.production.metrics.auprc, 2)}` : "no labels",
+      C: c.production ? `AUPRC rule ${n0(c.production.metrics.auprc, 2)} → cand. ${n0(c.candidate?.metrics?.auprc, 2)}` : "no labels",
       D: "813 simulated",
       E: `${d.E_spatial_holdout.triage_leave_one_aoi_out?.length || 0} AOIs held out`,
       F: d.F_negative_control.annaba ? "stood down" : "n/a",

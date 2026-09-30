@@ -64,6 +64,31 @@ def _canon(d) -> str:
     return json.dumps(d, sort_keys=True, separators=(",", ":"), default=str)
 
 
+def _post_webhook(alert: dict) -> None:
+    """POST an alert to BLUEBAN_ALERT_WEBHOOK, if configured.
+
+    Delivery (email, chat, pager) stays outside the product: the webhook gets
+    the alert JSON and does what the operator's organisation needs. It runs in
+    a daemon thread with a short timeout and never raises into the request.
+    """
+    url = os.environ.get("BLUEBAN_ALERT_WEBHOOK", "").strip()
+    if not url.startswith(("https://", "http://")):
+        return
+    import threading
+    import urllib.request
+
+    def send():
+        try:
+            req = urllib.request.Request(url, data=json.dumps(alert).encode(), method="POST",
+                                         headers={"content-type": "application/json",
+                                                  "user-agent": "BLUEBAN-813-alerts"})
+            urllib.request.urlopen(req, timeout=5).close()
+        except Exception as e:                                     # logged, never fatal
+            print(f"[alerts] webhook delivery failed: {e!r}")
+
+    threading.Thread(target=send, daemon=True).start()
+
+
 class Store:
     def __init__(self, url: str | None = None):
         self.path = _db_path(url)
@@ -168,6 +193,28 @@ class Store:
             return [dict(r) | {"bbox": json.loads(r["bbox"])}
                     for r in c.execute("SELECT * FROM aois ORDER BY id").fetchall()]
 
+    # -------------------------------------------------------------- assets
+    def list_assets(self) -> list:
+        with self.conn() as c:
+            return [dict(r) for r in c.execute("SELECT * FROM assets ORDER BY type, name").fetchall()]
+
+    def add_asset(self, a: dict, actor: str) -> dict:
+        if not (a.get("name") or "").strip():
+            raise ValueError("asset name is required")
+        if not (-180 <= float(a["lon"]) <= 180 and -90 <= float(a["lat"]) <= 90):
+            raise ValueError("lon/lat out of range")
+        aid = a.get("id") or f"OP-{uuid.uuid4().hex[:6].upper()}"
+        with self.conn() as c:
+            c.execute("INSERT INTO assets(id,name,type,lon,lat,aoi_id,sensitivity,source,notes,"
+                      "created_at,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET "
+                      "name=excluded.name, type=excluded.type, lon=excluded.lon, lat=excluded.lat",
+                      (aid, a["name"].strip(), a.get("type", "OTHER"), float(a["lon"]), float(a["lat"]),
+                       a.get("aoi_id"), a.get("sensitivity"), a.get("source", "operator"), a.get("notes"),
+                       inc_mod.now_utc(), actor))
+            self._audit(c, actor, "asset.create", "asset", aid,
+                        {"name": a["name"], "type": a.get("type"), "lon": a["lon"], "lat": a["lat"]})
+            return dict(c.execute("SELECT * FROM assets WHERE id=?", (aid,)).fetchone())
+
     # -------------------------------------------------------------- incidents
     def upsert_incident(self, payload: dict, actor="pipeline") -> dict:
         problems = inc_mod.validate_payload(payload)
@@ -206,6 +253,11 @@ class Store:
             self._audit(c, actor, "incident.upsert" if existed else "incident.create",
                         "incident", payload["id"],
                         {"status": payload["status"], "model_id": payload.get("model_id")})
+        if (not existed and payload.get("role", "operational") == "operational"
+                and payload["status"] in inc_mod.OPEN_STATES):
+            level = {"HIGH": "HIGH", "MEDIUM": "MEDIUM"}.get(str(payload.get("priority") or "").upper(), "LOW")
+            self.add_alert(level, inc_mod.alert_message(payload), actor=actor,
+                           incident_id=payload["id"], aoi_id=payload["aoi_id"])
         return self.get_incident(payload["id"])
 
     def list_incidents(self, status: str | None = None, include_controls=True) -> list:
@@ -621,12 +673,14 @@ class Store:
     # ----------------------------------------------------------------- alerts
     def add_alert(self, level, message, actor="system", incident_id=None, aoi_id=None):
         aid = f"AL-{uuid.uuid4().hex[:8]}"
+        at = inc_mod.now_utc()
         with self.conn() as c:
             c.execute("INSERT INTO alerts(id,incident_id,aoi_id,level,message,created_at) "
-                      "VALUES (?,?,?,?,?,?)", (aid, incident_id, aoi_id, level, message,
-                                               inc_mod.now_utc()))
+                      "VALUES (?,?,?,?,?,?)", (aid, incident_id, aoi_id, level, message, at))
             self._audit(c, actor, "alert.create", "alert", aid,
                         {"incident_id": incident_id, "level": level})
+        _post_webhook({"id": aid, "level": level, "message": message, "incident_id": incident_id,
+                       "aoi_id": aoi_id, "created_at": at})
         return aid
 
     def list_alerts(self, unacknowledged_only=False) -> list:

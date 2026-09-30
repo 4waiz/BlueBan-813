@@ -239,7 +239,10 @@ def main():
     log(f"OLCI cross-check: {olci}")
 
     # ---- distance to shore, exposure, drift -----------------------------------
-    dist_px = ndi.distance_transform_edt(water)
+    # distance to the COAST: the water body with interior holes (cloud, masked
+    # pixels) filled, so a cloud gap in open water is not mistaken for shore
+    coast_water = ndi.binary_fill_holes(ev["body"] | water)
+    dist_px = ndi.distance_transform_edt(coast_water)
     dshore_km = med(dist_px * a.res / 1000.0, event)
     assets_fc = json.load(open(os.path.join(ROOT, "config", "assets_uae.geojson"), encoding="utf-8"))
     near_assets = []

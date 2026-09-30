@@ -223,7 +223,7 @@ def rules_model(val_labels: list) -> dict:
          "created_at": "2026-09-30T00:00:00Z", "training_dataset_version": None,
          "validation_dataset_hash": None, "feature_set": L.TRIAGE_FEATURES,
          "params": {"rule": "p = 0.05 + 0.9 * clip((seasonal_pct - 80)/20) * (1 - persistence) "
-                            "* (1 - 0.6 cloud_adjacent); halved if SWIR B11 > 0.03"},
+                            "* (1 - 0.6 cloud_adjacent)"},
          "artifact": {"kind": "rules", "reference": "pipeline/learning.py:rules_score"},
          "status": "PRODUCTION", "parent_model": None,
          "notes": "Transparent detection rule used to raise incidents. The learned candidates must beat "

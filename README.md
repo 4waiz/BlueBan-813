@@ -1,359 +1,147 @@
-# BlueBan 813
+# BLUEBAN 813
 
-**Detect. Fingerprint. Forecast. Trace. Protect.**
+**Closed-loop coastal incident intelligence for the UAE.**
+Satellites flag it. An analyst decides. The field confirms. The model learns — and only gets promoted when it provably improves.
 
-BlueBan 813 turns satellite observations into operational water intelligence. Sentinel sensors watch large coastal areas continuously. When an anomaly appears, Arab Satellite 813 hyperspectral data fingerprints the event, AI estimates its severity and confidence, ocean conditions forecast where it will move, and BluePulse identifies which critical assets may be affected and where field teams should collect samples for confirmation. Instead of giving water operators another satellite image, BluePulse tells them where to look, what may be happening, where it is going, and what to do next.
-
-> Built for the **Arab Youth Space Hackathon 2026 – 813 Challenge** (Water Quality & Inland/Coastal Water Intelligence) by team **Kanban**. Demo area: the Gulf of Annaba, Algeria.
-
----
-
-## The questions BlueBan answers
-
-| # | Operator question | Module | Status |
-|---|---|---|---|
-| 1 | **Is something wrong?** | Spectral anomaly detection (RX / Mahalanobis) | Built |
-| 2 | **What is it?** | Optical fingerprinting (a weighted hypothesis, not a lab ID) | Built |
-| 3 | **How bad is it?** | Severity and confidence, reported separately, never multiplied | Built |
-| 4 | **Where is it going?** | Wind-driven surface drift forecast, 0–48 h | Built |
-| 5 | **What will it hit?** | Critical asset exposure and ETA | Built |
-| 6 | **Where did it come from?** | **Source tracing**: backward drift, archive look-back, source matching | **New** |
-| 7 | **Where do I send the field team?** | **Information-gain sampling**: where one sample tells you the most | **Upgraded** |
-
-Questions 1–5 describe the present and the future of an event. Question 6 adds its past. Knowing where an anomaly came from also changes the answer to question 7: the most useful sample is often not at the strongest signal but at the point that tells competing explanations apart.
+> Arab Youth Space Hackathon 2026 · 813 Challenge (Water Quality) · [Built by Team Kanban](https://kanbanstudios.ae/team-kanban)
+>
+> **Live:** [BlueBan813.kanbanstudios.ae](https://BlueBan813.kanbanstudios.ae) · **Paper:** [4waiz.github.io/BlueBan-813](https://4waiz.github.io/BlueBan-813/) · **Judge Mode:** one click, top right of the app
 
 ---
 
-## How it works
+## What it does
+
+Most water-quality dashboards stop at a coloured index map. BLUEBAN 813 treats every anomaly as an **incident** that moves through a governed loop:
 
 ```
-Sentinel-3 OLCI (daily, 300 m)   ─►  WATCH        wide-area screening, multi-year baseline
-Sentinel-2 MSI (10–20 m)         ─►  MAP          boundaries, seasonal percentile check
-Tanager-1 → 813 simulator        ─►  FINGERPRINT  what kind of anomaly (weighted hypothesis)
-Risk engine                      ─►  ASSESS       severity + confidence → priority (rule table)
-ERA5 wind drift, forward         ─►  FORECAST     where it is going
-ERA5 wind drift, backward        ─►  TRACE        where it came from                  ◄ NEW
-Operator asset register          ─►  PROTECT      which assets are exposed, and when
-Information-gain planner         ─►  SAMPLE       where one sample resolves the most  ◄ UPGRADED
+WATCH ─► DETECT ─► DIAGNOSE ─► VERIFY ─► ACT ─► LEARN
+  │         │          │           │        │       │
+Sentinel-2  per-pixel  spectrum,   analyst  field   verified labels ─► candidate model
+L2A over    seasonal   OLCI cross- review,  plan,   ─► frozen validation gate ─► human
+11 UAE AOIs anomaly    check, 813  audit    lab     promotion (production untouched
+            vs its own ablation    trail    results until the candidate is better)
+            history
 ```
 
-| Stage | Sensor / source | Role | Resolution |
-|---|---|---|---|
-| A. Regional watch | Sentinel-3 OLCI | Ocean-colour screening, baseline climatology | 300 m |
-| B. Spatial detail | Sentinel-2 MSI | Boundary mapping, same-hour cross-check | 10/20/60 m |
-| C. Spectral forensics | Planet Tanager-1 (426 bands) → **simulated 813** | Spectral fingerprint | 30 m |
-| D. Thermal context | Landsat 8/9 OLI-TIRS | Surface water temperature | 30 m |
-| E. Validation | Sentinel-3 OLCI L2 products | Independent chlorophyll / TSM reference | 300 m |
-| Drift | ERA5 10 m wind (Open-Meteo archive) | Forecast and backtrack | Hourly |
+Every decision is written to a SHA-256 hash-chained audit log. Every displayed number carries its provenance (**WHY AM I SEEING THIS?**).
 
-### A note on Satellite 813 data
+## The UAE case (real data)
 
-This PoC holds **no real Satellite 813 pixels**. The programme says 813 data is incubation-only and tells teams not to build a PoC that depends on it. Everything labelled "813" is a **simulation** built from real Planet Tanager-1 data: Gaussian spectral-response convolution onto the published 813 band set (205 bands, 400–1700 nm), at Tanager's native 30 m rather than an invented 20 m. See [`docs/813_PRODUCT_NOTES.md`](docs/813_PRODUCT_NOTES.md).
+**BB-AE-2024-001 · Fujairah, 17 February 2024, 06:49 UTC (Sentinel-2B)**
 
----
+![True colour of BB-AE-2024-001](outputs/incidents/BB-AE-2024-001/rgb.png)
 
-## NEW: Where did it come from? (source tracing)
-
-The forecast tells an operator where an anomaly is going. Operators also need to know **where it started**:
-
-- **Stop it.** A spill, an outfall or a discharge keeps going until someone finds it and shuts it off. Cleaning up downstream does nothing about the cause.
-- **Predict the next one.** A chronic source such as a river mouth or a sewage outfall will produce the same event again. A one-off such as a ship discharge will not.
-- **Protect the intake.** An anomaly moving away from a desalination intake can still matter if its source sits up-current of it.
-
-Source tracing produces a **ranked list of candidate origins, each with the evidence behind it**. It is a lead for investigation, not an accusation. Like the asset register, the list of candidate sources (outfalls, river mouths, ports, industrial discharges) is **supplied by the operator** or taken from open data such as OpenStreetMap. BlueBan never guesses who is responsible.
-
-### Four independent lines of evidence
-
-**1. Backward drift: run the forecast in reverse.**
-The existing Lagrangian particle model (`pipeline/forecast.py`) is run backwards in time. Particles are seeded over the detected event, the ERA5 wind-drift vector is reversed, and the particles are integrated back 6, 12, 24 and 48 hours. The random-walk diffusion term still applies, so the cloud of possible earlier positions **widens** the further back it goes. The result is a source-probability map for each look-back horizon.
-
-A useful side effect: when a particle "beaches" in backward time, the material could have **entered the sea at that stretch of coast**. Those shoreline entry points are where land-based sources (river mouths, outfalls, drains) would sit.
-
-**2. Archive look-back: find the first sighting.**
-The pipeline already reads the Sentinel-2 and Sentinel-3 archives for the temporal baseline. Source tracing walks backwards through those scenes (Sentinel-3 daily, Sentinel-2 every ~5 days) until the anomaly disappears. **The place it first appeared** is strong evidence of origin, and it does not depend on the drift model at all.
-
-**3. Fingerprint matching: is the spectral signature consistent with the source type?**
-The fingerprint module already outputs weighted class scores. Each candidate source type has an expected signature:
-
-| Candidate source type | Expected optical signature |
+| Evidence | Value |
 |---|---|
-| River / wadi discharge | Sediment-like, high CDOM, often cooler or warmer than the sea |
-| Sewage / wastewater outfall | Chlorophyll-like or organic-rich; nutrient-driven bloom downstream |
-| Thermal outfall (power station, desalination brine) | Landsat thermal anomaly; weak optical signal |
-| Port / shipping | Surface film / hydrocarbon-like (FAI, sheen) |
-| Dredging / resuspension (no external source) | Sediment-like, no salinity or thermal contrast |
-| Bottom reflectance (nothing in the water) | Persistent, shallow, sits mid-distribution in the temporal baseline |
+| What Sentinel-2 saw | Bright-green filaments of discoloured water off Fujairah (median 8 km from the coast), 2.39 km² at 20 m |
+| Against the same pixels' own history | NDCI robust z = 7.3 (100th seasonal percentile vs 33 same-season scenes from other years); MCI red-edge peak 0.0068 vs 0.0007 usual |
+| Colour change | Hue angle 54° where this water is usually 202° blue: visible discolouration |
+| Independent sensor, same morning | Sentinel-3B OLCI 30 min earlier: CHL_NN **13.1 vs 3.2 mg m⁻³** in the surrounding water (×4.1). A model product, not in-situ truth |
+| Context (not confirmation) | Green *Noctiluca* season in the Gulf of Oman (Nov–Apr); NASA PACE imaged a likely-*Noctiluca* bloom in the Gulf of Oman on 17 Mar 2024 |
+| Status | **UNDER REVIEW** — "bloom-like optical anomaly". No species, no toxin, no concentration is claimed: that needs a water sample |
 
-**4. Concentration gradient: which way is "upstream"?**
-Signal strength usually falls off with distance from a point source. The direction of increasing anomaly score inside the event is a local pointer back toward the source. On its own it is weak evidence, so it is used as a tie-breaker.
+**Two stand-downs show it does not cry wolf:**
 
-### Putting it together
+* **BB-AE-2023-001 · Fujairah, 25 Oct 2023** — a large NDCI spike over water whose colour did not change (hue 221°, blue) and where same-morning OLCI saw nothing unusual (×1.1). The NDCI ratio blows up over very clear water; an analyst should reject it, and that rejection becomes a training label.
+* **BB-DZ-2025-001 · Gulf of Annaba (negative control)** — spatially unusual (RX 99.7th percentile) but at the 6.6th seasonal percentile of 428 observations: a persistent coastal feature. Stood down automatically.
 
-Each candidate source `s` gets a posterior:
+## What is real, and what is not
 
-```
-P(s | evidence)  ∝  P(s) · L_backtrack(s) · L_archive(s) · L_fingerprint(s) · L_gradient(s)
-```
-
-Two extra hypotheses are always in the set, so the model can say "none of the above":
-
-- **`UNREGISTERED`**: a source not in the register. It gets a floor prior so an incomplete register cannot force a wrong answer.
-- **`IN_SITU`**: no external source at all (resuspension or bottom reflectance). Its likelihood comes from the existing temporal module: persistent features sit mid-distribution, real events sit in the upper tail.
-
-Each likelihood term is reported separately, the same way the risk engine keeps severity and confidence apart. An operator can see which evidence pointed where, and disagree with it.
-
-**Illustrative output** (shows the schema, not real results):
-
-```json
-{
-  "event_id": "BB-2026-001",
-  "method": "Bayesian source attribution over operator-supplied candidates",
-  "backtrack_horizons_h": [6, 12, 24, 48],
-  "candidates": [
-    {
-      "id": "SRC-03",
-      "type": "RIVER_MOUTH",
-      "posterior": 0.46,
-      "evidence": {
-        "backtrack_overlap": 0.71,
-        "first_seen_distance_m": 420,
-        "fingerprint_consistency": 0.80,
-        "gradient_alignment_deg": 22
-      }
-    },
-    { "id": "IN_SITU",      "type": "RESUSPENSION_OR_BOTTOM", "posterior": 0.31 },
-    { "id": "SRC-01",       "type": "PORT",                   "posterior": 0.15 },
-    { "id": "UNREGISTERED", "type": "UNKNOWN",                "posterior": 0.08 }
-  ],
-  "entropy_bits": 1.74,
-  "disclaimer": "Hypothesis ranking for investigation. Not an attribution of responsibility. Requires field confirmation."
-}
-```
-
-### Limits, stated up front
-
-- The backtrack uses the same **wind-only drift** as the forecast: no tides, no geostrophic or density-driven flow, no river momentum, no bathymetric steering. In a semi-enclosed gulf those can dominate. Backward error grows with look-back time, just as forward error does.
-- Diffusion cannot be undone. The backward cloud shows where the material **could** have been, and it spreads with time. Horizons past about 48 h are shown but down-weighted.
-- The archive look-back is limited by cloud cover and revisit gaps. "First seen" means first seen in a clear scene, which may be later than the true start.
-- Attribution is only as good as the candidate register. That is why `UNREGISTERED` always stays in the set.
-
----
-
-## UPGRADED: One sample, maximum information (where to send the field team)
-
-> *Where can I send the field team so that one water sample gives me the maximum information?*
-
-Satellites screen; laboratories confirm. A field team has a limited budget of boat hours and samples. The current planner (`pipeline/sampling.py`) assigns samples by **role**: event core, leading edge, asset boundary, background control, uncertainty point. That covers the event well, but it does not ask which **single** sample would change the operator's picture the most.
-
-The upgrade adds an **expected information gain** strategy.
-
-### The idea
-
-Before sampling, BlueBan holds a set of competing hypotheses `H`: what the event is (fingerprint classes) × where it came from (source candidates). A sample at location `x` returns a reading `y` (salinity, turbidity, temperature, chlorophyll, …). A good sample is one whose result is expected to **shrink that uncertainty the most**:
-
-```
-IG(x) = H(hypotheses)  −  Σ_y  P(y | x) · H(hypotheses | y, x)
-```
-
-In plain terms, the best place to sample is where the hypotheses **disagree most about what you would measure**. That is often not the strongest signal. It is typically:
-
-- the fork between two backtracked paths from different candidate sources, or
-- a point near a candidate source where "it came from here" and "it came from elsewhere" predict clearly different salinity or temperature, or
-- a shallow point where "suspended sediment" and "bottom reflectance" can be told apart with a depth reading and a Secchi disk.
-
-### Choosing what to measure, not just where
-
-The same logic ranks **which analytes to request**. Some tracers separate candidate origins in one reading, and several can be measured on the boat, instantly:
-
-| Separates… | Tracer | How fast |
-|---|---|---|
-| River / wadi water vs seawater | Salinity / conductivity (low), CDOM | Instant, CTD probe |
-| Thermal outfall vs everything else | Temperature anomaly | Instant, CTD / thermometer |
-| Suspended matter vs bottom reflectance | TSS / turbidity, Secchi depth, water depth | Instant (turbidity, Secchi, depth); TSS in lab |
-| Sewage vs other organic sources | Fecal indicator bacteria (E. coli, enterococci), ammonium | Ammonium kit on site; bacteria 24–48 h |
-| Nutrient-driven bloom | Chlorophyll-a, nitrate, phosphate | Fluorometer instant; lab for nutrients |
-| Ship / port discharge | Hydrocarbons (TPH, PAH), visible sheen | Lab |
-| Industrial effluent | Dissolved metals (Fe, Mn, Zn), pH | pH instant; metals in lab |
-
-### Accounting for travel time
-
-The plume keeps moving while the boat is on its way. Candidate locations are scored against the **forecast position at the team's arrival time**, not where the event was at the satellite overpass. The planner can also rank by **information per boat-hour**, `IG(x) / travel_time(x)`, when time matters more than sample count.
-
-### Adaptive sampling
-
-When results come back (instant CTD readings especially), the hypothesis weights are updated and the next-best point is recomputed. Each sample then decides where the next one goes, and the field plan narrows as evidence arrives instead of being fixed at the start.
-
-### How it fits the existing planner
-
-The information-gain strategy **adds to** the role-based plan rather than replacing it:
-
-| Role | Question it answers | Status |
-|---|---|---|
-| `EVENT_CORE` | What is present at the strongest signal? | Existing |
-| `LEADING_EDGE` | Is the event advancing? | Existing |
-| `ASSET_BOUNDARY` | Has it reached the asset yet? | Existing |
-| `BACKGROUND_CONTROL` | What does normal water read today? | Existing (always kept) |
-| `UNCERTAINTY_POINT` | Where is the model least sure? | Existing |
-| **`SOURCE_DISCRIMINATOR`** | **Which candidate origin is it?** | **New** |
-| **`BEST_SINGLE_SAMPLE`** | **If you can take only one sample, take it here** | **New** |
-
-A background control stays mandatory: an absolute lab value means nothing without a same-day reference.
-
-**Illustrative output** (shows the schema, not real results):
-
-```json
-{
-  "id": "S00",
-  "role": "BEST_SINGLE_SAMPLE",
-  "lon": 7.7712,
-  "lat": 36.8871,
-  "arrive_by_utc": "2025-06-01T13:30:00Z",
-  "expected_information_gain_bits": 1.21,
-  "measure": ["Salinity (CTD)", "Turbidity (NTU)", "Secchi depth", "Water depth", "TSS (lab)"],
-  "decision_table": [
-    { "if": "salinity < 36.5 PSU and TSS high",  "then": "River discharge most likely (≈ 0.85)" },
-    { "if": "salinity normal and TSS high",      "then": "Local resuspension most likely (≈ 0.75)" },
-    { "if": "TSS normal and depth < 4 m",        "then": "Bottom reflectance: no water-quality event (≈ 0.90)" }
-  ],
-  "rationale": "The three leading hypotheses predict clearly different salinity/TSS/depth combinations here. One visit with a CTD and a Secchi disk separates all three."
-}
-```
-
----
-
-## Demo event: BB-2026-001, Gulf of Annaba
-
-Real outputs from the current pipeline (`outputs/events/BB-2026-001.json`):
-
-| Field | Value |
+| | Status |
 |---|---|
-| Primary scene | Tanager-1 `20250601_104901_58_4001`, 2025-06-01 10:49 UTC, 0 % cloud |
-| Event area | 1.13 km², median 90 m from shore |
-| Anomaly | 99.7th percentile of the scene's water population (RX) |
-| Fingerprint | `SEDIMENT_LIKE`: high turbidity / suspended sediment signature |
-| Severity / confidence | 0.33 / 0.69 |
-| Priority | **WATCH**, reduced from HIGH_PRIORITY by the temporal veto (6.6th percentile of the multi-year record: a persistent coastal feature, not an event) |
-| Bottom-influence risk | 0.85 |
-| Drift | Westward, bearing ≈ 273° |
+| Sentinel-2 L2A (primary sensor) | **Real.** 2017–2026 archive via Microsoft Planetary Computer, baseline-aware `BOA_ADD_OFFSET`, SCL masks, glint-aware water mask |
+| Sentinel-3 OLCI WFR | **Real, used as a cross-sensor reference** (weight 0.5 labels, evidence) — never called ground truth. Planetary Computer archive ends 2026-02-23 |
+| Satellite 813 | **Simulated.** No 813 product is accessible to teams (authenticated audit, 30 Sep 2026). The 813 band set is simulated from real Planet Tanager-1 hyperspectral pixels and labelled SIMULATED everywhere |
+| UAE in-situ chlorophyll / turbidity / TSS | **None public.** So no physical concentration is ever printed: indices are PROXY; turbidity is a GENERIC calibration (Nechad 2016) marked "not locally validated". The matchup engine and calibration gate are built and wait for samples |
+| Drift | A wind-only **SCENARIO TRAJECTORY ESTIMATE** (ERA5), not a hydrodynamic forecast |
 
-**What the new modules are built to answer here.** The current system concludes "persistent feature, not an event" but cannot say why. Source tracing turns that into a testable question with three competing explanations: a chronic land source such as a nearby river mouth, local resuspension near the port, or bottom reflectance with nothing unusual in the water. The information-gain planner would then send one team to one point with a CTD, a Secchi disk and a TSS bottle, which is the cheapest measurement that separates all three.
+## Measured, not assumed: what did 813 add?
 
----
+On the same real Tanager pixels (Gulf of Annaba), convolved to Sentinel-2 and to the published 813 band set, with spatially blocked cross-validation:
 
-## Repository layout
+* **At the operational decision boundary** the simulated 813 band set cut false alarms from **159 to 84 (−47 %)** at the same recall (0.999), F1 0.985 → 0.992, over 25,513 pixels in 173 spatial blocks.
+* **For a gross plume**, both saturate: no gain.
+* **Concentration vs OLCI products**: not demonstrated. CHL_NN R² 0.08 (S2) and 0.01 (813) on 658 matchups taken 25.5 h apart: underpowered, reported anyway.
 
-```
-apps/web/            Next.js 14 + MapLibre operator UI (watch, spectra, forecast, assets, samples, validation)
-  app/source/        Source-tracing view: backward cloud + ranked origins            (new, planned)
-services/api/        FastAPI server that reads pipeline outputs (no geo-computation at request time)
-pipeline/
-  anomaly.py         RX spectral anomaly detection
-  fingerprint.py     Optical event classes as weighted hypotheses
-  risk.py            Severity, confidence, priority rule table
-  temporal.py        Multi-year baselines and percentile veto
-  forecast.py        Wind-driven Lagrangian drift (forward)
-  source.py          Backward drift, archive look-back, Bayesian attribution         (new, planned)
-  exposure.py        Operator-supplied asset exposure and ETA
-  sampling.py        Role-based field plan  + information-gain strategy               (upgrade, planned)
-  satellite813.py    813 sensor simulator (spectral convolution from Tanager)
-  sentinel2.py / sentinel3.py / spectral.py / indices.py / quality.py / water_mask.py / provenance.py / export.py
-scripts/             Offline builders (build_demo_event.py is the single orchestrator)
-experiments/         Hyperspectral and detectability ablations, simulator validation
-config/
-  project.yaml       AOI, sensors, algorithm parameters
-  assets.geojson     Operator asset register
-  sources.geojson    Operator candidate-source register                              (new, planned)
-docs/                813 product notes, AOI selection, data-access audit
-outputs/             Events, map layers, validation results produced by the pipeline
-```
+Details: [`docs/VALIDATION_REPORT.md`](docs/VALIDATION_REPORT.md) and the in-app **Validation** screen (sections A–F).
 
-### Planned configuration
+## The learning loop
 
-```yaml
-source_attribution:
-  candidate_sources: config/sources.geojson   # operator-supplied, like assets.geojson
-  backtrack_horizons_h: [6, 12, 24, 48]
-  n_particles: 2000
-  archive_lookback_days: 14
-  unregistered_source_prior: 0.15
+1. The **production** triage model (a transparent rule, `triage-1.0.0`) ranks candidates.
+2. Analysts **CONFIRM / FALSE POSITIVE / RECLASSIFY** → verified labels (analyst 1.0, field 2.0, OLCI cross-sensor 0.5).
+3. **Retrain** fits an L2 logistic candidate on the train split (identical in Python and in the browser — parity-tested to 1e-7).
+4. The **gate**: tests pass · frozen validation set unchanged (hash) · both classes present · AUPRC not worse (grouped bootstrap) · calibration acceptable · no AOI regression · **a named human approves**.
+5. Promotion retires the old model (rollback in one click). Nothing is ever promoted automatically.
 
-sampling:
-  strategy: information_gain      # or "roles" for the current behaviour
-  budget_samples: 1
-  boat_speed_kn: 10
-  always_include_background_control: true
-```
+## Product
 
----
+| Screen | Task it serves |
+|---|---|
+| **Incident Control** | Monitor AOIs, create AOIs (draw → live STAC query), open incidents, alerts |
+| **Investigation** | Timeline, before/after split map, evidence stack, report and evidence-package export, close/reopen |
+| **Spectral Lab** | 2D spectrum with diagnostic bands, 3D spectral cube, "What did 813 add?" |
+| **Field Ops** | Editable sample plan, collection states, measurement entry, lab CSV, CSV/GeoJSON export |
+| **Learn** | Labels, train candidate, compare, promote / reject / rollback |
+| **Validation** | A data quality · B matchups · C model performance · D 813 ablation · E spatial holdout · F negative control |
+| **Satellite View** (full screen, 3D) | Real Earth (NASA Blue Marble / Black Marble) lit by the real Sun; Sentinel-1/2/3, Landsat 8/9, PACE and Tanager-1 propagated with SGP4 from public TLEs; published swaths; predicted UAE passes; Satellite 813 on an explicitly illustrative orbit |
+| **Judge Mode** | The whole story in 11 steps, 2–3 minutes, with real review / retrain / promote actions |
+| **Data · Settings · API** | Source register and licences, lineage, audit log, docs; operator identity, workspace export/reset, alert webhook; HTTP contract |
 
-## Running locally
-
-There is no `requirements.txt` yet. The pipeline and API import:
+## Run it
 
 ```bash
-pip install numpy scipy pyproj rasterio h5py shapely affine pyyaml matplotlib pillow fastapi uvicorn pydantic
+pip install -e ".[dev]"                 # Python 3.11+
+python -m pytest -q                     # pipeline, closed loop, API contracts, matchups
 ```
 
-Build the demo event (fetches real data, writes everything under `outputs/`):
+Rebuild the evidence from public data (network; long-running steps noted):
 
 ```bash
-python scripts/build_demo_event.py
+python scripts/build_watch.py --aoi AE-FUJ --res 120 --start 2017-01-01 --cache   # per-datatake stats + feature cache (resumable)
+python scripts/build_detect.py --aoi AE-FUJ                                      # per-pixel seasonal anomaly
+python scripts/build_labels.py --aoi AE-FUJ                                      # OLCI cross-sensor references
+python scripts/build_incidents.py --aoi AE-FUJ --date 2024-02-17 --hyp BLOOM_LIKE --keep all --id BB-AE-2024-001
+python scripts/build_workspace_seed.py && python scripts/build_validation.py && python scripts/fetch_tle.py
 ```
 
-Start the API on port 8813:
+Self-hosted (FastAPI + SQLite; `DATABASE_URL` for PostgreSQL):
 
 ```bash
-uvicorn services.api.main:app --reload --port 8813
+python scripts/seed_db.py --reset
+uvicorn services.api.main:app --port 8813
+cd apps/web && npm install && NEXT_PUBLIC_DATA_MODE=live npm run dev
 ```
 
-Start the web UI on port 3000:
+Hosted build (static; every visitor gets a private in-browser workspace seeded from the same `seed.json`):
 
 ```bash
-cd apps/web && npm install && npm run dev
+python scripts/build_static_site.py
+cd apps/web && npm run build            # -> apps/web/out
 ```
 
-Credentials are optional; see `.env.example`. Planetary Computer works anonymously for public collections.
+## Repository
 
----
+```
+pipeline/        s2_features (indices, masks), watch, detect, sentinel3, matchup, quantify,
+                 learning (triage features, gate), incidents (state machine, alerts), exposure, forecast, report
+services/api/    FastAPI router, SQLite store (hash-chained audit), trainer (retrain, gate, promote, rollback)
+scripts/         build_watch / detect / labels / incidents / workspace_seed / validation / static_site, seed_db, fetch_tle
+apps/web/        Next.js 15, MapLibre, React Three Fiber; Engine interface (HTTP or in-browser workspace)
+config/          UAE AOIs, OSM asset register, EAD station locations, TLE snapshot
+docs/            audits, event register, AOI tournament, methodology, validation, limitations, roadmap
+paper/           research paper (published with GitHub Pages)
+tests/           pytest suite + TS/Python learning parity
+```
 
-## API
+## Documentation
 
-| Method | Endpoint | Returns |
-|---|---|---|
-| GET | `/api/health`, `/api/status`, `/api/config` | System status and configuration |
-| GET | `/api/events` | Event index |
-| GET | `/api/events/{id}` | Full event object |
-| GET | `/api/events/{id}/spectrum` | Event spectra |
-| GET | `/api/events/{id}/forecast` | Forward drift steps |
-| GET | `/api/events/{id}/samples` | Field-sampling plan |
-| GET | `/api/events/{id}/provenance` | Data lineage |
-| GET | `/api/events/{id}/source` | **Ranked candidate origins + backward cloud** *(new, planned)* |
-| GET | `/api/events/{id}/samples?strategy=information_gain&budget=1` | **Best single sample + decision table** *(new, planned)* |
-| GET | `/api/layers`, `/api/layers/{name}` | Map layers |
-| GET | `/api/validation`, `/api/hyperspectral-lift`, `/api/timeseries` | Validation results |
-| GET / POST | `/api/assets` | Operator asset register |
-
----
-
-## Roadmap: the "where from" feature
-
-- [ ] `pipeline/source.py`: backward advection (reuse `forecast.advect` with reversed drift, beaching as shoreline entry points)
-- [ ] Archive look-back over Sentinel-2 / Sentinel-3 for first-sighting location
-- [ ] Source-type ↔ fingerprint-class consistency matrix
-- [ ] Bayesian combination with `UNREGISTERED` and `IN_SITU` hypotheses; per-term evidence in the output
-- [ ] `config/sources.geojson` operator register + POST endpoint (same policy as assets)
-- [ ] `sampling.py`: expected-information-gain strategy, `SOURCE_DISCRIMINATOR` and `BEST_SINGLE_SAMPLE` roles
-- [ ] Travel-time-aware scoring against the forecast position at arrival
-- [ ] Adaptive re-planning when field readings are entered
-- [ ] `apps/web/app/source`: backward cloud, ranked origins, "one sample" card
-- [ ] Validation: synthetic releases from known points in the simulator, then check whether the true source ranks first
-
----
+[Mentor revamp audit](docs/MENTOR_REVAMP_AUDIT.md) · [Authenticated data audit](docs/AUTHENTICATED_DATA_AUDIT.md) · [Public UAE data](docs/PUBLIC_UAE_DATA.md) · [UAE event register](docs/UAE_EVENT_REGISTER.md) · [UAE AOI tournament](docs/UAE_AOI_TOURNAMENT.md) · [Methodology](docs/METHODOLOGY.md) · [Validation report](docs/VALIDATION_REPORT.md) · [Limitations](docs/LIMITATIONS.md) · [Data lineage](docs/DATA_LINEAGE.md) · [813 product notes](docs/813_PRODUCT_NOTES.md) · [Business case](docs/BUSINESS_CASE.md) · [Judging matrix](docs/JUDGING_MATRIX.md) · [Roadmap](docs/ROADMAP.md)
 
 ## Principles
 
-- **Hypotheses, not verdicts.** Fingerprints, severity and now source attribution are weighted hypotheses with visible evidence. Lab analysis confirms.
-- **Severity and confidence are never multiplied.** The same rule applies to the source-evidence terms.
-- **No invented data.** No 813 pixels are claimed; simulated products are labelled everywhere.
-- **Operators own sensitive locations.** Assets and candidate sources are operator-supplied, never guessed or published by the system.
-- **State the physics that is missing.** The forecast and the backtrack both list what they leave out.
+* **Hypotheses, not verdicts.** "Bloom-like", never "HAB confirmed" without species and field evidence; never "oil" from a SAR dark spot; never "source" from a trajectory.
+* **No invented data.** Simulated 813 is labelled simulated. Sentinel-3 model products are references, not ground truth. No concentration from an uncalibrated index.
+* **Measure the claim.** Every model number is on a frozen, grouped validation split; the 813 benefit is an ablation, not an assumption.
+* **Humans promote models.** The previous production model stays untouched until a candidate passes the gate and a named person approves.
+
+Restricted or authenticated downloads never leave `data/raw/private/` (gitignored). Everything in this repository is derived from open data.

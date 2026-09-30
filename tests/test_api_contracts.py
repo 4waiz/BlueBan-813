@@ -99,3 +99,40 @@ def test_report_export_contains_the_evidence_chain(client):
     assert md.startswith(f"# Incident report {IID}")
     assert "Operator reviews" in md and "Audit trail" in md
     assert "does not identify a species" in md
+
+
+def test_new_operational_incident_raises_one_factual_alert(client):
+    alerts = client.get("/api/alerts").json()["alerts"]
+    mine = [a for a in alerts if a["incident_id"] == IID]
+    assert len(mine) == 1
+    msg = mine[0]["message"]
+    assert msg.startswith("New coastal anomaly detected near") and "Analyst review required." in msg
+    assert "toxic" not in msg.lower() and "confirmed" not in msg.lower()
+    from services.api import loop
+    loop.store().upsert_incident(payload())               # re-ingesting the same incident
+    assert len([a for a in client.get("/api/alerts").json()["alerts"] if a["incident_id"] == IID]) == 1
+
+
+def test_alert_webhook_is_posted_only_when_configured(client, monkeypatch):
+    from services.api import store as st_mod
+    sent = []
+    monkeypatch.setattr(st_mod, "_post_webhook", lambda a: sent.append(a))
+    from services.api import loop
+    loop.store().add_alert("LOW", "test", incident_id=IID)
+    assert sent and sent[-1]["message"] == "test"
+    monkeypatch.undo()
+    monkeypatch.delenv("BLUEBAN_ALERT_WEBHOOK", raising=False)
+    st_mod._post_webhook({"id": "x"})                      # no URL configured: silently nothing
+
+
+def test_assets_and_aois_endpoints_match_the_web_engine(client):
+    r = client.post("/api/assets", json={"actor": "analyst.a", "name": "Intake F2", "type": "DESALINATION_PLANT",
+                                         "lon": 56.35, "lat": 25.2})
+    assert r.status_code == 200 and r.json()["source"] == "operator"
+    assert any(a["name"] == "Intake F2" for a in client.get("/api/assets").json()["assets"])
+    assert client.post("/api/assets", json={"actor": "a", "name": " ", "type": "PORT", "lon": 1, "lat": 1}).status_code == 422
+    a = client.post("/api/aois", json={"actor": "analyst.a", "name": "Test AOI", "bbox": [56.3, 25.0, 56.5, 25.2]})
+    assert a.status_code == 200 and a.json()["bbox"] == [56.3, 25.0, 56.5, 25.2]
+    assert client.post("/api/aois", json={"actor": "a", "name": "bad", "bbox": [56.5, 25.0, 56.3, 25.2]}).status_code == 422
+    kinds = {e["action"] for e in client.get("/api/audit").json()["events"]}
+    assert {"asset.create", "aoi.upsert"} <= kinds

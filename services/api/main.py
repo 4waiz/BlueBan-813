@@ -13,10 +13,9 @@ import os
 from functools import lru_cache
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
-from pydantic import BaseModel, Field
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 EVENTS = os.path.join(ROOT, "outputs", "events")
@@ -65,18 +64,6 @@ def _read_cached(path: str) -> Any:
     if not os.path.exists(path):
         raise HTTPException(404, f"Not found: {os.path.relpath(path, ROOT)}")
     return json.loads(_cached(path, os.path.getmtime(path)))
-
-
-# --------------------------------------------------------------------------- #
-# Models
-# --------------------------------------------------------------------------- #
-class AssetIn(BaseModel):
-    name: str = Field(..., max_length=120)
-    type: str = Field("CUSTOM", max_length=48)
-    lon: float = Field(..., ge=-180, le=180)
-    lat: float = Field(..., ge=-90, le=90)
-    sensitivity: float | None = Field(None, ge=0.0, le=1.0)
-    notes: str = Field("", max_length=500)
 
 
 # --------------------------------------------------------------------------- #
@@ -311,54 +298,6 @@ def timeseries(zone: str | None = None):
                                      f"Available: {list(data)}")
         return {zone: data[zone]}
     return data
-
-
-# --------------------------------------------------------------------------- #
-# Assets
-# --------------------------------------------------------------------------- #
-ASSET_STORE = os.path.join(EVENTS, "assets.json")
-
-
-@app.get("/api/assets", tags=["assets"])
-def get_assets():
-    """Operator assets.
-
-    BLUEBAN 813 ships no infrastructure database. Anything returned here was
-    placed by an operator, or is a clearly labelled demonstration fixture.
-    """
-    from pipeline import exposure as EX
-    if os.path.exists(ASSET_STORE):
-        stored = _read(ASSET_STORE)
-    else:
-        stored = {"assets": []}
-    idx = os.path.join(EVENTS, "index.json")
-    if os.path.exists(idx):
-        ev = _read(idx)["events"]
-        if ev:
-            e = _read(os.path.join(EVENTS, f"{ev[0]['event_id']}.json"))
-            demo = [x["asset"] for x in e.get("exposure", [])]
-            known = {a["id"] for a in stored["assets"]}
-            stored["assets"] = [a for a in demo if a["id"] not in known] + stored["assets"]
-    return {
-        "assets": stored["assets"],
-        "types": EX.ASSET_TYPES,
-        "policy": "Operator-configured only. No infrastructure coordinates are "
-                  "bundled with this software.",
-    }
-
-
-@app.post("/api/assets", tags=["assets"])
-def add_asset(asset: AssetIn = Body(...)):
-    from pipeline import exposure as EX
-    store = _read(ASSET_STORE) if os.path.exists(ASSET_STORE) else {"assets": []}
-    new_id = f"U{len(store['assets'])+1:03d}"
-    a = EX.Asset(new_id, asset.name, asset.type.upper(), asset.lon, asset.lat,
-                 asset.sensitivity, asset.notes, source="api")
-    store["assets"].append(a.to_dict())
-    os.makedirs(os.path.dirname(ASSET_STORE), exist_ok=True)
-    with open(ASSET_STORE, "w", encoding="utf-8") as f:
-        json.dump(store, f, indent=1)
-    return {"created": a.to_dict(), "count": len(store["assets"])}
 
 
 # --------------------------------------------------------------------------- #

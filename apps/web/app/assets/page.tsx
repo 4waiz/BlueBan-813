@@ -1,300 +1,109 @@
 "use client";
-
 /**
- * ASSETS - operator-configured infrastructure and its exposure.
+ * ASSETS - what an incident could reach.
  *
- * BLUEBAN 813 ships no infrastructure database. Intake coordinates for
- * desalination and industrial plants are frequently treated as sensitive, and
- * guessing them from imagery then publishing them would be both unreliable and
- * irresponsible. Everything here was placed by an operator, or is a clearly
- * labelled demonstration fixture.
+ * Desalination plants, power-plant cooling intakes, ports and public beaches
+ * from OpenStreetMap, plus any asset an operator adds. Exposure for the
+ * selected incident is distance and direction only: intake locations are not
+ * public, so none is estimated.
  */
+import React, { Suspense, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
+import { MapPin, Plus, Search } from "lucide-react";
+import { getOperator, mutate, useEngineQuery } from "@/lib/engine";
+import type { AssetRow } from "@/lib/engine/types";
+import { Chip, fmt, Modal, Panel, toast } from "@/components/ui";
 
-import React, { useEffect, useState } from "react";
-import { MapPin, Plus, Crosshair, Upload } from "lucide-react";
+const IncidentMap = dynamic(() => import("@/components/map/IncidentMap"), { ssr: false });
 
-import OceanMap, { RasterKey } from "@/components/OceanMap";
-import { MapLegend } from "@/components/MapControls";
-import {
-  Panel, Loading, ErrorBox, KV, Chip, Caveat, Meter, Readout,
-} from "@/components/hud";
-import { api, WaterEvent, ExposureRecord, fmt, pct } from "@/lib/api";
+const TYPES: Record<string, { label: string; color: string }> = {
+  DESALINATION_PLANT: { label: "Desalination plant", color: "#27C3F3" },
+  POWER_PLANT: { label: "Power plant (cooling water)", color: "#FFC23D" },
+  OIL_TERMINAL: { label: "Oil terminal", color: "#FF8A3D" },
+  PORT: { label: "Port / harbour", color: "#8B7BFF" },
+  PUBLIC_BEACH: { label: "Public beach", color: "#23D484" },
+  AQUACULTURE: { label: "Aquaculture", color: "#FF6FB5" },
+  PROTECTED_AREA: { label: "Protected area", color: "#93A6CB" },
+};
+const hav = (lo1: number, la1: number, lo2: number, la2: number) => {
+  const R = 6371e3, r = Math.PI / 180, a = Math.sin(((la2 - la1) * r) / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin(((lo2 - lo1) * r) / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+};
+const bearing = (lo1: number, la1: number, lo2: number, la2: number) => {
+  const r = Math.PI / 180, y = Math.sin((lo2 - lo1) * r) * Math.cos(la2 * r), x = Math.cos(la1 * r) * Math.sin(la2 * r) - Math.sin(la1 * r) * Math.cos(la2 * r) * Math.cos((lo2 - lo1) * r);
+  const b = (Math.atan2(y, x) / r + 360) % 360;
+  return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(b / 45) % 8];
+};
 
-export default function Assets() {
-  const [event, setEvent] = useState<WaterEvent | null>(null);
-  const [bounds, setBounds] = useState<number[] | null>(null);
-  const [scales, setScales] = useState<Record<string, any> | null>(null);
-  const [types, setTypes] = useState<Record<string, any>>({});
-  const [policy, setPolicy] = useState("");
-  const [err, setErr] = useState<string | null>(null);
-  const [sel, setSel] = useState<string | null>(null);
-  const [focus, setFocus] = useState<[number, number] | null>(null);
+function Assets() {
+  const sp = useSearchParams();
+  const list = useEngineQuery((e) => e.listIncidents()).data || [];
+  const iid = sp.get("incident") || list.find((i) => i.aoi_id?.startsWith("AE") && i.status === "UNDER_REVIEW")?.id || list[0]?.id || null;
+  const inc = useEngineQuery((e) => (iid ? e.getIncident(iid) : Promise.resolve(null)), [iid]).data || null;
+  const assets = useEngineQuery((e) => e.assets()).data || [];
+  const aois = useEngineQuery((e) => e.aois()).data || [];
+  const [q, setQ] = useState("");
+  const [type, setType] = useState("");
+  const [draft, setDraft] = useState<{ lon: number; lat: number } | null>(null);
+  const [name, setName] = useState("");
+  const [dtype, setDtype] = useState("DESALINATION_PLANT");
 
-  const [pickMode, setPickMode] = useState(false);
-  const [draft, setDraft] = useState<{ name: string; type: string; lon: string; lat: string }>(
-    { name: "", type: "DESALINATION_INTAKE", lon: "", lat: "" });
-  const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const rows = useMemo(() => {
+    const c = inc?.centroid;
+    return assets
+      .filter((a) => (!type || a.type === type) && (!q || a.name.toLowerCase().includes(q.toLowerCase())))
+      .map((a) => ({ a, d: c ? hav(c[0], c[1], a.lon, a.lat) : null, dir: c ? bearing(c[0], c[1], a.lon, a.lat) : null }))
+      .sort((x, y) => (x.d ?? 1e12) - (y.d ?? 1e12));
+  }, [assets, type, q, inc?.centroid]);
+  const counts = useMemo(() => assets.reduce((m, a) => { m[a.type] = (m[a.type] || 0) + 1; return m; }, {} as Record<string, number>), [assets]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const idx = await api.events();
-        const id = idx.events[0].event_id;
-        const [e, l, a] = await Promise.all([
-          api.event(id), api.layers(), api.assets().catch(() => null),
-        ]);
-        setEvent(e); setBounds(l.bounds_lonlat); setScales(l.grid?.scales ?? null);
-        if (a) { setTypes(a.types ?? {}); setPolicy(a.policy ?? ""); }
-        setSel(e.exposure[0]?.asset.id ?? null);
-      } catch (e: any) { setErr(e.message ?? String(e)); }
-    })();
-  }, []);
-
-  async function save() {
-    const lon = Number(draft.lon), lat = Number(draft.lat);
-    if (!draft.name.trim() || !Number.isFinite(lon) || !Number.isFinite(lat)) {
-      setSaveMsg("Name and a valid coordinate are required.");
-      return;
-    }
-    setSaving(true); setSaveMsg(null);
+  const add = async () => {
+    if (!draft || !name.trim()) return;
     try {
-      await api.addAsset({ name: draft.name.trim(), type: draft.type, lon, lat });
-      setSaveMsg("Asset stored. Re-run the pipeline to score its exposure "
-                 + "against the current event.");
-      setDraft({ name: "", type: draft.type, lon: "", lat: "" });
-    } catch (e: any) {
-      setSaveMsg(`Could not store the asset: ${e.message ?? e}. `
-                 + "The static build has no write endpoint.");
-    } finally { setSaving(false); }
-  }
-
-  if (err) return <div className="p-6"><ErrorBox error={err} /></div>;
-  if (!event || !bounds) return <Loading what="asset register" />;
-
-  const exposures = event.exposure;
-  const chosen = exposures.find((e) => e.asset.id === sel) ?? exposures[0];
+      await mutate((e) => e.addAsset({ name: name.trim(), type: dtype, lon: draft.lon, lat: draft.lat, notes: "Placed by an operator on the map" } as Omit<AssetRow, "id" | "source">, getOperator() || "operator"));
+      toast(`Asset added: ${name.trim()}`); setDraft(null); setName("");
+    } catch (e) { toast((e as Error).message, "err"); }
+  };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] gap-3 p-3 h-full min-h-0">
-      <div className="panel chamfer relative min-h-[340px] overflow-hidden scanlines panel-in">
-        <div className="absolute inset-0">
-          <OceanMap
-            bounds={bounds} raster="rgb" rasterOpacity={0.95}
-            showEvents showFlow={false} showParticles={false}
-            exposures={exposures} samples={[]}
-            glowAt={event.geometry.centroid_lonlat}
-            glowRadiusM={event.geometry.equivalent_radius_m}
-            focus={focus} focusZoom={13}
-            pickMode={pickMode}
-            onPickCoord={(lon, lat) => {
-              setDraft((d) => ({ ...d, lon: lon.toFixed(6), lat: lat.toFixed(6) }));
-              setPickMode(false);
-            }}
-            className="w-full h-full" />
+    <div className="grid h-full min-h-0 gap-3 p-3 short:gap-2 short:p-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(380px,1fr)]">
+      <Panel title="Asset map" kicker={inc ? `Exposure for ${inc.id}` : "Coastal assets"} bodyClass="relative min-h-0">
+        <IncidentMap incident={inc} incidents={inc ? [{ id: inc.id, status: inc.status, aoi_id: inc.aoi_id, centroid: inc.centroid, title: inc.title, event_type_hypothesis: inc.event_type_hypothesis, priority: inc.priority, observation_time: inc.observation_time } as never] : []}
+          aois={aois} assets={assets} onPlaceAsset={(lon, lat) => setDraft({ lon, lat })} compact showTimeline={false} initialMode="2d" />
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-md bg-void/80 px-2 py-1 text-[11px] text-muted">Use the map’s place-asset tool to add a facility.</div>
+      </Panel>
+      <Panel title="Asset register" kicker={`${assets.length} assets · OpenStreetMap + operator`} bodyClass="flex min-h-0 flex-col gap-2 p-3">
+        <div className="flex flex-wrap gap-1">
+          <button onClick={() => setType("")} className={`rounded-md border px-2 py-1 text-[11px] ${!type ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted"}`}>All {assets.length}</button>
+          {Object.entries(counts).map(([t, n]) => <button key={t} onClick={() => setType(t === type ? "" : t)} className={`rounded-md border px-2 py-1 text-[11px] ${type === t ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted"}`}><span className="mr-1 inline-block h-2 w-2 rounded-full" style={{ background: TYPES[t]?.color || "#93A6CB" }} />{TYPES[t]?.label || t} {n}</button>)}
         </div>
-        <div className="absolute top-2.5 left-2.5 z-10">
-          <MapLegend raster="rgb" collapsed scale={scales?.rgb} />
+        <div className="relative"><Search size={13} className="absolute left-2 top-2 text-dim" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search assets" className="w-full rounded-md border border-line bg-deep py-1.5 pl-7 pr-2 text-[12px]" /></div>
+        <div className="min-h-0 flex-1 overflow-y-auto rounded-md border border-edge">
+          <table className="w-full text-[11.5px]">
+            <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">Asset</th><th className="px-2 text-left">Type</th><th className="px-2 text-right">{inc ? "From incident" : "Location"}</th></tr></thead>
+            <tbody>{rows.map(({ a, d, dir }) => (
+              <tr key={a.id} className="border-b border-edge/50" title={a.notes || a.source}>
+                <td className="px-2 py-1"><div className="font-semibold text-ink">{a.name}</div><div className="text-[10.5px] text-dim">{a.source}</div></td>
+                <td className="px-2"><Chip label={TYPES[a.type]?.label || a.type} color={TYPES[a.type]?.color} /></td>
+                <td className="hud-value px-2 text-right">{d != null ? `${fmt.km(d)} ${dir}` : `${a.lat.toFixed(3)}, ${a.lon.toFixed(3)}`}</td>
+              </tr>))}</tbody>
+          </table>
         </div>
-        {pickMode && (
-          <div className="absolute inset-x-0 top-3 flex justify-center z-10 pointer-events-none">
-            <div className="chamfer-sm px-3 py-1.5 bg-beam/20 border border-beam
-                            hud-label blink-soft" style={{ color: "#F4F6FF" }}>
-              click the map to place the asset
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-3 min-w-0 overflow-y-auto pr-1">
-        <Panel title="Exposure ranking" accent="#FF7A45"
-               right={<Chip label={`${exposures.length} ASSETS`} />}>
-          <div className="space-y-2">
-            {exposures.map((e, i) => {
-              const on = e.asset.id === sel;
-              const strong = e.exposure_score >= 0.4;
-              return (
-                <button key={e.asset.id}
-                        onClick={() => { setSel(e.asset.id); setFocus([e.asset.lon, e.asset.lat]); }}
-                        className={`w-full text-left px-2.5 py-2 chamfer-sm tap panel-in
-                                    ${on ? "bg-beam/10" : "row-hover"}`}
-                        style={{
-                          animationDelay: `${i * 55}ms`,
-                          border: `1px solid ${on ? "#3186FF" : "rgba(27,36,68,0.8)"}`,
-                        }}>
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="hud-value text-[11px] text-ink truncate">
-                      {e.asset.id} · {e.asset.name}
-                    </span>
-                    <span className="hud-value text-[13px] shrink-0"
-                          style={{ color: strong ? "#FF7A45" : "#8A93B8" }}>
-                      {fmt(e.exposure_score, 3)}
-                    </span>
-                  </div>
-                  <div className="hud-label mt-1">{e.asset.type_label}</div>
-                  <div className="mt-1.5">
-                    <Meter label="" value={e.exposure_score} max={1}
-                           display={`${fmt(e.distance_km, 2)} km ${e.direction}`}
-                           color={strong ? "#FF7A45" : "#5A6490"} />
-                  </div>
-                  {e.eta_hours !== null && (
-                    <div className="hud-label mt-1" style={{ color: "#FF7A45" }}>
-                      drift contact +{e.eta_hours} h
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </Panel>
-
-        {chosen && (
-          <Panel title={`${chosen.asset.id} assessment`} accent="#FF7A45"
-                 right={
-                   <button onClick={() => setFocus([chosen.asset.lon, chosen.asset.lat])}
-                           className="hud-label tap flex items-center gap-1 hover:text-beam">
-                     <Crosshair size={11} /> centre
-                   </button>
-                 }>
-            <div className="grid grid-cols-2 gap-3">
-              <Readout label="Exposure" animate={chosen.exposure_score} digits={3}
-                       value={fmt(chosen.exposure_score, 3)} size="lg"
-                       color={chosen.exposure_score >= 0.4 ? "#FF7A45" : "#8A93B8"} />
-              <Readout label="Separation" animate={chosen.distance_km} digits={2}
-                       value={fmt(chosen.distance_km, 2)} unit="km" size="lg" />
-            </div>
-            <div className="mt-3">
-              <KV k="Type" v={chosen.asset.type_label} />
-              <KV k="Sensitivity" v={fmt(chosen.asset.sensitivity, 2)} />
-              <KV k="Bearing from event"
-                  v={`${fmt(chosen.bearing_from_event_deg, 0)}° ${chosen.direction}`} />
-              <KV k="Closest approach"
-                  v={`${fmt(chosen.closest_approach_m / 1000, 2)} km at +${fmt(chosen.closest_approach_hours, 0)} h`} />
-              <KV k="Drift intersects" v={chosen.intersects_forecast ? "yes" : "no"}
-                  color={chosen.intersects_forecast ? "#FF7A45" : "#8A93B8"} />
-              <KV k="ETA" v={chosen.eta_hours !== null ? `+${fmt(chosen.eta_hours, 0)} h` : "none"}
-                  color={chosen.eta_hours !== null ? "#FF7A45" : undefined} />
-              <KV k="Source" v={chosen.asset.source} />
-            </div>
-
-            <div className="mt-3">
-              <div className="hud-label mb-2">why this asset matters</div>
-              <p className="text-[10.5px] leading-[1.65] text-muted">
-                {chosen.asset.why_it_matters}
-              </p>
-              {chosen.asset.primary_concerns.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {chosen.asset.primary_concerns.map((c) => (
-                    <Chip key={c} label={c} color="#8A93B8" />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="mt-3">
-              <div className="hud-label mb-2">basis for this score</div>
-              <ul className="space-y-1.5">
-                {chosen.basis.map((b, i) => (
-                  <li key={i} className="flex gap-2 text-[10.5px] leading-[1.55] text-muted">
-                    <span className="text-dim shrink-0">{i + 1}.</span><span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {chosen.asset.notes && <Caveat>{chosen.asset.notes}</Caveat>}
-          </Panel>
-        )}
-
-        <Panel title="Add an asset" accent="#3186FF">
-          <div className="space-y-2.5">
-            <Field label="Name">
-              <input value={draft.name}
-                     onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                     placeholder="asset name"
-                     className="w-full bg-void/70 border border-edge chamfer-sm px-2 py-1.5
-                                hud-value text-[11px] text-ink outline-none
-                                focus:border-beam transition-colors" />
-            </Field>
-            <Field label="Type">
-              <select value={draft.type}
-                      onChange={(e) => setDraft({ ...draft, type: e.target.value })}
-                      className="w-full bg-void/70 border border-edge chamfer-sm px-2 py-1.5
-                                 hud-value text-[11px] text-ink outline-none
-                                 focus:border-beam transition-colors">
-                {Object.entries(types).length === 0
-                  ? <option value="DESALINATION_INTAKE">DESALINATION INTAKE</option>
-                  : Object.entries(types).map(([k, v]: any) => (
-                      <option key={k} value={k}>{v.label}</option>))}
-              </select>
-            </Field>
-            <p className="hud-label normal-case" style={{ letterSpacing: "0.05em" }}>
-              hints show the AOI centre; pick on the map for an exact position
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <Field label="Latitude">
-                <input value={draft.lat}
-                       onChange={(e) => setDraft({ ...draft, lat: e.target.value })}
-                       placeholder="36.9670"
-                       className="w-full bg-void/70 border border-edge chamfer-sm px-2 py-1.5
-                                  hud-value text-[11px] text-ink outline-none
-                                  focus:border-beam transition-colors" />
-              </Field>
-              <Field label="Longitude">
-                <input value={draft.lon}
-                       onChange={(e) => setDraft({ ...draft, lon: e.target.value })}
-                       placeholder="7.6633"
-                       className="w-full bg-void/70 border border-edge chamfer-sm px-2 py-1.5
-                                  hud-value text-[11px] text-ink outline-none
-                                  focus:border-beam transition-colors" />
-              </Field>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button onClick={() => setPickMode(!pickMode)}
-                      className="chamfer-sm hud-label px-2.5 py-1.5 tap flex items-center gap-1.5
-                                 border"
-                      style={{ borderColor: pickMode ? "#3186FF" : "#1B2444",
-                               color: pickMode ? "#4A93FF" : "#5A6490",
-                               background: pickMode ? "rgba(49,134,255,0.14)" : "transparent" }}>
-                <MapPin size={11} /> {pickMode ? "click map…" : "pick on map"}
-              </button>
-              <button onClick={save} disabled={saving}
-                      className="chamfer-sm hud-label px-2.5 py-1.5 tap flex items-center gap-1.5
-                                 border border-nominal/50 text-nominal
-                                 hover:bg-nominal/10 disabled:opacity-40">
-                <Plus size={11} /> {saving ? "storing…" : "add asset"}
-              </button>
-            </div>
-            {saveMsg && (
-              <p className="text-[10.5px] leading-[1.6] text-caution mt-1">{saveMsg}</p>
-            )}
-          </div>
-
-          <div className="mt-3 pt-3 border-t border-edge/50">
-            <div className="hud-label mb-2 flex items-center gap-1.5">
-              <Upload size={11} /> bulk import
-            </div>
-            <p className="text-[10.5px] leading-[1.6] text-dim">
-              GeoJSON point features and CSV with <span className="hud-value">lon</span>/
-              <span className="hud-value">lat</span> (or{" "}
-              <span className="hud-value">longitude</span>/
-              <span className="hud-value">latitude</span>) columns are supported by{" "}
-              <span className="hud-value text-muted">pipeline/exposure.py</span>. Optional
-              columns: <span className="hud-value">id, name, type, sensitivity, notes</span>.
-            </p>
-          </div>
-
-          {policy && <Caveat>{policy}</Caveat>}
-        </Panel>
-      </div>
+        <p className="text-[11px] text-dim">Distance and direction from the incident centroid only. Intake positions are not public and are never estimated; an operator can place a known intake on the map.</p>
+      </Panel>
+      <Modal open={!!draft} onClose={() => setDraft(null)} title="Add asset" width={420}>
+        <div className="space-y-2 text-[12.5px]">
+          <div className="flex items-center gap-2 text-muted"><MapPin size={14} /> {draft?.lat.toFixed(5)}, {draft?.lon.toFixed(5)}</div>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name (e.g. Intake, Fujairah F2)" className="w-full rounded-md border border-line bg-deep px-3 py-1.5" />
+          <select value={dtype} onChange={(e) => setDtype(e.target.value)} className="w-full rounded-md border border-line bg-deep px-3 py-1.5">
+            {Object.entries(TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          </select>
+          <div className="flex justify-end gap-2 pt-2"><button className="btn" onClick={() => setDraft(null)}>Cancel</button><button className="btn btn-primary" disabled={!name.trim()} onClick={add}><Plus size={14} /> Add</button></div>
+        </div>
+      </Modal>
     </div>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="hud-label block mb-1">{label}</span>
-      {children}
-    </label>
-  );
-}
+export default function Page() { return <Suspense><Assets /></Suspense>; }

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLUEBAN 813: verification-first coastal incident intelligence for the UAE</title>
+<meta name="description" content="Research paper: a closed-loop system for coastal water-quality incidents in the UAE using Sentinel-2, Sentinel-3 cross-sensor references and a simulated aquatic hyperspectral sensor (Satellite 813).">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#1b1f24; --muted:#56606d; --line:#dfe3e8; --accent:#1f4e99; --bg:#fbfbf9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#e8eaed; --muted:#a3acb8; --line:#2b3240; --accent:#7fa8ff; --bg:#0f131a; } }
+:root[data-theme="dark"] { --ink:#e8eaed; --muted:#a3acb8; --line:#2b3240; --accent:#7fa8ff; --bg:#0f131a; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.62 "Source Serif 4", Georgia, serif; }
+main { max-width:820px; margin:0 auto; padding:48px 16px 96px; }
+h1 { font-size:30px; line-height:1.2; margin:0 0 10px; }
+h2 { font:600 13px/1.4 Inter, system-ui, sans-serif; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin:44px 0 8px; }
+h3 { font-size:18px; margin:26px 0 6px; }
+.authors { color:var(--muted); font-size:15px; } .authors a { color:var(--accent); }
+.abstract { border-left:3px solid var(--accent); padding:4px 0 4px 16px; margin:26px 0; font-size:16px; }
+figure { margin:26px 0; } figure img { width:100%; border:1px solid var(--line); border-radius:4px; background:#fff; }
+figcaption { font-size:14px; color:var(--muted); margin-top:6px; }
+table { width:100%; border-collapse:collapse; font-size:14px; margin:14px 0; }
+th, td { border-bottom:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; }
+th { font:600 12px Inter, system-ui, sans-serif; color:var(--muted); }
+code, .eq { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size:14px; }
+.eq { display:block; background:rgba(127,127,127,.08); padding:8px 12px; border-radius:4px; margin:10px 0; overflow-x:auto; }
+.note { font-size:14px; color:var(--muted); }
+a { color:var(--accent); }
+ol.refs li { font-size:14px; margin-bottom:6px; }
+.meta { font:500 12px Inter, system-ui, sans-serif; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
+</style></head>
+<body><main>
+<div class="meta"><span>Arab Youth Space Hackathon 2026 · 813 Challenge</span><span>Built 2026-09-30</span><span><a href="https://github.com/4waiz/BlueBan-813">Code &amp; data</a></span><span><a href="https://BlueBan813.kanbanstudios.ae">Live system</a></span></div>
+<h1>BLUEBAN 813: verification-first coastal incident intelligence for the UAE</h1>
+<div class="authors">Awaiz Ahmed and <a href="https://kanbanstudios.ae/team-kanban">Team Kanban</a> (Kanban Studios)</div>
+
+<div class="abstract"><b>Abstract.</b> Satellite water-quality products usually end at an index map, leaving operators to decide what an anomaly means and whether to act. We describe BLUEBAN 813, a closed-loop system that turns Sentinel-2 anomalies over UAE coastal waters into incidents that are verified, acted on and learned from. Each water pixel is compared with its own same-season history in other years, which suppresses persistent bright coastal features; candidates are checked against same-morning Sentinel-3 OLCI Case-2 retrievals used strictly as a cross-sensor reference; analysts' decisions become weighted labels; and a candidate triage model reaches production only through a frozen-validation gate and named human approval. Screening 2,204 Sentinel-2 datatakes over 5 UAE areas of interest (2017–2026) produced 1,127 candidates. On 17 February 2024 the system isolated 2.39 km² of discoloured, chlorophyll-rich filaments off Fujairah (NDCI robust z 7.3, hue angle 54° against a usual 202°) that OLCI, 30 minutes earlier, independently resolved as 13.1 vs 3.2 mg m⁻³ CHL_NN (×4.1). A comparable NDCI spike on 25 October 2023 was not supported by colour or by OLCI (×1.11) and is presented as a failure mode the loop is designed to learn. Because Satellite 813 data were not accessible and no public UAE in-situ measurements exist, 813 is simulated from real Tanager-1 hyperspectral pixels and no physical concentration is reported; on the same pixels the simulated 813 band set reduced false alarms at the decision boundary from 159 to 84 at matched recall.</div>
+
+<h2>1 Introduction</h2>
+<p>The UAE draws most of its drinking water from desalination plants on two very different seas: the shallow, hypersaline Arabian Gulf with a bright seabed, and the deep Gulf of Oman, where blooms have become more frequent and cluster between November and April [1]. The 2008–2009 <i>Margalefidinium</i> (<i>Cochlodinium</i>) bloom closed desalination plants and killed fish along both coasts [2], and green <i>Noctiluca scintillans</i> now dominates many winter blooms in the Gulf of Oman and Arabian Sea [3]. Satellite ocean colour sees these events, but three problems keep it from being operational: optically shallow water and bright coastlines flood spatial anomaly detectors with persistent false alarms [4]; standard chlorophyll products are biased in these waters [5]; and a map does not decide anything — someone has to review it, sample the water and feed the answer back.</p>
+<p>BLUEBAN 813 addresses the third problem first. Its contributions are: (i) a per-pixel seasonal anomaly detector over the full Sentinel-2 archive that makes persistence explicit; (ii) a cross-sensor reference built from same-morning Sentinel-3 OLCI Case-2 retrievals, used as weak labels and as incident evidence but never as ground truth; (iii) an incident model with a state machine, verification queue, field workflow and alerts; (iv) a governed learning loop with a frozen validation set, a promotion gate and human approval; and (v) a measured, rather than assumed, estimate of what an aquatic hyperspectral sensor such as Satellite 813 would add.</p>
+
+<h2>2 Data</h2>
+<p><b>Sentinel-2 MSI Level-2A</b> surface reflectance (Sen2Cor) from the Microsoft Planetary Computer is the primary sensor. The reflectance offset (<code>BOA_ADD_OFFSET = −1000</code>) is applied according to each tile's processing baseline (≥ 04.00), not its acquisition date, before datatakes spanning UTM zones 39 and 40 are mosaicked. <b>Sentinel-3 OLCI WFR Level-2</b> (CHL_NN, TSM_NN, WQSF flags) provides the cross-sensor reference; the Planetary Computer archive ends on 23 February 2026. <b>Planet Tanager-1</b> hyperspectral data (CC-BY-4.0) over the Gulf of Annaba supply the source spectra for the simulated 813 product. ERA5 10 m winds drive a wind-only drift scenario; OpenStreetMap provides 125 coastal assets (desalination and power plants, ports, beaches); Environment Agency Abu Dhabi publishes monitoring-station locations but no measurements.</p>
+<p>An audit of the hackathon platform and the gIQ portal (30 September 2026) found no accessible Satellite 813 product and no downloadable in-situ data; public searches found no per-sample UAE chlorophyll, turbidity or TSS measurements. These two facts shape everything below: 813 appears only as a labelled simulation, and all water-quality quantities are reported as proxies.</p>
+
+<h2>3 Methods</h2>
+<h3>3.1 Water mask and features</h3>
+<p>Pixels are rejected when the scene classification flags no data, saturation, cloud shadow, medium or high cloud probability, cirrus or snow. Water requires MNDWI &gt; 0 and B11 &lt; 0.10; pixels with B11 &gt; 0.0215 are kept but flagged as glint-affected and corrected by subtracting B12 from every band, a first-order surface correction. Features follow their published definitions: NDCI = (R705 − R665)/(R705 + R665) [6]; MCI, the height of R705 above the R665–R740 baseline [7]; FAI [8]; turbidity from the Nechad et al. single-band algorithm with its generic coefficients [9]; and the water-colour hue angle [10].</p>
+<h3>3.2 Per-pixel seasonal anomaly (DETECT)</h3>
+<p>For acquisition <i>t</i> and feature <i>F</i>, each pixel is compared with its own values on acquisitions within ±45 days of the same day of year in other years:</p>
+<span class="eq">z(p) = (F_t(p) − median(clim(p))) / (1.4826 · MAD(clim(p)) + floor_F)</span>
+<p>A candidate is a connected region of at least 0.5 km² with z ≥ 3 and seasonal percentile ≥ 95 on the hypothesis' primary feature (NDCI for bloom-like, turbidity for sediment-like, FAI for surface material), with a secondary feature in agreement (MCI z ≥ 1 for bloom-like). A zone screen on the AOI's P95/P99 seasonal percentile selects 1,053 of 2,229 acquisitions for the pixel-level pass. Each candidate carries thirteen triage features, including its persistence (the share of past same-season dates showing a similar signal) and its water-colour change relative to the pixel's seasonal median.</p>
+<h3>3.3 Cross-sensor reference</h3>
+<p>For every bloom-like or sediment-like candidate up to 23 February 2026, the OLCI granule from the same morning is read in a window around the AOI, its pixels are mapped onto the candidate, and the Case-2 neural-network product (CHL_NN or TSM_NN) inside the region is compared with the surrounding water. The region is a reference positive when its median is ≥ 1.5 × the surroundings (and ≥ 2 units) or ≥ 10 units outright, a reference negative when the ratio is ≤ 1.15 and the median &lt; 5 units, and unlabelled otherwise. These labels carry weight 0.5 (analyst 1.0, field 2.0). For incidents the comparison uses footprint matching: an OLCI pixel belongs to the event when its 300 m footprint overlaps it.</p>
+<h3>3.4 Incidents, verification and learning</h3>
+<p>An incident moves through DETECTED → UNDER_REVIEW → FIELD_VALIDATION_REQUIRED → CONFIRMED / FALSE_POSITIVE / RESOLVED. Analyst decisions CONFIRM, FALSE_POSITIVE and RECLASSIFY create labels; NEEDS_FIELD_SAMPLE and INSUFFICIENT_EVIDENCE do not. Labels are split into train and a frozen validation set by a deterministic hash of AOI and month, so near-duplicate scenes never straddle the split. A candidate L2 logistic model (identical in Python and in the browser to 10⁻⁷) is promoted only if the model tests pass, the validation hash is unchanged, both classes are present, AUPRC is not worse than production (grouped bootstrap), calibration is acceptable, no AOI regresses, and a named human approves. Every action is recorded in a SHA-256 hash-chained audit log.</p>
+<h3>3.5 Simulating Satellite 813</h3>
+<p>The published 813 configuration (≈205 bands, 400–1700 nm) is simulated by Gaussian spectral-response convolution of real Tanager-1 spectra (368 good bands, 5 nm sampling). The simulator was checked against a real Sentinel-2 scene acquired 38 minutes from the Tanager scene. The ablation trains the same classifier on the same pixels convolved to each band set, with spatially blocked cross-validation (173 blocks), so spectral configuration is the only variable. Reference labels are a full-spectrum RX judgement, not in-situ truth.</p>
+
+<h2>4 Results</h2>
+<h3>4.1 Archive screening</h3>
+<p>2,204 of 2,204 Sentinel-2 datatakes were read over 5 UAE AOIs. DETECT produced 1,127 candidates (205 bloom like, 920 sediment like, 2 surface film like). The cross-sensor reference labelled 139 of them (80 confirmed, 59 not confirmed); most others were smaller than a few OLCI pixels or had no clear OLCI granule.</p>
+<table><thead><tr><th>AOI</th><th>Datatakes</th><th>Usable</th><th>Glint-flagged water (median)</th><th>Candidates</th><th>OLCI refs (+/−)</th></tr></thead><tbody>
+<tr><td>AE-AUH-NORTH</td><td>655</td><td>597</td><td>40 %</td><td>681</td><td>41/19</td></tr>
+<tr><td>AE-FUJ-DIBBA</td><td>333</td><td>278</td><td>95 %</td><td>57</td><td>12/7</td></tr>
+<tr><td>AE-FUJ</td><td>563</td><td>456</td><td>49 %</td><td>257</td><td>11/20</td></tr>
+<tr><td>AE-SHJ-KALBA</td><td>298</td><td>241</td><td>20 %</td><td>57</td><td>11/3</td></tr>
+<tr><td>AE-SHJ-KHORFAKKAN</td><td>355</td><td>263</td><td>62 %</td><td>75</td><td>5/10</td></tr>
+</tbody></table>
+
+<h3>4.2 Fujairah, 17 February 2024</h3>
+<figure><img src="figures/fig1_fujairah.png" alt="Three panels: true colour showing bright green filaments off Fujairah, NDCI robust z map, and hue angle map"><figcaption><b>Figure 1.</b> BB-AE-2024-001, Sentinel-2B, 17 Feb 2024 06:49 UTC, 20 m. (a) Bright-green filaments off Fujairah (median 8.1 km from the coast). (b) NDCI robust z against 33 same-season acquisitions from other years. (c) Hue angle: the filaments are yellow-green (~54°) in water that is usually blue (~202°).</figcaption></figure>
+<p>The event covers 2.39 km² at 20 m. Its median NDCI is 0.68 against a seasonal median of -0.003 (robust z 7.3, 100th seasonal percentile), MCI is 0.0068 against 0.0007, and the same location showed a similar signal on only 4 % of past same-season dates. Sentinel-3B OLCI, 30 minutes earlier, gives a CHL_NN median of 13.1 mg m⁻³ over the 34 OLCI pixels overlapping the event against 3.2 mg m⁻³ around it. The spectrum (Fig. 2) shows the red-edge excess at 705 nm expected of dense phytoplankton. The timing matches the winter <i>Noctiluca</i> season, and NASA's PACE imaged a likely-<i>Noctiluca</i> bloom in the Gulf of Oman a month later [11]; neither confirms the species of this event. The incident is therefore raised as a bloom-like optical anomaly for analyst review, with a five-point sampling plan (core, edge, background control, uncertainty) and exposure to the nearest ports and the Fujairah and Kalba power and desalination plants.</p>
+<figure><img src="figures/fig2_spectra.png" alt="Event and background reflectance spectra"><figcaption><b>Figure 2.</b> Median Sentinel-2 spectra of the event and of background water (5–95 % band), SWIR-offset corrected.</figcaption></figure>
+<figure><img src="figures/fig3_record.png" alt="Time series of NDCI P95 and hue angle for the Fujairah AOI"><figcaption><b>Figure 3.</b> The Fujairah AOI's seasonal record (AOI P95 of NDCI and median hue angle per acquisition). The two detections are marked.</figcaption></figure>
+
+<h3>4.3 A failure mode: 25 October 2023</h3>
+<p>BB-AE-2023-001 has an equally high NDCI z (6.8) but its hue angle (221°) is unchanged from the usual 213°, turbidity is at its 3th seasonal percentile, and same-morning OLCI saw 3.8 vs 3.4 mg m⁻³ (×1.11). Over very clear water the corrected red reflectance approaches zero and NDCI, a ratio, becomes unstable. The system raises it (the rule baseline cannot tell), the cross-sensor reference labels such cases negative, and an analyst rejection adds a full-weight label: this is precisely the error a learned triage model should absorb.</p>
+<figure><img src="figures/fig6_controls.png" alt="The 2023 artifact case and the Annaba negative control"><figcaption><b>Figure 4.</b> (a) BB-AE-2023-001: no visible discolouration. (b–c) Negative control, Gulf of Annaba (Tanager-1): spatially anomalous (RX 99.7th percentile) but at the 6.6th seasonal percentile of 106 observations — a persistent coastal feature, stood down.</figcaption></figure>
+
+<h3>4.4 Agreement between Sentinel-2 and OLCI</h3>
+<p>Across referenced candidates, the size of the Sentinel-2 change and the OLCI contrast are related (bloom-like: Spearman ρ = 0.29, n = 49; sediment-like: ρ = 0.38, n = 90; median |Δt| 30 min). Figure 5 shows the separation the reference provides.</p>
+<figure><img src="figures/fig4_crosssensor.png" alt="Scatter of Sentinel-2 change against OLCI contrast"><figcaption><b>Figure 5.</b> Sentinel-2 change against the OLCI region/surroundings contrast for referenced candidates. Dashed lines: the reference thresholds (×1.5 positive, ×1.15 negative).</figcaption></figure>
+
+<h3>4.5 Triage model on the frozen validation set</h3>
+<p>With 105 training and 34 validation labels (18 positive), the rule baseline and an offline logistic candidate score as follows. The validation set is small; the confidence intervals, not the point estimates, are the result.</p>
+<table><thead><tr><th>Metric</th><th>Rule baseline (production)</th><th>Logistic candidate</th><th>Δ, grouped bootstrap 95 % CI</th></tr></thead><tbody>
+<tr><td>AUPRC</td><td>0.514</td><td>0.864</td><td>[-0.079, 0.800]</td></tr>
+<tr><td>AUROC</td><td>0.365</td><td>0.806</td><td>[-0.090, 1.000]</td></tr>
+<tr><td>F1 (0.5)</td><td>0.692</td><td>0.711</td><td></td></tr>
+<tr><td>Precision</td><td>0.529</td><td>0.593</td><td></td></tr>
+<tr><td>Recall</td><td>1.000</td><td>0.889</td><td></td></tr>
+<tr><td>Brier</td><td>0.354</td><td>0.220</td><td></td></tr>
+<tr><td>ECE</td><td>0.381</td><td>0.244</td><td></td></tr>
+</tbody></table>
+<p class="note">Leave-one-AOI-out (AUPRC, candidate vs rule):</p>
+<table><thead><tr><th>Held-out AOI</th><th>n (positive)</th><th>Candidate</th><th>Rule</th></tr></thead><tbody><tr><td>AE-AUH-NORTH</td><td>60 (41)</td><td>0.957</td><td>0.497</td></tr>
+<tr><td>AE-FUJ</td><td>31 (11)</td><td>0.467</td><td>0.340</td></tr>
+<tr><td>AE-FUJ-DIBBA</td><td>19 (12)</td><td>0.839</td><td>0.860</td></tr>
+<tr><td>AE-SHJ-KALBA</td><td>14 (11)</td><td>0.907</td><td>0.755</td></tr>
+<tr><td>AE-SHJ-KHORFAKKAN</td><td>15 (5)</td><td>1.000</td><td>0.221</td></tr></tbody></table>
+
+<h3>4.6 What does 813 add?</h3>
+<figure><img src="figures/fig5_ablation.png" alt="Bar chart of false alarms by band set"><figcaption><b>Figure 6.</b> False alarms at matched recall on the same Tanager pixels, spatially blocked cross-validation.</figcaption></figure>
+<p>At the operational decision boundary the simulated 813 band set reduced false alarms from 159 to 84 (F1 0.985 → 0.992), while for a gross plume both band sets saturate (F1 1.000 vs 1.000). Regressions against OLCI products were not skilful for either (CHL_NN R² 0.08 and 0.01; 658 matchups 25.5 h apart). The measured value of hyperspectral sampling is therefore discrimination near the decision boundary, not detection of obvious events and not, on this evidence, concentration.</p>
+
+<h2>5 Discussion and limitations</h2>
+<p>Sen2Cor is a land processor, and the SWIR offset removes only first-order glint; water-specific atmospheric correction would reduce the NDCI instability seen in §4.3. OLCI CHL_NN and TSM_NN are model products with their own errors, worst in optically shallow Gulf water; they are used as weak references and every label records the OLCI values it came from. The references under-represent events smaller than a few 300 m pixels and cannot exist after February 2026. The per-pixel climatology needs several years of same-season scenes and is weaker for the earliest dates. No physical concentration is reported: the matchup engine (±24 h, 3×3 box, CV ≤ 0.15, sensitivity at 3 h and 72 h) and a calibration gate (≥ 20 matchups in ≥ 5 groups, grouped-CV R² ≥ 0.4 in log space with a confidence interval above zero) are ready for the first legitimate samples. The drift is a wind-only scenario and no source is ever inferred from it. The 813 results are simulations on an Algerian scene until real 813 data and a UAE Tanager scene are available.</p>
+
+<h2>6 Conclusion</h2>
+<p>Treating detections as incidents — compared with their own history, cross-checked by an independent sensor, decided by analysts, confirmed in the field and fed back through a gated learning loop — turns satellite water-quality monitoring into something an operator can act on without being flooded by the coastline. On real UAE data the approach surfaced a visible, cross-sensor-supported bloom-like event off Fujairah and exposed, rather than hid, a characteristic false positive. BlueBan turns every coastal incident into both a response and a lesson.</p>
+
+<h2>Data and code availability</h2>
+<p>All code, derived outputs and this paper's generator are at <a href="https://github.com/4waiz/BlueBan-813">github.com/4waiz/BlueBan-813</a>; every figure and number here is rebuilt from the repository's outputs by <code>scripts/build_paper.py</code>. Input data are public (Copernicus, Planet Tanager open data, ERA5, OpenStreetMap). No restricted data are included.</p>
+
+<h2>References</h2>
+<ol class="refs">
+<li>Al-Shehhi, M. R., Nelson, D., Farzanah, R., Alshihi, R., Salehi-Ashtiani, K. (2021). Characterizing algal blooms in a shallow &amp; a deep channel. <i>Ocean &amp; Coastal Management</i> 213, 105840.</li>
+<li>Richlen, M. L. et al. (2010). The catastrophic 2008–2009 red tide in the Arabian Gulf region, with observations on the identification and phylogeny of the fish-killing dinoflagellate <i>Cochlodinium polykrikoides</i>. <i>Harmful Algae</i> 9, 163–172.</li>
+<li>Gomes, H. R. et al. (2014). Massive outbreaks of <i>Noctiluca scintillans</i> blooms in the Arabian Sea due to spread of hypoxia. <i>Nature Communications</i> 5, 4862.</li>
+<li>Al Shehhi, M. R., Gherboudj, I., Ghedira, H. (2017). In situ spectral response of the Arabian Gulf and Sea of Oman coastal waters to bio-optical properties. <i>J. Photochem. Photobiol. B</i> 175, 235–243.</li>
+<li>Warren, M. A. et al. (2019). Assessment of atmospheric correction algorithms for the Sentinel-2A MultiSpectral Imager over coastal and inland waters. <i>Remote Sensing of Environment</i> 225, 267–289.</li>
+<li>Mishra, S., Mishra, D. R. (2012). Normalized difference chlorophyll index. <i>Remote Sensing of Environment</i> 117, 394–406.</li>
+<li>Gower, J., King, S., Borstad, G., Brown, L. (2005). Detection of intense plankton blooms using the 709 nm band of the MERIS imaging spectrometer. <i>Int. J. Remote Sensing</i> 26, 2005–2012.</li>
+<li>Hu, C. (2009). A novel ocean color index to detect floating algae in the global oceans. <i>Remote Sensing of Environment</i> 113, 2118–2129.</li>
+<li>Nechad, B., Ruddick, K. G., Park, Y. (2010). Calibration and validation of a generic multisensor algorithm for mapping of total suspended matter in turbid waters. <i>Remote Sensing of Environment</i> 114, 854–866.</li>
+<li>van der Woerd, H. J., Wernand, M. R. (2015). True colour classification of natural waters with medium-spectral resolution satellites. <i>Sensors</i> 15, 25663–25680.</li>
+<li>NASA Earth Observatory (2024). Complex Beauty in the Gulf of Oman (PACE OCI, 17 March 2024).</li>
+<li>Doerffer, R., Schiller, H. (2007). The MERIS Case 2 water algorithm. <i>Int. J. Remote Sensing</i> 28, 517–535.</li>
+<li>Gernez, P., Zoffoli, M. L., Lacour, T., Hernández Fariñas, T., Navarro, G., Caballero, I., Harmel, T. (2023). The many shades of red tides: Sentinel-2 optical types of highly-concentrated harmful algal blooms. <i>Remote Sensing of Environment</i> 287, 113486.</li>
+</ol>
+</main></body></html>

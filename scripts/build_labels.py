@@ -32,8 +32,11 @@ OLCI on the Planetary Computer ends on 2026-02-23; later candidates stay
 unlabelled until an analyst or field result labels them.
 
 Extracts are cached under data/cache/olci/<AOI>/ (gitignored).
-Writes outputs/labels/seed_labels.json. Split: grouped by AOI and month with a
-deterministic hash, ~20 % validation (frozen), the rest train.
+Writes outputs/labels/seed_labels.json. Split: stratified and grouped. Labels
+from the same AOI and month always share a side (near-duplicate scenes never
+straddle the split); groups are taken in a deterministic hash order until the
+validation side holds ~20 % of each class, so the frozen set can measure both
+precision and recall.
 
 Usage: python scripts/build_labels.py --aoi AE-FUJ [--aoi ...] [--workers 3]
 """
@@ -97,6 +100,30 @@ def olci_extract(args):
     return date, out
 
 
+def stratified_group_split(labels: list, frac: float = 0.2) -> None:
+    """Assign whole AOI-month groups to validation until ~frac of EACH class is held out."""
+    groups: dict = {}
+    for l in labels:
+        groups.setdefault(l["group_key"], []).append(l)
+    tot_p = sum(l["target"]["y"] == 1 for l in labels)
+    tot_n = len(labels) - tot_p
+    tp, tn = frac * tot_p, frac * tot_n
+    vp = vn = 0
+    chosen = set()
+    for g in sorted(groups, key=lambda g: hashlib.sha256(g.encode()).hexdigest()):
+        gp = sum(l["target"]["y"] == 1 for l in groups[g])
+        gn = len(groups[g]) - gp
+        short_p, short_n = vp < tp, vn < tn
+        if not (short_p or short_n):
+            break
+        helps = (short_p and gp > 0) or (short_n and gn > 0)
+        if helps and vp + gp <= 1.5 * tp + 1 and vn + gn <= 1.5 * tn + 1:
+            chosen.add(g)
+            vp, vn = vp + gp, vn + gn
+    for l in labels:
+        l["split"] = "validation" if l["group_key"] in chosen else "train"
+
+
 def region_mask(ci, stacks, t, cand, window):
     """The candidate's pixels on its own date (z >= Z_MIN and pct >= PCT_MIN inside its bbox)."""
     prim = detect.HYPOTHESIS_FEATURES[cand["hypothesis"]][0][0]
@@ -116,7 +143,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--aoi", action="append", required=True)
     ap.add_argument("--workers", type=int, default=3)
-    ap.add_argument("--val-fold", type=int, default=0)
+    ap.add_argument("--val-frac", type=float, default=0.2)
     a = ap.parse_args()
     labels, stats = [], {}
     for aoi in a.aoi:
@@ -181,7 +208,6 @@ def main():
             n_pos += y_ == 1
             n_neg += y_ == 0
             gk = f"{aoi}|{cand['date'][:7]}"
-            fold = int(hashlib.sha256(gk.encode()).hexdigest(), 16) % 5
             lid = "LB-S3-" + hashlib.sha256(
                 f"{aoi}|{cand['date']}|{cand['hypothesis']}|{cand['label']}".encode()).hexdigest()[:10]
             labels.append({
@@ -196,7 +222,7 @@ def main():
                            "hypothesis": cand["hypothesis"]},
                 "features": cand["features"], "source": "cross_sensor_reference",
                 "source_ref": f"{aoi}:{cand['date']}:{cand['hypothesis']}:{cand['label']}",
-                "weight": 0.5, "split": "validation" if fold == a.val_fold else "train",
+                "weight": 0.5, "split": "train",
                 "group_key": gk, "created_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "created_by": "pipeline (OLCI cross-sensor reference)", "superseded_by": None})
         stats[aoi] = {"candidates": len(cands), "positive": int(n_pos), "negative": int(n_neg),
@@ -204,6 +230,7 @@ def main():
                       "seconds": round(time.time() - t0, 1)}
         print(aoi, stats[aoi], flush=True)
     os.makedirs(os.path.join(ROOT, "outputs", "labels"), exist_ok=True)
+    stratified_group_split(labels, a.val_frac)
     val = [l for l in labels if l["split"] == "validation"]
     out = {"generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "method": "Sentinel-3 OLCI cross-sensor reference labels (see scripts/build_labels.py)",

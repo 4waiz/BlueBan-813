@@ -12,7 +12,7 @@ META_DIR = os.path.join("data", "metadata")
 
 
 def _get_json(url, timeout=120):
-    req = urllib.request.Request(url, headers={"User-Agent": "bluepulse813/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "blueban813/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.load(r)
 
@@ -20,7 +20,7 @@ def _get_json(url, timeout=120):
 def download(url, dest, chunk=8 * 1024 * 1024):
     """Stream to disk with a resume-safe temp file and a running SHA-256."""
     tmp = dest + ".part"
-    req = urllib.request.Request(url, headers={"User-Agent": "bluepulse813/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "blueban813/1.0"})
     with urllib.request.urlopen(req, timeout=300) as r:
         total = int(r.headers.get("Content-Length", 0))
         h = hashlib.sha256()

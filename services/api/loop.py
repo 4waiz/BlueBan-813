@@ -9,9 +9,10 @@ import csv
 import io
 import json
 import os
+import uuid
 from functools import lru_cache
 
-from fastapi import APIRouter, Body, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel, Field
 
@@ -337,6 +338,52 @@ def ack(aid: str, body: ActorNoteIn):
 @router.get("/aois", tags=["watch"])
 def aois():
     return {"aois": store().list_aois()}
+
+
+class AoiIn(BaseModel):
+    actor: str
+    name: str
+    bbox: list[float]
+    id: str | None = None
+    emirate: str | None = None
+    coast: str | None = None
+    optical_regime: str | None = None
+
+
+@router.post("/aois", tags=["watch"])
+def add_aoi(body: AoiIn):
+    if len(body.bbox) != 4 or not (body.bbox[0] < body.bbox[2] and body.bbox[1] < body.bbox[3]):
+        raise HTTPException(422, "bbox must be [west, south, east, north]")
+    aid = body.id or "OP-" + uuid.uuid4().hex[:6].upper()
+    st = store()
+    st.upsert_aoi({"id": aid, "name": body.name, "bbox": body.bbox, "emirate": body.emirate,
+                   "coast": body.coast, "optical_regime": body.optical_regime}, actor=body.actor)
+    return next(a for a in st.list_aois() if a["id"] == aid)
+
+
+class AssetIn(BaseModel):
+    actor: str
+    name: str
+    type: str
+    lon: float
+    lat: float
+    id: str | None = None
+    aoi_id: str | None = None
+    notes: str | None = None
+
+
+@router.get("/assets", tags=["assets"])
+def list_assets():
+    """Coastal assets: the OpenStreetMap register (seeded) plus operator additions."""
+    return {"assets": store().list_assets()}
+
+
+@router.post("/assets", tags=["assets"])
+def add_asset(body: AssetIn):
+    try:
+        return store().add_asset(body.model_dump(exclude={"actor"}), actor=body.actor)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
 
 
 @router.get("/watch/{aoi_id}", tags=["watch"])

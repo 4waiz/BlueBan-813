@@ -119,7 +119,7 @@ void main() {
   vec3 v = normalize(cameraPosition - vW);
   vec3 hv = normalize(sunDir + v);
   float nh = max(dot(n, hv), 0.0);
-  float spec = (pow(nh, 420.0) * 0.55 + pow(nh, 38.0) * 0.07) * water * smoothstep(0.0, 0.25, ndlS) * glintOn;
+  float spec = (pow(nh, 420.0) * 0.42 + pow(nh, 40.0) * 0.045) * water * smoothstep(0.0, 0.25, ndlS) * glintOn;
   col += vec3(1.0, 0.94, 0.84) * spec;
   // atmospheric scattering toward the limb, warm at the terminator
   float fres = pow(1.0 - max(dot(n, v), 0.0), 2.6);
@@ -175,8 +175,8 @@ void main() {
   vec3 c = spectral(nm);
   float band = 0.72 + 0.28 * step(0.22, fract(vS * 205.0));          // 205 narrow bands
   float sweep = exp(-pow((fract(time * 0.18) - vS) * 9.0, 2.0));       // scanning highlight
-  float a = (0.10 + 0.55 * sweep) * (1.0 - vH * 0.85);
-  gl_FragColor = vec4(c * band * (0.8 + 1.4 * sweep), a);
+  float a = (0.3 + 0.5 * sweep) * (0.45 + 0.55 * (1.0 - vH));
+  gl_FragColor = vec4(min(c * band * (0.9 + 0.9 * sweep), vec3(1.0)), a);
 }`;
 
 // --------------------------------------------------------------------------- scene pieces
@@ -248,7 +248,7 @@ const Constellation = memo(function Constellation({ sats, clock, positions, sele
       const v = toVec(lla.lat, lla.lon, lla.alt, prev?.v || new THREE.Vector3());
       positions.current.set(s.key, { v, lla });
       g.position.copy(v);
-      g.scale.setScalar(Math.min(2.5, Math.max(0.05, camera.position.distanceTo(v) / 2.4)));   // constant on-screen size
+      g.scale.setScalar(Math.min(2.5, Math.max(0.012, camera.position.distanceTo(v) / 2.4)));  // constant on-screen size
     }
     if (pulse.current && selected) {
       const p = positions.current.get(selected);
@@ -314,11 +314,14 @@ function Coverage({ sat, clock, showOrbit, showSwath, playing }: { sat: SatDef; 
     for (let k = 0; k < fanM; k++) { const sc = (k + 0.5) / fanM; s.set([sc, k / fanM, (k + 1) / fanM], k * 3); h.set([1, 0, 0], k * 3); }
     g.setAttribute("s", new THREE.BufferAttribute(s, 1)); g.setAttribute("hgt", new THREE.BufferAttribute(h, 1));
     const mat = sat.synth
-      ? new THREE.ShaderMaterial({ vertexShader: fanVert, fragmentShader: fanFrag, uniforms: { time: { value: 0 } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })
-      : new THREE.MeshBasicMaterial({ color: sat.color, transparent: true, opacity: 0.1, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
-    return new THREE.Mesh(g, mat);
+      ? new THREE.ShaderMaterial({ vertexShader: fanVert, fragmentShader: fanFrag, uniforms: { time: { value: 0 } }, transparent: true, depthWrite: false, side: THREE.DoubleSide })
+      : new THREE.MeshBasicMaterial({ color: sat.color, transparent: true, opacity: 0.13, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+    const m = new THREE.Mesh(g, mat);
+    m.renderOrder = 6;                                   // over the (transparent) cloud layer
+    return m;
   }, [sat.synth, sat.color]);
   useEffect(() => () => { [orbit, ground, ribbon, scan, fan].forEach((o) => { o.geometry.dispose(); (o.material as THREE.Material).dispose(); }); }, [orbit, ground, ribbon, scan, fan]);
+  useEffect(() => { if (process.env.NODE_ENV !== "production") (window as unknown as Record<string, unknown>).__cov = { fan, ribbon, scan, orbit }; }, [fan, ribbon, scan, orbit]);
 
   const tmp = useMemo(() => ({ p: new THREE.Vector3(), q: new THREE.Vector3(), t: new THREE.Vector3() }), []);
   useFrame(({ clock: c }) => {
@@ -412,9 +415,9 @@ const AoiLayer = memo(function AoiLayer({ aois, incident, glow }: { aois: Aoi[];
 });
 
 /** Sim clock + Sun + camera behaviour. */
-function Rig({ clock, speed, playing, sun, follow, flyTo, positions, controls, onUserMove }: {
+function Rig({ clock, speed, playing, sun, follow, followScale, flyTo, positions, controls, onUserMove }: {
   clock: React.MutableRefObject<number>; speed: number; playing: boolean; sun: React.MutableRefObject<THREE.Vector3>;
-  follow: string | null; flyTo: React.MutableRefObject<THREE.Vector3 | null>;
+  follow: string | null; followScale: number; flyTo: React.MutableRefObject<THREE.Vector3 | null>;
   positions: React.MutableRefObject<Map<string, { v: THREE.Vector3; lla: LLA }>>;
   controls: React.MutableRefObject<{ target: THREE.Vector3; update: () => void; enabled: boolean } | null>; onUserMove: () => void;
 }) {
@@ -422,23 +425,28 @@ function Rig({ clock, speed, playing, sun, follow, flyTo, positions, controls, o
   const tmp = useMemo(() => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), prev: new THREE.Vector3() }), []);
   useEffect(() => { const c = controls.current as unknown as { addEventListener?: (e: string, f: () => void) => void; removeEventListener?: (e: string, f: () => void) => void } | null; c?.addEventListener?.("start", onUserMove); return () => c?.removeEventListener?.("start", onUserMove); }, [controls, onUserMove]);
   useFrame((_, dt) => {
-    if (playing) clock.current += dt * 1000 * speed;
+    if (playing) clock.current += Math.min(dt, 0.1) * 1000 * speed;
     sunDirection(new Date(clock.current), sun.current);
     const ctl = controls.current;
     if (follow) {
       const p = positions.current.get(follow);
       if (p) {
-        tmp.a.copy(p.v).normalize();
-        const moveDir = tmp.b.subVectors(p.v, tmp.prev).normalize();
+        tmp.a.copy(p.v).normalize();                                   // local vertical
+        const step = tmp.b.subVectors(p.v, tmp.prev);
+        if (step.lengthSq() > 1e-12) tmp.b.normalize(); else tmp.b.set(0, 0, 0);
         tmp.prev.copy(p.v);
-        const want = p.v.clone().addScaledVector(tmp.a, 0.28).addScaledVector(moveDir, -0.42);
-        camera.position.lerp(want, 0.06);
-        if (ctl) { ctl.target.lerp(p.v.clone().multiplyScalar(0.985), 0.12); ctl.update(); }
+        const want = p.v.clone().addScaledVector(tmp.a, 0.035 * followScale).addScaledVector(tmp.b, -0.085 * followScale);
+        camera.position.lerp(want, 0.08);
+        camera.up.lerp(tmp.a, 0.1).normalize();
+        if (ctl) { ctl.target.lerp(p.v.clone().multiplyScalar(1 - 0.038 * Math.max(0.6, followScale)), 0.15); ctl.update(); }
       }
-    } else if (flyTo.current) {
-      camera.position.lerp(flyTo.current, 0.055);
-      if (ctl) { ctl.target.lerp(new THREE.Vector3(0, 0, 0), 0.1); ctl.update(); }
-      if (camera.position.distanceTo(flyTo.current) < 0.01) flyTo.current = null;
+    } else {
+      if (camera.up.y < 0.999) camera.up.lerp(new THREE.Vector3(0, 1, 0), 0.1).normalize();
+      if (flyTo.current) {
+        camera.position.lerp(flyTo.current, 0.055);
+        if (ctl) { ctl.target.lerp(new THREE.Vector3(0, 0, 0), 0.1); ctl.update(); }
+        if (camera.position.distanceTo(flyTo.current) < 0.01) flyTo.current = null;
+      }
     }
   });
   return null;
@@ -483,12 +491,18 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
     return out;
   }, [tle]);
 
-  const clock = useRef<number>(Date.now());
+  const initialT = useMemo(() => {
+    if (typeof window === "undefined") return Date.now();
+    const q = new URLSearchParams(window.location.search).get("t");
+    const t = q ? Date.parse(q) : NaN;
+    return Number.isFinite(t) && Math.abs(t - Date.parse(tle.fetched_utc)) < 30 * 86400e3 ? t : Date.now();
+  }, [tle.fetched_utc]);
+  const clock = useRef<number>(initialT);
   const sun = useRef(new THREE.Vector3(1, 0, 0));
   const positions = useRef(new Map<string, { v: THREE.Vector3; lla: LLA }>());
   const controls = useRef<{ target: THREE.Vector3; update: () => void; enabled: boolean } | null>(null);
   const flyTo = useRef<THREE.Vector3 | null>(null);
-  const startMs = useRef(Date.now());
+  const startMs = useRef(initialT);
 
   const firstSel = useMemo(() => {
     const k = (Object.keys(SENSORS) as SensorKey[]).includes(initialSensor as SensorKey) ? (initialSensor as SensorKey) : "S2";
@@ -604,7 +618,7 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
         {layers.aois && <AoiLayer aois={aois} incident={incident} glow={glow} />}
         <Constellation sats={sats} clock={clock} positions={positions} selected={selected} hovered={hovered} visible={visible} labels={layers.labels} glow={glow} onSelect={select} onHover={setHovered} />
         {sel && visible.has(sel.sensor) && <Coverage key={sel.key} sat={sel} clock={clock} showOrbit={layers.orbits} showSwath={layers.swaths} playing={playing} />}
-        <Rig clock={clock} speed={speed} playing={playing} sun={sun} follow={follow} flyTo={flyTo} positions={positions} controls={controls} onUserMove={onUserMove} />
+        <Rig clock={clock} speed={speed} playing={playing} sun={sun} follow={follow} followScale={Math.min(2, Math.max(0.3, (SENSORS[sats.find((x) => x.key === follow)?.sensor || "S2"].swath_km ?? 60) / 290))} flyTo={flyTo} positions={positions} controls={controls} onUserMove={onUserMove} />
         <OrbitControls ref={controls as never} enablePan={false} enableDamping dampingFactor={0.08} rotateSpeed={0.45} zoomSpeed={0.7} minDistance={1.08} maxDistance={14} />
       </Canvas>
 
@@ -681,7 +695,8 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
         </div>)}
 
       {/* time + layers */}
-      <div className="absolute inset-x-3 bottom-3 flex flex-wrap items-center gap-2 rounded-lg border border-edge bg-void/80 px-3 py-2 backdrop-blur">
+      <div className="absolute inset-x-3 bottom-3 rounded-lg border border-edge bg-void/80 px-3 py-2 backdrop-blur">
+      <div className="flex flex-wrap items-center gap-2">
         <button onClick={() => setPlaying((p) => !p)} className="btn px-3 py-1.5">{playing ? <Pause size={15} /> : <Play size={15} />}</button>
         {SPEEDS.map((s) => <button key={s} onClick={() => { setSpeed(s); setPlaying(true); }} className={`rounded-md border px-2 py-1 text-[11px] font-semibold ${speed === s ? "border-beam bg-beam/20 text-ink" : "border-edge text-muted hover:text-ink"}`}>×{s}</button>)}
         <button onClick={() => { clock.current = Date.now(); startMs.current = Date.now(); setSpeed(1); }} className="btn px-2 py-1 text-[11px]"><RotateCcw size={13} /> Now</button>
@@ -695,9 +710,9 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
         <button onClick={camUAE} className="btn px-2 py-1 text-[11px]"><Radar size={13} /> UAE</button>
         <button onClick={camGlobe} className="btn px-2 py-1 text-[11px]"><Globe2 size={13} /> Globe</button>
       </div>
-
-      <div className="pointer-events-none absolute bottom-[62px] left-3 max-w-[60%] text-[10px] text-dim">
-        Earth: NASA Blue Marble / Black Marble; cloud layer is a static texture, not the actual cloud cover · orbits: {tle.source}, snapshot {tle.fetched_utc.slice(0, 10)}, SGP4 (satellite.js) · swaths from published instrument specs · Satellite 813 orbit and marker are illustrative
+      <div className="mt-1 truncate text-[10px] text-dim" title="Earth: NASA Blue Marble / Black Marble. The cloud layer is a static texture, not the actual cloud cover. Orbits: CelesTrak TLE snapshot, SGP4 (satellite.js). Swaths from published instrument specifications. Satellite 813 orbit and marker are illustrative.">
+        Earth: NASA Blue Marble / Black Marble · clouds: static texture, not actual cover · orbits: {tle.source}, snapshot {tle.fetched_utc.slice(0, 10)}, SGP4 (satellite.js) · swaths: published instrument specs · Satellite 813 orbit and marker are illustrative
+      </div>
       </div>
       {hovered && hovered !== selected && positions.current.get(hovered) && (
         <div className="pointer-events-none absolute left-1/2 top-[86px] -translate-x-1/2 rounded-md border border-edge bg-void/85 px-3 py-1 text-[12px]">

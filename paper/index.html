@@ -32,7 +32,7 @@ ol.refs li { font-size:14px; margin-bottom:6px; }
 <h1>BLUEBAN 813: verification-first coastal incident intelligence for the UAE</h1>
 <div class="authors">Awaiz Ahmed and <a href="https://kanbanstudios.ae/team-kanban">Team Kanban</a> (Kanban Studios)</div>
 
-<div class="abstract"><b>Abstract.</b> Satellite water-quality products usually end at an index map, leaving operators to decide what an anomaly means and whether to act. We describe BLUEBAN 813, a closed-loop system that turns Sentinel-2 anomalies over UAE coastal waters into incidents that are verified, acted on and learned from. Each water pixel is compared with its own same-season history in other years, which suppresses persistent bright coastal features; candidates are checked against same-morning Sentinel-3 OLCI Case-2 retrievals used strictly as a cross-sensor reference; analysts' decisions become weighted labels; and a candidate triage model reaches production only through a frozen-validation gate and named human approval. Screening 2,860 Sentinel-2 datatakes over 6 UAE areas of interest (2017–2026) produced 1,127 candidates. On 17 February 2024 the system isolated 2.39 km² of discoloured, chlorophyll-rich filaments off Fujairah (NDCI robust z 7.3, hue angle 54° against a usual 202°) that OLCI, 30 minutes earlier, independently resolved as 13.1 vs 3.2 mg m⁻³ CHL_NN (×4.1). A comparable NDCI spike on 25 October 2023 was not supported by colour or by OLCI (×1.11) and is presented as a failure mode the loop is designed to learn. Because Satellite 813 data were not accessible and no public UAE in-situ measurements exist, 813 is simulated from real Tanager-1 hyperspectral pixels and no physical concentration is reported; on the same pixels the simulated 813 band set reduced false alarms at the decision boundary from 159 to 84 at matched recall.</div>
+<div class="abstract"><b>Abstract.</b> Satellite water-quality products usually end at an index map, leaving operators to decide what an anomaly means and whether to act. We describe BLUEBAN 813, a closed-loop system that turns Sentinel-2 anomalies over UAE coastal waters into incidents that are verified, acted on and learned from. Each water pixel is compared with its own same-season history in other years, which suppresses persistent bright coastal features; candidates are checked against same-morning Sentinel-3 OLCI Case-2 retrievals used strictly as a cross-sensor reference; analysts' decisions become weighted labels; and a candidate triage model reaches production only through a frozen-validation gate and named human approval. Screening 2,860 Sentinel-2 datatakes over 6 UAE areas of interest (2017–2026) produced 1,803 candidates. On 17 February 2024 the system isolated 2.39 km² of discoloured, chlorophyll-rich filaments off Fujairah (NDCI robust z 7.3, hue angle 54° against a usual 202°) that OLCI, 30 minutes earlier, independently resolved as 13.1 vs 3.2 mg m⁻³ CHL_NN (×4.1). A comparable NDCI spike on 25 October 2023 was not supported by colour or by OLCI (×1.11) and is presented as a failure mode the loop is designed to learn. Because Satellite 813 data were not accessible and no public UAE in-situ measurements exist, 813 is simulated from real Tanager-1 hyperspectral pixels and no physical concentration is reported; on the same pixels the simulated 813 band set reduced false alarms at the decision boundary from 159 to 84 at matched recall.</div>
 
 <h2>1 Introduction</h2>
 <p>The UAE draws most of its drinking water from desalination plants on two very different seas: the shallow, hypersaline Arabian Gulf with a bright seabed, and the deep Gulf of Oman, where blooms have become more frequent and cluster between November and April [1]. The 2008–2009 <i>Margalefidinium</i> (<i>Cochlodinium</i>) bloom closed desalination plants and killed fish along both coasts [2], and green <i>Noctiluca scintillans</i> now dominates many winter blooms in the Gulf of Oman and Arabian Sea [3]. Satellite ocean colour sees these events, but three problems keep it from being operational: optically shallow water and bright coastlines flood spatial anomaly detectors with persistent false alarms [4]; standard chlorophyll products are biased in these waters [5]; and a map does not decide anything — someone has to review it, sample the water and feed the answer back.</p>
@@ -48,20 +48,20 @@ ol.refs li { font-size:14px; margin-bottom:6px; }
 <h3>3.2 Per-pixel seasonal anomaly (DETECT)</h3>
 <p>For acquisition <i>t</i> and feature <i>F</i>, each pixel is compared with its own values on acquisitions within ±45 days of the same day of year in other years:</p>
 <span class="eq">z(p) = (F_t(p) − median(clim(p))) / (1.4826 · MAD(clim(p)) + floor_F)</span>
-<p>A candidate is a connected region of at least 0.5 km² with z ≥ 3 and seasonal percentile ≥ 95 on the hypothesis' primary feature (NDCI for bloom-like, turbidity for sediment-like, FAI for surface material), with a secondary feature in agreement (MCI z ≥ 1 for bloom-like). A zone screen on the AOI's P95/P99 seasonal percentile selects 1,053 of 2,229 acquisitions for the pixel-level pass. Each candidate carries thirteen triage features, including its persistence (the share of past same-season dates showing a similar signal) and its water-colour change relative to the pixel's seasonal median.</p>
+<p>A candidate is a connected region of at least 0.5 km² with z ≥ 3 and seasonal percentile ≥ 95 on the hypothesis' primary feature (NDCI for bloom-like, turbidity for sediment-like, FAI for surface material), with a secondary feature in agreement (MCI z ≥ 1 for bloom-like). A zone screen on the AOI's P95/P99 seasonal percentile selects 1,383 of 2,885 acquisitions for the pixel-level pass. Each candidate carries thirteen triage features, including its persistence (the share of past same-season dates showing a similar signal) and its water-colour change relative to the pixel's seasonal median.</p>
 <h3>3.3 Cross-sensor reference</h3>
 <p>For every bloom-like or sediment-like candidate up to 23 February 2026, the OLCI granule from the same morning is read in a window around the AOI, its pixels are mapped onto the candidate, and the Case-2 neural-network product (CHL_NN or TSM_NN) inside the region is compared with the surrounding water. The region is a reference positive when its median is ≥ 1.5 × the surroundings (and ≥ 2 units) or ≥ 10 units outright, a reference negative when the ratio is ≤ 1.15 and the median &lt; 5 units, and unlabelled otherwise. These labels carry weight 0.5 (analyst 1.0, field 2.0). For incidents the comparison uses footprint matching: an OLCI pixel belongs to the event when its 300 m footprint overlaps it.</p>
 <h3>3.4 Incidents, verification and learning</h3>
-<p>An incident moves through DETECTED → UNDER_REVIEW → FIELD_VALIDATION_REQUIRED → CONFIRMED / FALSE_POSITIVE / RESOLVED. Analyst decisions CONFIRM, FALSE_POSITIVE and RECLASSIFY create labels; NEEDS_FIELD_SAMPLE and INSUFFICIENT_EVIDENCE do not. Labels are split into train and a frozen validation set by a deterministic hash of AOI and month, so near-duplicate scenes never straddle the split. A candidate L2 logistic model (identical in Python and in the browser to 10⁻⁷) is promoted only if the model tests pass, the validation hash is unchanged, both classes are present, AUPRC is not worse than production (grouped bootstrap), calibration is acceptable, no AOI regresses, and a named human approves. Every action is recorded in a SHA-256 hash-chained audit log.</p>
+<p>An incident moves through DETECTED → UNDER_REVIEW → FIELD_VALIDATION_REQUIRED → CONFIRMED / FALSE_POSITIVE / RESOLVED. Analyst decisions CONFIRM, FALSE_POSITIVE and RECLASSIFY create labels; NEEDS_FIELD_SAMPLE and INSUFFICIENT_EVIDENCE do not. Labels are split into train and a frozen validation set by whole AOI-month groups, taken in a deterministic hash order until about 20 % of each class is held out (a stratified grouped split), so near-duplicate scenes never straddle the split. A candidate L2 logistic model (identical in Python and in the browser to 10⁻⁷) is promoted only if the model tests pass, the validation hash is unchanged, both classes are present, AUPRC is not worse than production (grouped bootstrap), calibration is acceptable, no AOI regresses, and a named human approves. Every action is recorded in a SHA-256 hash-chained audit log.</p>
 <h3>3.5 Simulating Satellite 813</h3>
 <p>The published 813 configuration (≈205 bands, 400–1700 nm) is simulated by Gaussian spectral-response convolution of real Tanager-1 spectra (368 good bands, 5 nm sampling). The simulator was checked against a real Sentinel-2 scene acquired 38 minutes from the Tanager scene. The ablation trains the same classifier on the same pixels convolved to each band set, with spatially blocked cross-validation (173 blocks), so spectral configuration is the only variable. Reference labels are a full-spectrum RX judgement, not in-situ truth.</p>
 
 <h2>4 Results</h2>
 <h3>4.1 Archive screening</h3>
-<p>2,860 of 2,860 Sentinel-2 datatakes were read over 6 UAE AOIs. DETECT produced 1,127 candidates (205 bloom like, 920 sediment like, 2 surface film like). The cross-sensor reference labelled 139 of them (80 confirmed, 59 not confirmed); most others were smaller than a few OLCI pixels or had no clear OLCI granule.</p>
+<p>2,860 of 2,860 Sentinel-2 datatakes were read over 6 UAE AOIs. DETECT produced 1,803 candidates (326 bloom like, 1,475 sediment like, 2 surface film like). The cross-sensor reference labelled 229 of them (154 confirmed, 75 not confirmed); most others were smaller than a few OLCI pixels or had no clear OLCI granule.</p>
 <table><thead><tr><th>AOI</th><th>Datatakes</th><th>Usable</th><th>Glint-flagged water (median)</th><th>Candidates</th><th>OLCI refs (+/−)</th></tr></thead><tbody>
 <tr><td>AE-AUH-NORTH</td><td>655</td><td>597</td><td>40 %</td><td>681</td><td>41/19</td></tr>
-<tr><td>AE-AUH-TAWEELAH</td><td>656</td><td>570</td><td>51 %</td><td>—</td><td>—/—</td></tr>
+<tr><td>AE-AUH-TAWEELAH</td><td>656</td><td>570</td><td>51 %</td><td>676</td><td>74/16</td></tr>
 <tr><td>AE-FUJ-DIBBA</td><td>333</td><td>278</td><td>95 %</td><td>57</td><td>12/7</td></tr>
 <tr><td>AE-FUJ</td><td>563</td><td>456</td><td>49 %</td><td>257</td><td>11/20</td></tr>
 <tr><td>AE-SHJ-KALBA</td><td>298</td><td>241</td><td>20 %</td><td>57</td><td>11/3</td></tr>
@@ -79,26 +79,27 @@ ol.refs li { font-size:14px; margin-bottom:6px; }
 <figure><img src="figures/fig6_controls.png" alt="The 2023 artifact case and the Annaba negative control"><figcaption><b>Figure 4.</b> (a) BB-AE-2023-001: no visible discolouration. (b–c) Negative control, Gulf of Annaba (Tanager-1): spatially anomalous (RX 99.7th percentile) but at the 6.6th seasonal percentile of 106 observations — a persistent coastal feature, stood down.</figcaption></figure>
 
 <h3>4.4 Agreement between Sentinel-2 and OLCI</h3>
-<p>Across referenced candidates, the size of the Sentinel-2 change and the OLCI contrast are related (bloom-like: Spearman ρ = 0.29, n = 49; sediment-like: ρ = 0.38, n = 90; median |Δt| 30 min). Figure 5 shows the separation the reference provides.</p>
+<p>Across referenced candidates, the size of the Sentinel-2 change and the OLCI contrast are related (bloom-like: Spearman ρ = 0.00, n = 62; sediment-like: ρ = 0.58, n = 167; median |Δt| 25 min). Figure 5 shows the separation the reference provides.</p>
 <figure><img src="figures/fig4_crosssensor.png" alt="Scatter of Sentinel-2 change against OLCI contrast"><figcaption><b>Figure 5.</b> Sentinel-2 change against the OLCI region/surroundings contrast for referenced candidates. Dashed lines: the reference thresholds (×1.5 positive, ×1.15 negative).</figcaption></figure>
 
 <h3>4.5 Triage model on the frozen validation set</h3>
-<p>With 105 training and 34 validation labels (18 positive), the rule baseline and an offline logistic candidate score as follows. The validation set is small; the confidence intervals, not the point estimates, are the result.</p>
+<p>With 180 training and 49 validation labels (33 positive), the rule baseline and an offline logistic candidate score as follows. The validation set is small; the confidence intervals, not the point estimates, are the result.</p>
 <table><thead><tr><th>Metric</th><th>Rule baseline (production)</th><th>Logistic candidate</th><th>Δ, grouped bootstrap 95 % CI</th></tr></thead><tbody>
-<tr><td>AUPRC</td><td>0.514</td><td>0.864</td><td>[-0.079, 0.800]</td></tr>
-<tr><td>AUROC</td><td>0.365</td><td>0.806</td><td>[-0.090, 1.000]</td></tr>
-<tr><td>F1 (0.5)</td><td>0.692</td><td>0.711</td><td></td></tr>
-<tr><td>Precision</td><td>0.529</td><td>0.593</td><td></td></tr>
-<tr><td>Recall</td><td>1.000</td><td>0.889</td><td></td></tr>
-<tr><td>Brier</td><td>0.354</td><td>0.220</td><td></td></tr>
-<tr><td>ECE</td><td>0.381</td><td>0.244</td><td></td></tr>
+<tr><td>AUPRC</td><td>0.590</td><td>0.953</td><td>[0.158, 0.673]</td></tr>
+<tr><td>AUROC</td><td>0.312</td><td>0.894</td><td>[0.301, 0.990]</td></tr>
+<tr><td>F1 (0.5)</td><td>0.805</td><td>0.870</td><td></td></tr>
+<tr><td>Precision</td><td>0.673</td><td>0.833</td><td></td></tr>
+<tr><td>Recall</td><td>1.000</td><td>0.909</td><td></td></tr>
+<tr><td>Brier</td><td>0.267</td><td>0.122</td><td></td></tr>
+<tr><td>ECE</td><td>0.283</td><td>0.119</td><td></td></tr>
 </tbody></table>
 <p class="note">Leave-one-AOI-out (AUPRC, candidate vs rule):</p>
-<table><thead><tr><th>Held-out AOI</th><th>n (positive)</th><th>Candidate</th><th>Rule</th></tr></thead><tbody><tr><td>AE-AUH-NORTH</td><td>60 (41)</td><td>0.957</td><td>0.497</td></tr>
-<tr><td>AE-FUJ</td><td>31 (11)</td><td>0.467</td><td>0.340</td></tr>
-<tr><td>AE-FUJ-DIBBA</td><td>19 (12)</td><td>0.839</td><td>0.860</td></tr>
-<tr><td>AE-SHJ-KALBA</td><td>14 (11)</td><td>0.907</td><td>0.755</td></tr>
-<tr><td>AE-SHJ-KHORFAKKAN</td><td>15 (5)</td><td>1.000</td><td>0.221</td></tr></tbody></table>
+<table><thead><tr><th>Held-out AOI</th><th>n (positive)</th><th>Candidate</th><th>Rule</th></tr></thead><tbody><tr><td>AE-AUH-NORTH</td><td>60 (41)</td><td>0.981</td><td>0.497</td></tr>
+<tr><td>AE-AUH-TAWEELAH</td><td>90 (74)</td><td>0.996</td><td>0.669</td></tr>
+<tr><td>AE-FUJ</td><td>31 (11)</td><td>0.495</td><td>0.340</td></tr>
+<tr><td>AE-FUJ-DIBBA</td><td>19 (12)</td><td>0.882</td><td>0.860</td></tr>
+<tr><td>AE-SHJ-KALBA</td><td>14 (11)</td><td>0.925</td><td>0.755</td></tr>
+<tr><td>AE-SHJ-KHORFAKKAN</td><td>15 (5)</td><td>0.825</td><td>0.221</td></tr></tbody></table>
 
 <h3>4.6 What does 813 add?</h3>
 <figure><img src="figures/fig5_ablation.png" alt="Bar chart of false alarms by band set"><figcaption><b>Figure 6.</b> False alarms at matched recall on the same Tanager pixels, spatially blocked cross-validation.</figcaption></figure>

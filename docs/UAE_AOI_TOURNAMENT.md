@@ -19,9 +19,9 @@ Which UAE area of interest should carry the demonstration, decided from the data
 | 1 | **AE-FUJ** Fujairah / Qidfa / anchorage | Gulf of Oman | 456 | 257 (23) | 11/20 | 5 | 0.76 | 1.00 | 1.00 | 0.62 | 0.35 | **0.79** |
 | 2 | **AE-AUH-NORTH** Abu Dhabi island north coast / Saadiyat | Arabian Gulf | 597 | 681 (151) | 41/19 | 8 | 1.00 | 0.40 | 0.67 | 1.00 | 0.68 | **0.73** |
 | 3 | **AE-SHJ-KALBA** Kalba | Gulf of Oman | 241 | 57 (12) | 11/3 | 1 | 0.40 | 1.00 | 1.00 | 0.12 | 0.79 | **0.70** |
-| 4 | **AE-FUJ-DIBBA** Dibba | Gulf of Oman | 278 | 57 (11) | 12/7 | 0 | 0.47 | 1.00 | 0.83 | 0.00 | 0.63 | **0.61** |
-| 5 | **AE-SHJ-KHORFAKKAN** Khor Fakkan | Gulf of Oman | 263 | 75 (8) | 5/10 | 4 | 0.44 | 1.00 | 0.42 | 0.50 | 0.33 | **0.54** |
-| 6 | **AE-AUH-TAWEELAH** Al Taweelah / Khalifa Port | Arabian Gulf | 570 | — (—) | —/— | 8 | 0.95 | 0.40 | 0.00 | 1.00 | 0.50 | **0.50** |
+| 4 | **AE-AUH-TAWEELAH** Al Taweelah / Khalifa Port | Arabian Gulf | 570 | 676 (121) | 74/16 | 8 | 0.95 | 0.40 | 0.50 | 1.00 | 0.82 | **0.70** |
+| 5 | **AE-FUJ-DIBBA** Dibba | Gulf of Oman | 278 | 57 (11) | 12/7 | 0 | 0.47 | 1.00 | 0.83 | 0.00 | 0.63 | **0.61** |
+| 6 | **AE-SHJ-KHORFAKKAN** Khor Fakkan | Gulf of Oman | 263 | 75 (8) | 5/10 | 4 | 0.44 | 1.00 | 0.42 | 0.50 | 0.33 | **0.54** |
 
 **Pending (screening not finished; not scored, not guessed):** AE-AUH-LAGOON (Abu Dhabi / Musaffah lagoons), AE-DXB-JEBELALI (Dubai / Jebel Ali), AE-SHJ-AJM (Sharjah / Ajman), AE-UAQ-RAK (Umm Al Quwain / Ras Al Khaimah).
 

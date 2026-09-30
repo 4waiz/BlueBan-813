@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import json
 import os
 import subprocess
 import sys
@@ -34,12 +35,17 @@ def main():
     ap.add_argument("--skip-detect", action="store_true")
     ap.add_argument("--skip-labels", action="store_true")
     a = ap.parse_args()
-    watch = {os.path.basename(p)[:-5]: os.path.getmtime(p)
+    # Staleness from the generated_utc stamps inside the files, not file mtimes:
+    # cloud sync and git checkouts rewrite mtimes without changing the data.
+    def stamp(path):
+        with open(path, encoding="utf-8") as f:
+            return json.load(f).get("generated_utc") or ""
+    watch = {os.path.basename(p)[:-5]: stamp(p)
              for p in glob.glob(os.path.join(ROOT, "outputs", "watch", "*.json"))}
     if not a.skip_detect:
         stale = [aoi for aoi, t in sorted(watch.items())
                  if not os.path.exists(os.path.join(ROOT, "outputs", "detect", f"{aoi}.json"))
-                 or os.path.getmtime(os.path.join(ROOT, "outputs", "detect", f"{aoi}.json")) < t]
+                 or stamp(os.path.join(ROOT, "outputs", "detect", f"{aoi}.json")) < t]
         if stale:
             run("scripts/build_detect.py", *sum((["--aoi", s] for s in stale), []))
     detected = sorted(os.path.basename(p)[:-5] for p in glob.glob(os.path.join(ROOT, "outputs", "detect", "*.json")))

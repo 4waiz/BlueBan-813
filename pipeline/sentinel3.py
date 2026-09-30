@@ -180,3 +180,133 @@ def subset_bbox(scene: OlciScene, bbox) -> dict:
         if v.shape == inside.shape:
             out[k] = v[inside]
     return out
+
+
+def load_window(item, bbox, pad_deg: float = 0.25,
+                variables=("chl-nn", "tsm-nn")) -> dict | None:
+    """Read only the part of an OLCI granule around ``bbox``.
+
+    A WFR granule is ~4000 x 4800 pixels; a coastal AOI needs a few hundred.
+    The tie-point grid (subsampled 64 x 64) locates the window, and only that
+    hyperslab is read from each variable, so a cross-check costs megabytes
+    instead of the full granule. Returns flat arrays of the window (lon, lat,
+    valid and each variable in its native log10 form), or None when the AOI
+    is outside the granule.
+    """
+    tie = _open_asset(item, "tie-geo-coordinates")
+    tlon = np.asarray(tie["longitude"].values, dtype="float64")
+    tlat = np.asarray(tie["latitude"].values, dtype="float64")
+    al = int(tie.attrs.get("al_subsampling_factor", 64))
+    ac = int(tie.attrs.get("ac_subsampling_factor", 64))
+    tie.close()
+    lo_x, lo_y, hi_x, hi_y = bbox
+    near = ((tlon >= lo_x - pad_deg) & (tlon <= hi_x + pad_deg)
+            & (tlat >= lo_y - pad_deg) & (tlat <= hi_y + pad_deg))
+    if not near.any():
+        return None
+    rr, cc = np.where(near)
+    win = {"rows": slice(max(rr.min() - 1, 0) * al, (rr.max() + 2) * al),
+           "columns": slice(max(cc.min() - 1, 0) * ac, (cc.max() + 2) * ac)}
+
+    def read(key, names):
+        ds = _open_asset(item, key)
+        sub = ds.isel({k: v for k, v in win.items() if k in ds.dims})
+        got = {n: np.asarray(sub[n].values) for n in names if n in sub}
+        ds.close()
+        return got
+
+    geo = read("geo-coordinates", ("longitude", "latitude"))
+    out = {"lon": geo["longitude"].astype("float64"), "lat": geo["latitude"].astype("float64")}
+    for key in variables:
+        var = L2_VARIABLES.get(key, {}).get("variable", "").split(" ")[0]
+        got = read(key, (var,))
+        if var in got:
+            out[var] = got[var].astype("float32")
+    ds = _open_asset(item, "wqsf")
+    wq = ds["WQSF"]
+    masks = {n: int(v) for n, v in zip(wq.attrs.get("flag_meanings", "").split(),
+                                       np.atleast_1d(wq.attrs.get("flag_masks", [])))}
+    bits = 0
+    for name in WQSF_REJECT:
+        bits |= masks.get(name, 0)
+    wv = np.asarray(ds.isel({k: v for k, v in win.items() if k in ds.dims})["WQSF"].values)
+    ds.close()
+    out["valid"] = (wv.astype("uint64") & np.uint64(bits)) == 0
+    for k in list(out):
+        out[k] = out[k].ravel()
+    out["item_id"] = item.id
+    out["datetime"] = item.properties["datetime"]
+    return out
+
+
+#: Which OLCI Case-2 product answers which event hypothesis.
+REFERENCE_VARIABLE = {"BLOOM_LIKE": ("CHL_NN", "mg m^-3"), "SEDIMENT_LIKE": ("TSM_NN", "g m^-3")}
+#: Last OLCI WFR granule on the Planetary Computer (checked 2026-09-30).
+PC_OLCI_END = "2026-02-23"
+
+
+def reference_contrast(region_vals, bg_vals):
+    """Cross-sensor reference rule on linear values -> (y, region, background, ratio).
+
+    y = 1 when the region is >= 1.5 x its surroundings (and >= 2 units) or
+    >= 10 units outright; y = 0 when the ratio is <= 1.15 and the region is
+    < 5 units; otherwise None (ambiguous). One rule for seed labels and for
+    the incident evidence, so the two can never disagree.
+    """
+    reg = float(np.median(region_vals))
+    bg = float(np.median(bg_vals))
+    ratio = reg / bg if bg > 0 else float("inf")
+    if (ratio >= 1.5 and reg >= 2.0) or reg >= 10.0:
+        return 1, reg, bg, ratio
+    if ratio <= 1.15 and reg < 5.0:
+        return 0, reg, bg, ratio
+    return None, reg, bg, ratio
+
+
+def crosscheck(bbox, date: str, s2_datetime: str, locate, hypothesis: str,
+               pad_deg: float = 0.2, min_region_px: int = 8, min_bg_px: int = 30) -> dict:
+    """Compare an S2 event with the same-morning OLCI Case-2 product.
+
+    ``locate(lon, lat) -> (in_region, near_region)`` maps OLCI pixel centres
+    onto the event mask. Returns a JSON-ready record; never raises.
+    """
+    import datetime as _dt
+    var, units = REFERENCE_VARIABLE.get(hypothesis, (None, None))
+    if var is None:
+        return {"available": False, "note": f"no OLCI counterpart for {hypothesis}"}
+    if date > PC_OLCI_END:
+        return {"available": False, "note": f"OLCI on the Planetary Computer ends {PC_OLCI_END}"}
+    try:
+        items = search(bbox, f"{date}T03:30:00Z/{date}T10:00:00Z")
+    except Exception as e:
+        return {"available": False, "note": f"OLCI search failed: {e!r}"[:200]}
+    t_s2 = _dt.datetime.fromisoformat(s2_datetime.replace("Z", "+00:00"))
+    best = None
+    for it in items[:3]:
+        try:
+            w = load_window(it, bbox, pad_deg, variables=("chl-nn", "tsm-nn"))
+        except Exception:
+            continue
+        if not w or var not in w:
+            continue
+        inr, near = locate(w["lon"], w["lat"])
+        v = np.power(10.0, w[var].astype("float64"))
+        ok = w["valid"] & np.isfinite(v)
+        rp, bp = ok & inr, ok & ~near
+        if best is None or rp.sum() > best[0]:
+            best = (int(rp.sum()), w, v, rp, bp)
+    if best is None:
+        return {"available": False, "note": "no OLCI granule with valid water that morning"}
+    n, w, v, rp, bp = best
+    t_o = _dt.datetime.fromisoformat(str(w["datetime"]).replace("Z", "+00:00"))
+    rec = {"available": True, "item_id": w["item_id"], "datetime": str(w["datetime"])[:19] + "Z",
+           "dt_minutes": round((t_o - t_s2).total_seconds() / 60.0, 1), "variable": var, "units": units,
+           "n_region_px": int(rp.sum()), "n_background_px": int(bp.sum()),
+           "product": "ESA OLCI WFR L2 Case-2 neural net (a model product, not in situ)"}
+    if rp.sum() < min_region_px or bp.sum() < min_bg_px:
+        rec.update({"agrees": None, "note": "too few valid OLCI pixels over the event"})
+        return rec
+    y, reg, bg, ratio = reference_contrast(v[rp], v[bp])
+    rec.update({"agrees": None if y is None else bool(y), "region_median": round(reg, 3),
+                "background_median": round(bg, 3), "ratio": round(ratio, 3)})
+    return rec

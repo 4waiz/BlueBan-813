@@ -19,6 +19,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "recharts": "^3.10.1",
+    "satellite.js": "^6.0.2",
     "three": "^0.186.1"
   },
   "devDependencies": {

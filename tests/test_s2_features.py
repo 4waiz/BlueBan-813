@@ -201,3 +201,19 @@ def test_scl_dark_area_and_vegetation_classes_are_not_auto_excluded():
     # Dense blooms and clear dark water are often mislabelled 2/4/5 by Sen2Cor.
     assert s2.scl_usable(np.array([2, 4, 5, 6, 7])).all()
     assert not s2.scl_usable(np.array([0, 1, 3, 8, 9, 10, 11])).any()
+
+
+def test_hole_buffer_off_keeps_open_water_around_single_bad_pixels():
+    n = 40
+    r = _flat(0.02, shape=(n, n))
+    r["B03"][:] = 0.05
+    r["B11"][:] = 0.005
+    r["B11"][:, :10] = 0.25                           # land strip
+    r["B04"][20, 25] = -0.05                          # one over-corrected pixel in open water
+    scl = np.full((n, n), 6)
+    old, _ = s2.water_quality_mask(r, scl, shoreline_buffer_m=40, pixel_size_m=20)
+    new, rep = s2.water_quality_mask(r, scl, shoreline_buffer_m=40, pixel_size_m=20, hole_buffer=False)
+    assert not old[20, 27] and new[20, 27]            # no halo around the bad pixel
+    assert not new[20, 25]                            # the bad pixel itself is still excluded
+    assert not new[:, 10:12].any()                    # the shoreline buffer is unchanged
+    assert rep.to_dict()["params"]["hole_buffer"] is False

@@ -39,6 +39,7 @@ import yaml  # noqa: E402
 
 from pipeline import detect, export, exposure, forecast, risk, sampling  # noqa: E402
 from pipeline import s2_features as s2f  # noqa: E402
+from pipeline import sentinel3 as s3  # noqa: E402
 from pipeline import watch  # noqa: E402
 from pipeline.provenance import AlgorithmRecord, Provenance, SourceRecord  # noqa: E402
 
@@ -68,10 +69,12 @@ def load_features(args):
         refl, scl, meta = watch.load_datatake(items, grid)
         feats = s2f.compute_features(refl, platform=meta["platform"])
         water, rep = s2f.water_quality_mask(refl, scl, pixel_size_m=grid.resolution_m,
-                                            shoreline_buffer_m=60)
+                                            shoreline_buffer_m=60, hole_buffer=False)
+        body = (np.isfinite(refl["B03"]) & np.isfinite(refl["B11"])
+                & (refl["B11"] < 0.10) & ((refl["B03"] - refl["B11"]) > 0))
         out = {k: feats[k].astype("float32") for k in ("NDCI", "MCI", "TUR_NECHAD2016",
                                                        "HUE_ANGLE", "FAI", "SPM_NECHAD2016")}
-        return {"key": key, "ok": True, "water": water, "feats": out, "meta": meta,
+        return {"key": key, "ok": True, "water": water, "body": body, "feats": out, "meta": meta,
                 "quality": rep.to_dict(),
                 "refl": {b: refl[b] for b in S2_BANDS_SPECTRUM + ["B11", "B12"]}, "scl": scl}
     except Exception as e:                                   # recorded, never hidden
@@ -92,6 +95,8 @@ def main():
     ap.add_argument("--status", default="DETECTED")
     ap.add_argument("--title", default=None)
     ap.add_argument("--context", default=None, help="JSON list of register context entries")
+    ap.add_argument("--keep", choices=("near", "all"), default="near",
+                    help="near: components within 1.5 km of the candidate; all: every component in the window")
     a = ap.parse_args()
 
     cfg = yaml.safe_load(open(os.path.join(ROOT, "config", "aois_uae.yaml"), encoding="utf-8"))["aois"]
@@ -158,6 +163,8 @@ def main():
 
     prim = detect.HYPOTHESIS_FEATURES[hyp][0][0]
     hit = water & (zmaps[prim] >= detect.Z_MIN) & (pmaps[prim] >= detect.PCT_MIN)
+    for name, sign in detect.HYPOTHESIS_FEATURES[hyp][1:]:     # same agreement rule as DETECT
+        hit &= (sign * np.nan_to_num(zmaps[name])) >= 1.0
     from scipy import ndimage as ndi
     hit = ndi.binary_opening(hit, iterations=1)
     lab, nlab = ndi.label(hit)
@@ -171,6 +178,9 @@ def main():
     rad = int(1500 / a.res)
     near = lab[max(0, rr0 - rad):rr0 + rad, max(0, cc0 - rad):cc0 + rad]
     keep |= set(np.unique(near[near > 0]).tolist())
+    if a.keep == "all" and nlab:
+        min_px = max(1, int(detect.MIN_AREA_KM2 * 1e6 / 4 / a.res ** 2))   # >= 0.125 km2 pieces
+        keep |= {k for k in range(1, nlab + 1) if sizes[k - 1] >= min_px}
     if not keep and nlab:
         keep = {int(np.argmax(sizes)) + 1}
     event = np.isin(lab, list(keep))
@@ -206,6 +216,27 @@ def main():
         v = arr[m]
         v = v[np.isfinite(v)]
         return float(np.median(v)) if v.size else None
+
+    # ---- independent cross-sensor check (Sentinel-3 OLCI, same morning) ----------
+    # An OLCI pixel (300 m) belongs to the event when its FOOTPRINT overlaps it,
+    # i.e. its centre lies within half a pixel of the event; the surroundings
+    # start two OLCI pixels out, so partly covered pixels count on neither side.
+    foot = ndi.binary_dilation(event, iterations=max(1, int(round(150 / a.res))))
+    ring = ndi.binary_dilation(event, iterations=max(1, int(round(600 / a.res))))
+    tr_ll = Transformer.from_crs("EPSG:4326", f"EPSG:{grid.epsg}", always_xy=True)
+
+    def locate(lon, lat):
+        x, y = tr_ll.transform(lon, lat)
+        col = np.floor((np.asarray(x) - grid.transform.c) / grid.transform.a).astype(int)
+        row = np.floor((np.asarray(y) - grid.transform.f) / grid.transform.e).astype(int)
+        ing = (row >= 0) & (row < grid.shape[0]) & (col >= 0) & (col < grid.shape[1])
+        inr = np.zeros(len(row), bool)
+        nr = np.zeros(len(row), bool)
+        inr[ing] = foot[row[ing], col[ing]]
+        nr[ing] = ring[row[ing], col[ing]]
+        return inr, nr
+    olci = s3.crosscheck(list(win), a.date, ev["meta"]["datetime"], locate, hyp)
+    log(f"OLCI cross-check: {olci}")
 
     # ---- distance to shore, exposure, drift -----------------------------------
     dist_px = ndi.distance_transform_edt(water)
@@ -300,8 +331,9 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     bl = grid.lonlat_bounds()
     valid = np.isfinite(ev["refl"]["B03"])
+    # display: the whole water body (the analysis mask's quality holes are not land)
     export.save_rgb_png(os.path.join(out_dir, "rgb.png"), ev["refl"]["B04"], ev["refl"]["B03"],
-                        ev["refl"]["B02"], valid, water)
+                        ev["refl"]["B02"], valid, ev["body"] | water)
     legends = {}
     legends["ndci"] = export.save_scalar_png(os.path.join(out_dir, "ndci.png"), F["NDCI"], water, "turbo")
     legends["ndci_z"] = export.save_scalar_png(os.path.join(out_dir, "ndci_z.png"), zmaps["NDCI"], water,
@@ -314,7 +346,7 @@ def main():
     from PIL import Image
     wm = np.zeros(water.shape + (4,), np.uint8)
     wm[water] = (39, 195, 243, 70)
-    Image.fromarray(wm, "RGBA").save(os.path.join(out_dir, "water.png"), optimize=True)
+    Image.fromarray(wm).save(os.path.join(out_dir, "water.png"), optimize=True)
 
     def L(key, label, fn, units, cmap="seq", lg=None):
         d = {"key": key, "label": label, "url": f"layers/{a.id}/{fn}", "bounds": bl,
@@ -419,6 +451,15 @@ def main():
         acquisition_utc=f"{min(x['meta']['datetime'] for x in clim)[:10]} .. {max(x['meta']['datetime'] for x in clim)[:10]}",
         product="sentinel-2-l2a", processing_level="L2A", provider="ESA Copernicus via Microsoft Planetary Computer",
         licence="Copernicus open", units="reflectance", notes="Per-pixel seasonal climatology (+/-45 days of day-of-year, other years)"))
+    if olci.get("available"):
+        prov.add_source(SourceRecord(
+            satellite=olci["item_id"][:3].replace("S3", "Sentinel-3"), sensor="OLCI", scene_id=olci["item_id"],
+            acquisition_utc=olci["datetime"], product="sentinel-3-olci-wfr-l2-netcdf",
+            processing_level="L2 WFR (Case-2 neural net CHL_NN / TSM_NN)",
+            provider="EUMETSAT / ESA Copernicus via Microsoft Planetary Computer", licence="Copernicus open",
+            native_resolution_m=[300], bands_used=[olci["variable"], "WQSF"], units=olci["units"],
+            quality_mask="WQSF: " + ",".join(s3.WQSF_REJECT[:10]) + ",...",
+            notes="independent cross-sensor reference (a model product, not in situ)"))
     if wind_meta:
         prov.add_source(SourceRecord(satellite="ERA5 reanalysis", sensor="10 m wind", scene_id=f"cell {wind_meta['cell']}",
                                      acquisition_utc=ev["meta"]["datetime"], product="ERA5 hourly", processing_level="reanalysis",
@@ -474,7 +515,12 @@ def main():
                      "series": [{"date": r_["date"], "value": ((r_.get("all") or {}).get(prim) or {}).get("p95")}
                                 for r_ in ws["rows"] if "error" not in r_ and (r_.get("all") or {}).get("n_water", 0) > 500]},
         "spatial": {"rx_percentile": cand["features"].get("rx_pct")},
-        "sensor_agreement": {"Sentinel-2 L2A": {"agrees": True, "note": f"z {zmed:.1f}, {pmed:.0f}th seasonal pct"}},
+        "sensor_agreement": {
+            "Sentinel-2 L2A": {"agrees": True, "note": f"z {zmed:.1f}, {pmed:.0f}th seasonal pct"},
+            "Sentinel-3 OLCI": {**olci, "note": olci.get("note") or (
+                f"{olci['variable']} {olci['region_median']:.2f} vs {olci['background_median']:.2f} {olci['units']} "
+                f"around it (x{olci['ratio']:.2f}), {olci['dt_minutes']:+.0f} min from Sentinel-2; "
+                "an independent sensor and retrieval, not in-situ truth")}},
         "quality_flags": [f"Glint-affected water fraction {glint_frac:.0%} (B11 > 0.0215; SWIR-offset corrected)",
                           f"Median distance to shore {dshore_km:.2f} km" if dshore_km is not None else "distance to shore unknown"],
         "exposure": exp_rows[:8],

@@ -1,0 +1,1 @@
+{"bounds": [56.35783050025323, 25.049299792225018, 56.537818985516374, 25.19445595851437], "shape": [400, 452], "fields": ["NDCI", "NDCI_z", "NDCI_pct", "MCI", "TUR_FNU", "HUE_deg", "B04", "B05"], "scale": {"NDCI": 0.0001, "NDCI_z": 0.001, "NDCI_pct": 0.01, "MCI": 1e-05, "TUR_FNU": 0.01, "HUE_deg": 0.01, "B04": 1e-05, "B05": 1e-05}, "nodata": -32768, "resolution_m": 40.0}

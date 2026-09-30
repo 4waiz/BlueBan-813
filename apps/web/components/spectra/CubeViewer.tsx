@@ -88,16 +88,23 @@ function Slices({ meta, data, sel, onPick, scanning }: { meta: CubeMeta; data: U
   );
 }
 
-export default function CubeViewer({ name, height = 300, onSpectrum, compact = false }: {
+export default function CubeViewer({ name, height = 300, onSpectrum, compact = false, sweep = false }: {
   name: string; height?: number | string; compact?: boolean;
+  /** Step the wavelength slice automatically (Judge Mode); off under reduced motion. */
+  sweep?: boolean;
   onSpectrum?: (s: { wavelengths_nm: number[]; values: (number | null)[]; row: number; col: number }) => void;
 }) {
   const [meta, setMeta] = useState<CubeMeta | null>(null);
   const [data, setData] = useState<Uint8Array | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [sel, setSel] = useState(0);
-  const [scanning, setScanning] = useState(false);
+  const [scanning, setScanning] = useState(sweep);
   const reduce = useReducedMotion();
+  useEffect(() => {
+    if (!sweep || reduce || !meta) return;
+    const t = setInterval(() => setSel((s) => (s + 1) % meta.shape[0]), 900);
+    return () => clearInterval(t);
+  }, [sweep, reduce, meta]);
   useEffect(() => {
     let dead = false;
     setMeta(null); setData(null); setErr(null);

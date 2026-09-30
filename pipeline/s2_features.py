@@ -484,7 +484,8 @@ def water_quality_mask(refl: dict, scl: np.ndarray | None,
                        mndwi_min: float = 0.0, swir_reject: float = 0.10,
                        glint_flag: float = 0.0215,
                        shoreline_buffer_m: float = 40.0,
-                       pixel_size_m: float = 20.0):
+                       pixel_size_m: float = 20.0,
+                       hole_buffer: bool = True):
     """Open-water mask for water-colour work, plus an auditable report.
 
     A pixel is analysable water when it is valid, not flagged unusable by SCL,
@@ -494,6 +495,14 @@ def water_quality_mask(refl: dict, scl: np.ndarray | None,
     SWIR offset correction (negative corrected red is atmospheric
     over-correction). Pixels with B11 above ``glint_flag`` (the ACOLITE non-water
     threshold) stay in the mask but are counted as glint-affected.
+
+    ``hole_buffer=True`` (the WATCH screening default, kept so every cached
+    archive is internally consistent) erodes around EVERY excluded pixel, so a
+    single noisy pixel inside open water becomes a hole of radius
+    ``shoreline_buffer_m``. ``hole_buffer=False`` buffers only against land,
+    bright (SWIR) cloud and SCL cloud areas of >= 25 pixels, then removes the
+    remaining single-pixel exclusions without a halo; the 20 m incident
+    analysis uses it.
 
     Returns ``(mask, report)``.
     """
@@ -506,10 +515,15 @@ def water_quality_mask(refl: dict, scl: np.ndarray | None,
     raw = valid & usable & (mndwi > mndwi_min) & swir_ok
     red_corr = refl["B04"] - refl["B12"] if "B12" in refl else refl["B04"]
     neg_red = raw & (red_corr < -0.002)
-    raw &= ~neg_red
-    raw = _label_and_filter(raw, 25)
     buf_px = int(round(shoreline_buffer_m / pixel_size_m))
-    water = _erode(raw, buf_px)
+    if hole_buffer:
+        raw &= ~neg_red
+        raw = _label_and_filter(raw, 25)
+        water = _erode(raw, buf_px)
+    else:
+        big_bad = _label_and_filter(valid & ~usable, 25)       # real cloud / shadow areas
+        body = _label_and_filter(valid & (mndwi > mndwi_min) & swir_ok & ~big_bad, 25)
+        water = _erode(body, buf_px) & usable & ~neg_red
     glinty = water & (refl["B11"] > glint_flag)
     rep_ = S2QualityReport(
         total_px=int(valid.size), valid_px=int(valid.sum()),
@@ -521,6 +535,7 @@ def water_quality_mask(refl: dict, scl: np.ndarray | None,
                 "glint_flag_b11": glint_flag,
                 "shoreline_buffer_m": shoreline_buffer_m,
                 "pixel_size_m": pixel_size_m, "scl_unusable": list(SCL_UNUSABLE),
+                "hole_buffer": hole_buffer,
                 "median_b11_water": (float(np.nanmedian(refl["B11"][water]))
                                      if water.any() else None)},
     )

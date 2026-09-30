@@ -299,7 +299,13 @@ def _grid_from_dict(d: dict) -> AoiGrid:
 def process_datatake(args) -> dict:
     """One datatake -> one time-series row (+ cache file). Runs in a worker process."""
     key, item_dicts, grid_d, cache_dir, zones_path = args
+    import json as _json
     import pystac
+    tag = f"{key[0]}_R{int(key[1]):03d}_{(key[2] or 'S2')[-2:]}"
+    sidecar = os.path.join(cache_dir, f"{tag}.row.json") if cache_dir else None
+    if sidecar and os.path.exists(sidecar) and os.path.exists(os.path.join(cache_dir, f"{tag}.npz")):
+        with open(sidecar, encoding="utf-8") as f:                 # resume: already processed
+            return _json.load(f)
     items = [pystac.Item.from_dict(d) for d in item_dicts]
     grid = _grid_from_dict(grid_d)
     res = grid.resolution_m
@@ -311,14 +317,16 @@ def process_datatake(args) -> dict:
         water, _ = s2f.water_quality_mask(refl, scl, pixel_size_m=res,
                                           shoreline_buffer_m=max(40.0, res))
         st = zone_statistics(refl, scl, meta["platform"], res, zmasks, feats=feats, water=water)
+        row = {"date": key[0], **meta, **st}
         if cache_dir:
-            tag = f"{key[0]}_R{int(key[1]):03d}_{(key[2] or 'S2')[-2:]}"
             np.savez_compressed(
                 os.path.join(cache_dir, f"{tag}.npz"), water=water, scl=scl,
                 **{f: np.where(water, feats[f], np.nan).astype("float16") for f in CACHE_FEATURES},
                 rgb=np.dstack([refl["B04"], refl["B03"], refl["B02"]]).astype("float16"))
-            st["cache_file"] = f"{tag}.npz"
-        return {"date": key[0], **meta, **st}
+            row["cache_file"] = f"{tag}.npz"
+            with open(sidecar, "w", encoding="utf-8") as f:            # lets an interrupted run resume
+                _json.dump(row, f, default=float)
+        return row
     except Exception as e:                                    # recorded, not hidden
         return {"date": key[0], "error": repr(e)[:300], "item_ids": [i.id for i in items]}
 

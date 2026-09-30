@@ -49,6 +49,62 @@ DOC_KEYS = {
 }
 
 
+#: Every external dataset the product touches: provider, licence, role, status.
+DATA_SOURCES = [
+    {"name": "Sentinel-2 MSI L2A", "provider": "ESA Copernicus via Microsoft Planetary Computer",
+     "licence": "Copernicus: free, full and open", "role": "Primary detection sensor (10/20/60 m, 2-5 day revisit)",
+     "status": "USED", "url": "https://planetarycomputer.microsoft.com/dataset/sentinel-2-l2a"},
+    {"name": "Sentinel-3 OLCI WFR L2", "provider": "EUMETSAT / ESA Copernicus via Microsoft Planetary Computer",
+     "licence": "Copernicus: free, full and open",
+     "role": "Cross-sensor reference (CHL_NN, TSM_NN; model products, never in-situ truth) and wide-area context",
+     "status": "USED (archive ends 2026-02-23)", "url": "https://planetarycomputer.microsoft.com/dataset/sentinel-3-olci-wfr-l2-netcdf"},
+    {"name": "Planet Tanager-1 hyperspectral", "provider": "Planet Labs PBC (open STAC)", "licence": "CC-BY-4.0",
+     "role": "Source spectra for the SIMULATED 813 product and the 813 ablation (Gulf of Annaba)",
+     "status": "USED for simulation; UAE (Tarif) scene awaiting download approval", "url": "https://www.planet.com/data/stac/"},
+    {"name": "Satellite 813 products", "provider": "Arab Youth Space Hackathon / partners", "licence": "n/a",
+     "role": "Target sensor", "status": "NOT ACCESSIBLE (authenticated audit, 30 Sep 2026)", "url": None},
+    {"name": "ERA5 hourly 10 m wind", "provider": "ECMWF / Copernicus C3S via the Open-Meteo archive API",
+     "licence": "Copernicus licence (attribution)", "role": "Wind-only drift SCENARIO (not a hydrodynamic forecast)",
+     "status": "USED", "url": "https://open-meteo.com/en/docs/historical-weather-api"},
+    {"name": "OpenStreetMap coastal assets", "provider": "OpenStreetMap contributors (Overpass extract)", "licence": "ODbL",
+     "role": "Desalination plants, ports, power plants, beaches for exposure", "status": "USED (120 assets)",
+     "url": "https://www.openstreetmap.org/copyright"},
+    {"name": "EAD marine monitoring locations", "provider": "Abu Dhabi Spatial Data Infrastructure (EAD layers 170/171)",
+     "licence": "ADSDI open data", "role": "Station LOCATIONS only; no measurement values are public",
+     "status": "USED (50 locations)", "url": None},
+    {"name": "Sentinel-2 cloudless 2021 basemap", "provider": "EOX IT Services GmbH (contains modified Copernicus data)",
+     "licence": "CC BY-NC-SA 4.0", "role": "Basemap only; never analysed", "status": "DISPLAY", "url": "https://s2maps.eu"},
+    {"name": "Terrain tiles (terrarium)", "provider": "AWS Open Data / Mapzen", "licence": "various open (see provider)",
+     "role": "3D relief only", "status": "DISPLAY", "url": "https://registry.opendata.aws/terrain-tiles/"},
+    {"name": "Hackathon platform datasets and gIQ", "provider": "Arab Youth Space Hackathon Cockpit; gIQ",
+     "licence": "restricted", "role": "Audited for UAE water data", "status": "NOTHING USABLE FOR UAE WATER (see audit)",
+     "url": None},
+]
+
+
+def lineage() -> dict:
+    """Counts of what each pipeline stage produced, read from outputs/."""
+    def jl(p):
+        p = os.path.join(ROOT, p)
+        return json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
+    watch = [jl(os.path.relpath(p, ROOT)) for p in glob.glob(os.path.join(ROOT, "outputs", "watch", "*.json"))]
+    det = [jl(os.path.relpath(p, ROOT)) for p in glob.glob(os.path.join(ROOT, "outputs", "detect", "*.json"))]
+    labels = jl("outputs/labels/seed_labels.json") or {}
+    incs = glob.glob(os.path.join(ROOT, "outputs", "incidents", "BB-*.json"))
+    olci = glob.glob(os.path.join(ROOT, "data", "cache", "olci", "*", "*.npz"))
+    return {
+        "watch": {"aois": len(watch), "datatakes": sum(w.get("n_datatakes", 0) for w in watch),
+                  "ok": sum(w.get("n_ok", 0) for w in watch)},
+        "detect": {"aois": len(det), "acquisitions": sum(d.get("n_acquisitions", 0) for d in det),
+                   "pixel_level": sum((d.get("two_stage") or {}).get("n_pixel_level", 0) for d in det),
+                   "candidates": sum(len(d.get("candidates", [])) for d in det)},
+        "olci_extracts": len(olci),
+        "labels": {"n": labels.get("n", 0), "validation": labels.get("n_validation", 0),
+                   "stats": labels.get("stats", {})},
+        "incidents": sorted(os.path.basename(p)[:-5] for p in incs),
+    }
+
+
 def log(m):
     print(f"  {m}", flush=True)
 
@@ -120,7 +176,7 @@ def main():
         n += 1
     log(f"watch/detect series: {n}")
 
-    for name in ("assets_uae.geojson", "stations_ead.geojson", "aois_uae.yaml"):
+    for name in ("assets_uae.geojson", "stations_ead.geojson", "aois_uae.yaml", "tle_eo.json"):
         copy(os.path.join(ROOT, "config", name), os.path.join(OUT, "registers", name))
     copy(os.path.join(ROOT, "outputs", "aoi", "census.json"), os.path.join(OUT, "registers", "census.json"))
 
@@ -140,6 +196,7 @@ def main():
     log(f"docs: {len(idx)}")
 
     status = {"generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+              "sources": DATA_SOURCES, "lineage": lineage(),
               "data_policy": {
                   "real_813_data_used": False,
                   "813_status": "SIMULATED (no Satellite 813 product accessible to the team; "

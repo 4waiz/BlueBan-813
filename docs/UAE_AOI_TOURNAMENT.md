@@ -1,6 +1,6 @@
 # UAE AOI tournament
 
-**BLUEBAN 813** · Team Kanban · generated 30 September 2026 by `scripts/build_tournament.py`
+**BLUEBAN 813** · Team Kanban · generated 01 October 2026 by `scripts/build_tournament.py`
 
 Which UAE area of interest should carry the demonstration, decided from the data rather than chosen in advance. Each criterion is in [0, 1]; the total is the weighted sum. Re-run the script after new screening.
 
@@ -16,14 +16,16 @@ Which UAE area of interest should carry the demonstration, decided from the data
 
 | # | AOI | Coast | Usable scenes | Candidates (bloom-like) | OLCI refs +/− | Plants nearby | Data | Optics | Evidence | Exposure | Burden | **Total** |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | **AE-FUJ** Fujairah / Qidfa / anchorage | Gulf of Oman | 456 | 257 (23) | 11/20 | 5 | 0.76 | 1.00 | 1.00 | 0.62 | 0.35 | **0.79** |
-| 2 | **AE-AUH-NORTH** Abu Dhabi island north coast / Saadiyat | Arabian Gulf | 597 | 681 (151) | 41/19 | 8 | 1.00 | 0.40 | 0.67 | 1.00 | 0.68 | **0.73** |
-| 3 | **AE-SHJ-KALBA** Kalba | Gulf of Oman | 241 | 57 (12) | 11/3 | 1 | 0.40 | 1.00 | 1.00 | 0.12 | 0.79 | **0.70** |
-| 4 | **AE-AUH-TAWEELAH** Al Taweelah / Khalifa Port | Arabian Gulf | 570 | 676 (121) | 74/16 | 8 | 0.95 | 0.40 | 0.50 | 1.00 | 0.82 | **0.70** |
-| 5 | **AE-FUJ-DIBBA** Dibba | Gulf of Oman | 278 | 57 (11) | 12/7 | 0 | 0.47 | 1.00 | 0.83 | 0.00 | 0.63 | **0.61** |
-| 6 | **AE-SHJ-KHORFAKKAN** Khor Fakkan | Gulf of Oman | 263 | 75 (8) | 5/10 | 4 | 0.44 | 1.00 | 0.42 | 0.50 | 0.33 | **0.54** |
-
-**Pending (screening not finished; not scored, not guessed):** AE-AUH-LAGOON (Abu Dhabi / Musaffah lagoons), AE-DXB-JEBELALI (Dubai / Jebel Ali), AE-SHJ-AJM (Sharjah / Ajman), AE-UAQ-RAK (Umm Al Quwain / Ras Al Khaimah).
+| 1 | **AE-FUJ** Fujairah / Qidfa / anchorage | Gulf of Oman | 456 | 257 (23) | 11/20 | 5 | 0.68 | 1.00 | 1.00 | 0.56 | 0.35 | **0.77** |
+| 2 | **AE-DXB-JEBELALI** Dubai / Jebel Ali | Arabian Gulf | 551 | 391 (98) | 46/12 | 9 | 0.83 | 0.55 | 0.67 | 1.00 | 0.79 | **0.75** |
+| 3 | **AE-AUH-NORTH** Abu Dhabi island north coast / Saadiyat | Arabian Gulf | 597 | 681 (151) | 41/19 | 8 | 0.90 | 0.40 | 0.67 | 0.89 | 0.68 | **0.69** |
+| 4 | **AE-SHJ-KALBA** Kalba | Gulf of Oman | 241 | 57 (12) | 11/3 | 1 | 0.36 | 1.00 | 1.00 | 0.11 | 0.79 | **0.69** |
+| 5 | **AE-AUH-TAWEELAH** Al Taweelah / Khalifa Port | Arabian Gulf | 570 | 676 (121) | 74/16 | 8 | 0.86 | 0.40 | 0.50 | 0.89 | 0.82 | **0.66** |
+| 6 | **AE-UAQ-RAK** Umm Al Quwain / Ras Al Khaimah | Arabian Gulf | 343 | 370 (71) | 61/15 | 6 | 0.52 | 0.55 | 0.67 | 0.67 | 0.80 | **0.64** |
+| 7 | **AE-SHJ-AJM** Sharjah / Ajman | Arabian Gulf | 334 | 215 (24) | 52/11 | 5 | 0.50 | 0.55 | 0.67 | 0.56 | 0.83 | **0.62** |
+| 8 | **AE-AUH-LAGOON** Abu Dhabi / Musaffah lagoons | Arabian Gulf | 666 | 282 (35) | 10/0 | 1 | 1.00 | 0.20 | 0.83 | 0.11 | 1.00 | **0.61** |
+| 9 | **AE-FUJ-DIBBA** Dibba | Gulf of Oman | 278 | 57 (11) | 12/7 | 0 | 0.42 | 1.00 | 0.83 | 0.00 | 0.63 | **0.61** |
+| 10 | **AE-SHJ-KHORFAKKAN** Khor Fakkan | Gulf of Oman | 263 | 75 (8) | 5/10 | 4 | 0.39 | 1.00 | 0.42 | 0.44 | 0.33 | **0.52** |
 
 ## Result
 
@@ -31,7 +33,7 @@ Which UAE area of interest should carry the demonstration, decided from the data
 
 The hero incident, **BB-AE-2024-001**, comes from this AOI: bright-green filaments on 17 February 2024 that Sentinel-3 OLCI independently resolved the same morning.
 
-**AE-AUH-NORTH** is second (0.73), strongest on data, exposure, burden. It is an optically shallow shelf: there Sentinel-2 and OLCI can both respond to seabed reflectance and resuspension, so their agreement is weaker evidence of a water-column event than in deep water. That is why the optics criterion carries weight, and why a high candidate count there is not by itself an advantage.
+**AE-DXB-JEBELALI** is second (0.75), strongest on exposure, data, burden. It is an optically shallow shelf: there Sentinel-2 and OLCI can both respond to seabed reflectance and resuspension, so their agreement is weaker evidence of a water-column event than in deep water. That is why the optics criterion carries weight, and why a high candidate count there is not by itself an advantage.
 
 The first AOI's burden score is a reminder, not a flaw to hide: over its very clear water NDCI becomes unstable and many candidates there are ratio artefacts that OLCI does not confirm (BB-AE-2023-001 is one). The verification queue and the learning loop exist for exactly that.
 

@@ -10,10 +10,7 @@ what the limitation is, what it means for the product, and what would remove it.
   data, Sen2Cor is not a water processor, and the drift is wind-only.
 * **New limitations of the UAE pipeline:**
   * *NDCI over very clear water.* When corrected red reflectance approaches zero
-    NDCI becomes unstable (BB-AE-2023-001). Only 10 of 62 OLCI-referenced
-    bloom-like candidates were confirmed, versus 144 of 167 sediment-like ones,
-    and the size of the bloom-like NDCI change does not track the OLCI
-    chlorophyll contrast (Spearman ρ ≈ 0).
+    NDCI becomes unstable (BB-AE-2023-001). <!--num:bloom-->Only 23 of 83 OLCI-referenced bloom-like candidates were confirmed, versus 300 of 353 sediment-like ones, and the size of the bloom-like NDCI change does not track the OLCI chlorophyll contrast (Spearman ρ -0.19).<!--/num:bloom-->
     The hue angle, MCI and the learned triage model are the mitigation; a
     water-specific atmospheric correction is the fix.
   * *The cross-sensor reference is a model product.* OLCI CHL_NN/TSM_NN are
@@ -21,10 +18,7 @@ what the limitation is, what it means for the product, and what would remove it.
     300 m pixels, and end on 2026-02-23 on the Planetary Computer.
   * *Shallow-water agreement is weak evidence.* In the Arabian Gulf both sensors
     can respond to the same seabed or resuspension signal.
-  * *Small, sediment-heavy label set.* 229 cross-sensor labels, 49 frozen for
-    validation, dominated by sediment-like candidates in shallow Gulf water
-    where agreement is weaker evidence. The candidate's AUPRC gain over the rule
-    has a grouped bootstrap interval of [0.16, 0.67]. More analyst and field labels
+  * *Small, sediment-heavy label set.* <!--num:labels-->436 cross-sensor labels, 100 frozen for validation, dominated by sediment-like candidates in shallow Gulf water where agreement is weaker evidence. The candidate's AUPRC gain over the rule has a grouped bootstrap interval of [0.04, 0.48].<!--/num:labels--> More analyst and field labels
     are the remedy, which is what the loop is for.
   * *Screening coverage.* Arabian Gulf AOIs beyond Abu Dhabi North are still
     being screened (`docs/UAE_AOI_TOURNAMENT.md` lists them as pending).

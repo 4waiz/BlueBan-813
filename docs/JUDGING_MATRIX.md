@@ -16,7 +16,7 @@ typed into the interface.
 |---|---|
 | **What** | Incidents that reach a decision: verification queue, field plan, alerts, exposure to desalination and power plants, and a model that improves from every decision |
 | **Evidence** | BB-AE-2024-001 off Fujairah: 2.39 km² of discoloured water, ~11–22 km from the Port of Fujairah, Kalba power plant and Fujairah F2 desalination plant; five-point sampling plan with a mandatory background control |
-| **Number** | On the frozen validation set (49 labels) the learned triage candidate reaches AUPRC 0.95 vs 0.59 for the rule it would replace; the grouped bootstrap 95 % interval on the difference is [0.16, 0.67], and it wins on all six held-out AOIs (promotion still gated) |
+| **Number** | <!--num:triage-->On the frozen validation set (100 labels) the learned triage candidate reaches AUPRC 0.94 vs 0.66 for the rule it would replace; the grouped bootstrap 95 % interval on the difference is [0.04, 0.48], excluding zero, and it beats the rule on 9 of 9 held-out AOIs (promotion still gated)<!--/num:triage--> |
 | **Demo** | Judge Mode steps 3, 7–10; Incident Control; Field Ops |
 
 The UAE draws most of its drinking water from desalination on two very different
@@ -36,7 +36,7 @@ The loop targets exactly that trade-off.
 | | |
 |---|---|
 | **What** | Honest data policy (no concentration from an uncalibrated index; OLCI is a reference, not truth; 813 is simulated), grouped/spatial validation, negative controls |
-| **Evidence** | Validation screen A–F; `docs/VALIDATION_REPORT.md` (generated); `docs/LIMITATIONS.md`; 229 OLCI references; Spearman ρ between the S2 change and the OLCI contrast 0.58 for sediment-like candidates (n = 167) and ≈ 0 for bloom-like ones (n = 62), reported as the weakness it is |
+| **Evidence** | Validation screen A–F; `docs/VALIDATION_REPORT.md` (generated); `docs/LIMITATIONS.md`; <!--num:xsensor-->436 OLCI references; Spearman ρ between the S2 change and the OLCI contrast 0.46 for sediment-like candidates (n = 353) and -0.19 for bloom-like ones (n = 83)<!--/num:xsensor-->, reported as the weakness it is |
 | **Negative controls** | Annaba (RX 99.7th percentile but 6.6th seasonal percentile → stood down) and BB-AE-2023-001 (NDCI spike over unchanged blue water; OLCI ×1.1 → rejectable) |
 | **What we do not claim** | "HAB confirmed", species, toxins, concentrations, oil from SAR darkness, pollution sources from trajectories |
 

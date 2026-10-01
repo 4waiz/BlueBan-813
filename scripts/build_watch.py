@@ -46,11 +46,23 @@ def main():
         print(f"[{time.strftime('%H:%M:%S')}] {aoi_id} ...", flush=True)
         cache = (os.path.join(ROOT, "data", "cache", "watch",
                               f"{aoi_id}{a.suffix}") if a.cache else None)
-        ts = watch.screen_aoi(aoi_id, cfg[aoi_id]["bbox"], a.start, a.end,
-                              resolution_m=a.res, max_cloud=a.max_cloud,
-                              workers=a.workers, cache_dir=cache,
-                              zones=None if a.zones == "none" else a.zones,
-                              progress=lambda m: print(m, flush=True))
+        # A killed worker (sleep, memory pressure, session teardown) breaks the
+        # whole process pool. With --cache every finished datatake has a sidecar,
+        # so retrying resumes where it stopped instead of failing the AOI.
+        from concurrent.futures.process import BrokenProcessPool
+        for attempt in range(1, 6):
+            try:
+                ts = watch.screen_aoi(aoi_id, cfg[aoi_id]["bbox"], a.start, a.end,
+                                      resolution_m=a.res, max_cloud=a.max_cloud,
+                                      workers=a.workers, cache_dir=cache,
+                                      zones=None if a.zones == "none" else a.zones,
+                                      progress=lambda m: print(m, flush=True))
+                break
+            except BrokenProcessPool as e:
+                if attempt == 5 or not cache:
+                    raise
+                print(f"  worker pool broke ({e}); resuming from cache, attempt {attempt + 1}", flush=True)
+                time.sleep(10)
         ts["aoi"] = cfg[aoi_id]
         out = os.path.join(ROOT, "outputs", "watch", f"{aoi_id}{a.suffix}.json")
         with open(out, "w", encoding="utf-8") as f:

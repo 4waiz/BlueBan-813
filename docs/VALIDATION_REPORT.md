@@ -4,42 +4,46 @@
 
 ## UAE closed-loop validation (generated)
 
-Recomputed from the pipeline outputs on 2026-09-30T10:59:03Z. The same numbers drive the in-app Validation screen (sections A-F). The Annaba and Tanager experiments below this section are unchanged.
+Recomputed from the pipeline outputs on 2026-10-01T09:55:55Z. The same numbers drive the in-app Validation screen (sections A-F). The Annaba and Tanager experiments below this section are unchanged.
 
 ### A. Data quality
 
-2,860 Sentinel-2 L2A datatakes read over 6 UAE AOIs, 2,405 usable (>= 500 water pixels).
+5,080 Sentinel-2 L2A datatakes read over 10 UAE AOIs, 4,299 usable (>= 500 water pixels).
 
 | AOI | Period | Datatakes | Usable | Median valid | Glint-flagged water |
 |---|---|---|---|---|---|
+| AE-AUH-LAGOON | 2021-01-01 to 2026-09-29 | 755 | 666 | 100 % | 71 % |
 | AE-AUH-NORTH | 2021-01-01 to 2026-09-29 | 655 | 597 | 81 % | 40 % |
 | AE-AUH-TAWEELAH | 2021-01-01 to 2026-09-29 | 656 | 570 | 100 % | 51 % |
+| AE-DXB-JEBELALI | 2021-01-01 to 2026-09-29 | 739 | 551 | 12 % | 40 % |
 | AE-FUJ-DIBBA | 2021-01-03 to 2026-09-29 | 333 | 278 | 100 % | 95 % |
 | AE-FUJ | 2017-01-04 to 2026-09-29 | 563 | 456 | 100 % | 49 % |
+| AE-SHJ-AJM | 2021-01-03 to 2026-09-29 | 380 | 334 | 100 % | 85 % |
 | AE-SHJ-KALBA | 2021-01-03 to 2026-09-29 | 298 | 241 | 100 % | 20 % |
 | AE-SHJ-KHORFAKKAN | 2021-01-03 to 2026-09-29 | 355 | 263 | 100 % | 62 % |
+| AE-UAQ-RAK | 2021-01-03 to 2026-09-29 | 346 | 343 | 100 % | 76 % |
 
 ### B. Matchups
 
 * **In situ: 0.** No public per-sample UAE chlorophyll, turbidity or TSS measurements were found (docs/PUBLIC_UAE_DATA.md). The hackathon platform and gIQ hold none for UAE water (docs/AUTHENTICATED_DATA_AUDIT.md). A data request to EAD is drafted, not sent.
 * Physical units allowed: **no** (only 0 matchups (need >= 20); only 0 independent groups (need >= 5); no model could be evaluated).
-* **Cross-sensor reference (Sentinel-3 OLCI, not in situ): 229 labelled candidates**, median |dt| 25 min.
-  * SEDIMENT_LIKE: 144 confirmed / 23 not (TSM_NN); Spearman rho between the S2 change and the OLCI contrast 0.58 (p 0.0000, n 167).
-  * BLOOM_LIKE: 10 confirmed / 52 not (CHL_NN); Spearman rho between the S2 change and the OLCI contrast 0.00 (p 0.9798, n 62).
+* **Cross-sensor reference (Sentinel-3 OLCI, not in situ): 436 labelled candidates**, median |dt| 24 min.
+  * SEDIMENT_LIKE: 300 confirmed / 53 not (TSM_NN); Spearman rho between the S2 change and the OLCI contrast 0.46 (p 0.0000, n 353).
+  * BLOOM_LIKE: 23 confirmed / 60 not (CHL_NN); Spearman rho between the S2 change and the OLCI contrast -0.19 (p 0.0824, n 83).
 
 ### C. Model performance (triage, frozen validation)
 
-180 train / 49 validation labels (33 positive), stratified by class and grouped by AOI-month; validation hash `6a2b6524ca1a011a`.
+336 train / 100 validation labels (75 positive), stratified by class and grouped by AOI-month; validation hash `c30fc552449c0de0`.
 
 | Metric | Rule baseline (production) | Logistic candidate | Delta, grouped bootstrap 95 % CI |
 |---|---|---|---|
-| AUPRC | 0.590 | 0.953 | [0.158, 0.673] |
-| AUROC | 0.312 | 0.894 | [0.301, 0.990] |
-| F1 | 0.805 | 0.870 |  |
-| PRECISION | 0.673 | 0.833 |  |
-| RECALL | 1.000 | 0.909 |  |
-| BRIER | 0.267 | 0.122 |  |
-| ECE | 0.283 | 0.119 |  |
+| AUPRC | 0.658 | 0.936 | [0.039, 0.476] |
+| AUROC | 0.353 | 0.793 | [0.065, 0.944] |
+| F1 | 0.857 | 0.787 |  |
+| PRECISION | 0.750 | 0.787 |  |
+| RECALL | 1.000 | 0.787 |  |
+| BRIER | 0.222 | 0.156 |  |
+| ECE | 0.232 | 0.162 |  |
 
 The rule baseline has no skill against the cross-sensor reference; the learned candidate does, but the confidence interval is wide at this label count. Promotion still requires the gate and a named human.
 
@@ -47,17 +51,21 @@ The rule baseline has no skill against the cross-sensor reference; the learned c
 
 | Held-out AOI | n (positive) | AUPRC candidate | AUPRC rule |
 |---|---|---|---|
-| AE-AUH-NORTH | 60 (41) | 0.981 | 0.497 |
-| AE-AUH-TAWEELAH | 90 (74) | 0.996 | 0.669 |
-| AE-FUJ | 31 (11) | 0.495 | 0.340 |
-| AE-FUJ-DIBBA | 19 (12) | 0.882 | 0.860 |
+| AE-AUH-LAGOON | 10 (10) | n/a | n/a |
+| AE-AUH-NORTH | 60 (41) | 0.982 | 0.497 |
+| AE-AUH-TAWEELAH | 90 (74) | 0.998 | 0.669 |
+| AE-DXB-JEBELALI | 58 (46) | 0.992 | 0.618 |
+| AE-FUJ | 31 (11) | 0.563 | 0.340 |
+| AE-FUJ-DIBBA | 19 (12) | 0.937 | 0.860 |
+| AE-SHJ-AJM | 63 (52) | 0.935 | 0.729 |
 | AE-SHJ-KALBA | 14 (11) | 0.925 | 0.755 |
-| AE-SHJ-KHORFAKKAN | 15 (5) | 0.825 | 0.221 |
+| AE-SHJ-KHORFAKKAN | 15 (5) | 1.000 | 0.221 |
+| AE-UAQ-RAK | 76 (61) | 0.897 | 0.835 |
 
 ### F. Negative control
 
 * Annaba: RX 99.7th percentile in the scene, 6.6th seasonal percentile: stood down.
-* UAE: 75 of 229 referenced candidates were not confirmed by OLCI; the largest are high-z Sentinel-2 anomalies over water OLCI saw as ordinary (e.g. AE-FUJ 2023-10-25).
+* UAE: 113 of 436 referenced candidates were not confirmed by OLCI; the largest are high-z Sentinel-2 anomalies over water OLCI saw as ordinary (e.g. AE-FUJ 2023-10-25).
 
 <!-- END GENERATED -->
 

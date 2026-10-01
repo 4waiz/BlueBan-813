@@ -187,7 +187,7 @@ historical rather than deleted:
 | UAE as the hero, Annaba as negative control | Done: BB-AE-2024-001 (Fujairah, OLCI ×4.1 same morning); Annaba stood down | `outputs/incidents/`, `outputs/workspace/seed.json` |
 | Sentinel-2 L2A primary sensor, documented indices | Done | `pipeline/s2_features.py`, `docs/METHODOLOGY.md` Part A |
 | Per-pixel seasonal detection | Done | `pipeline/detect.py` |
-| Cross-sensor reference (never ground truth) | Done: 229 OLCI labels over six AOIs, weight 0.5 | `scripts/build_labels.py`, `pipeline/sentinel3.py` |
+| Cross-sensor reference (never ground truth) | Done: <!--num:nlabels-->436 OLCI labels over 10 AOIs<!--/num:nlabels-->, weight 0.5 | `scripts/build_labels.py`, `pipeline/sentinel3.py` |
 | Matchup engine, quantification zoo, calibration gate | Built and tested; 0 in-situ matchups exist, so no concentration is reported | `pipeline/matchup.py`, `pipeline/quantify.py` |
 | Real 813 reader | Built as a contract (refuses Lw without Ed); no product to read | `pipeline/satellite813_real.py` |
 | 813 A/B/C ablation | Done on the Annaba Tanager scene; UAE repeat awaits the Tarif scene download (approval pending) | `outputs/validation/detectability_lift_*.json` |

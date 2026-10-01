@@ -340,6 +340,51 @@ def write_report(out: dict) -> None:
         f.write(doc)
 
 
+def update_markers(out: dict) -> None:
+    """Rewrite the <!--num:x-->...<!--/num:x--> figures in the hand-written docs."""
+    import re as _re
+    C = out["C_model_performance"]
+    cs = out["B_matchups"]["cross_sensor"]
+    per, agr = cs.get("per_hypothesis") or {}, cs.get("agreement") or {}
+    bl, sd = per.get("BLOOM_LIKE", {}), per.get("SEDIMENT_LIKE", {})
+    rb = (agr.get("BLOOM_LIKE") or {}).get("spearman_rho")
+    rs = (agr.get("SEDIMENT_LIKE") or {}).get("spearman_rho")
+    loao = (out["E_spatial_holdout"].get("triage_leave_one_aoi_out") or [])
+    scored = [r for r in loao if r.get("candidate") and r.get("production")]
+    wins = sum(1 for r in scored if (r["candidate"]["auprc"] or 0) > (r["production"]["auprc"] or 0))
+    ci = ((C.get("bootstrap") or {}).get("auprc") or {}).get("ci") or [None, None]
+    cm = ((C.get("candidate") or {}).get("metrics") or {}).get("auprc")
+    pm = ((C.get("production") or {}).get("metrics") or {}).get("auprc")
+    naoi = len({l for l in (out.get("_label_aois") or [])}) or len(scored)
+    f2 = lambda v: "n/a" if v is None else f"{v:.2f}"
+    vals = {
+        "triage": (f"On the frozen validation set ({C.get('n_validation', 0)} labels) the learned triage candidate reaches "
+                   f"AUPRC {f2(cm)} vs {f2(pm)} for the rule it would replace; the grouped bootstrap 95 % interval on the "
+                   f"difference is [{f2(ci[0])}, {f2(ci[1])}]"
+                   + (", excluding zero" if ci[0] is not None and ci[0] > 0 else ", which still includes zero")
+                   + f", and it beats the rule on {wins} of {len(scored)} held-out AOIs (promotion still gated)"),
+        "xsensor": (f"{cs.get('n', 0)} OLCI references; Spearman ρ between the S2 change and the OLCI contrast {f2(rs)} "
+                    f"for sediment-like candidates (n = {sd.get('n', 0)}) and {f2(rb)} for bloom-like ones (n = {bl.get('n', 0)})"),
+        "bloom": (f"Only {bl.get('positive', 0)} of {bl.get('n', 0)} OLCI-referenced bloom-like candidates were confirmed, "
+                  f"versus {sd.get('positive', 0)} of {sd.get('n', 0)} sediment-like ones, and the size of the bloom-like NDCI "
+                  f"change {'does not track' if rb is None or abs(rb) < 0.2 else 'only partly tracks'} the OLCI chlorophyll "
+                  f"contrast (Spearman ρ {f2(rb)})."),
+        "labels": (f"{cs.get('n', 0)} cross-sensor labels, {C.get('n_validation', 0)} frozen for validation, dominated by "
+                   f"sediment-like candidates in shallow Gulf water where agreement is weaker evidence. The candidate's "
+                   f"AUPRC gain over the rule has a grouped bootstrap interval of [{f2(ci[0])}, {f2(ci[1])}]."),
+        "nlabels": f"{cs.get('n', 0)} OLCI labels over {naoi} AOIs",
+    }
+    for name in ("JUDGING_MATRIX.md", "LIMITATIONS.md", "MENTOR_REVAMP_AUDIT.md"):
+        path = os.path.join(ROOT, "docs", name)
+        if not os.path.exists(path):
+            continue
+        doc = open(path, encoding="utf-8").read()
+        for k, v in vals.items():
+            doc = _re.sub(rf"<!--num:{k}-->.*?<!--/num:{k}-->", lambda m: f"<!--num:{k}-->{v}<!--/num:{k}-->", doc, flags=_re.S)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(doc)
+
+
 def main():
     seed = load("outputs/workspace/seed.json")
     seed_labels = load("outputs/labels/seed_labels.json")
@@ -356,6 +401,8 @@ def main():
     with open(p, "w", encoding="utf-8") as f:
         json.dump(clean(out), f, separators=(",", ":"))
     write_report(clean(out))
+    labs = (load("outputs/labels/seed_labels.json") or {}).get("labels", [])
+    update_markers({**clean(out), "_label_aois": [l["aoi_id"] for l in labs]})
     print("->", p, "+ docs/VALIDATION_REPORT.md")
 
 

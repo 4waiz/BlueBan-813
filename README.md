@@ -18,7 +18,7 @@ WATCH ─► DETECT ─► DIAGNOSE ─► VERIFY ─► ACT ─► LEARN
   │         │          │           │        │       │
 Sentinel-2  per-pixel  spectrum,   analyst  field   verified labels ─► candidate model
 L2A over    seasonal   OLCI cross- review,  plan,   ─► frozen validation gate ─► human
-11 UAE AOIs anomaly    check, 813  audit    lab     promotion (production untouched
+10 UAE AOIs anomaly    check, 813  audit    lab     promotion (production untouched
             vs its own ablation    trail    results until the candidate is better)
             history
 ```

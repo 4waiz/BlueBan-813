@@ -36,6 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+inland = ["pandas>=2.0"]   # pipeline/inland/temporal.py (not needed to serve the precomputed results)
 
 [tool.setuptools]
 packages = ["pipeline", "services", "services.api"]

@@ -1,0 +1,21 @@
+{
+ "_schema": "SourceRecord, per pipeline/provenance.py (carried over from DesalGuard-main unmodified)",
+ "_note": "sha256 not yet computed -- device shell could not reach the mounted file when this record was written (see local integrity check note below). Compute with sha256sum against the file in 'sourced data/' before treating this record as tamper-evident, and fill the field in then.",
+ "satellite": "EnMAP",
+ "sensor": "HSI (VNIR + SWIR)",
+ "scene_id": "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z",
+ "acquisition_utc": "2022-09-08T07:30:13.226624Z",
+ "product": "ENMAP_HSI_L2A",
+ "processing_level": "L2A",
+ "provider": "DLR / EOC Geoservice",
+ "licence": "proprietary (per STAC collection record license field -- NOT CC-BY; exact redistribution/display terms not yet confirmed, see docs/DATA_ACCESS_AUDIT.md section 1)",
+ "native_resolution_m": 30.0,
+ "bands_used": [],
+ "wavelengths_nm": [],
+ "units": "surface reflectance (card4l:specification = SR), produced under correctionType = Land_Mode, waterReflectanceProduct = NA -- not a water-specific atmospheric correction. See docs/DATA_ACCESS_AUDIT.md before assuming this behaves like DesalGuard-main's Tanager surface reflectance over water.",
+ "quality_mask": "separate COG assets shipped alongside the image: quality_classes, quality_cloud, quality_cloud_shadow, quality_haze, quality_cirrus, quality_snow, defective_pixel_mask (not yet downloaded/inspected)",
+ "access_url": "https://download.geoservice.dlr.de/ENMAP/files/L2A/2022/09/08/DT0000003309/06/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.TIF",
+ "local_path": "sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+ "sha256": "",
+ "notes": "Downloaded directly by project owner via DLR/UMS self-service account (see docs/DATA_ACCESS_AUDIT.md section 3). Downloaded file size 415,173,616 bytes vs product's own reported size 352,981,669 bytes (METADATA.XML <base><size>) -- difference attributed to COG re-encoding on download, not verified further. Footprint confirmed by point-in-polygon test to fully contain the locked aoi/shawka_dam.geojson polygon (50/50 vertices), using tile _006_ specifically -- the sibling tile _007_ from the same datatake does NOT contain the AOI. Scene quality per its own METADATA.XML: cloudCover 0, hazeCover 1, cirrusCover 0, snowCover 0, waterCover 0 (scene-wide flag, not a per-pixel AOI statement), overallQuality 0 (nominal per DLR FAQ), sceneSZA (solar zenith) 22 deg, deadPixelsVNIR 137, deadPixelsSWIR 1531, defectivePixelsVNIR 2, defectivePixelsSWIR 12, productScreeningResult OK / failedGroups NONE. Citation from the product itself: \"DLR (2025): EnMAP L0 Product 0000003309_06_L0_20220908T201017_010402_20251029 doi: 10.15489/rlyibn8gjc58 Processed to level 2A (version: 010502, parameters: U0BLNNTS284G)\"."
+}

@@ -1,0 +1,29 @@
+{
+ "date_label": "20220908",
+ "geotiff": "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+ "precropped": false,
+ "window_shape": [
+  25,
+  30
+ ],
+ "px_inside_locked_polygon": 84,
+ "px_water_final": 10,
+ "px_water_inside_polygon": 10,
+ "px_water_outside_polygon": 0,
+ "wet_fraction_of_polygon_pct": 11.904761904761905,
+ "brightness_max": 0.11,
+ "short_long_index_min": 0.0,
+ "min_component_px": 3,
+ "buffer_px": 0,
+ "scipy_available": true,
+ "bad_bands_dropped": [
+  129,
+  130,
+  131,
+  132,
+  133,
+  134
+ ],
+ "px_water_raw": 11,
+ "px_water_after_components": 10
+}

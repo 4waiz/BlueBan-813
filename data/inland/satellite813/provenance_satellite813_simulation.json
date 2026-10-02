@@ -1,0 +1,51 @@
+{
+ "result_id": "satellite813_real_simulation_shawka_dam_v1",
+ "result_kind": "satellite813_simulation",
+ "sources": [],
+ "algorithm": {
+  "name": "simulate_813_enmap (Gaussian-SRF resample, real EnMAP source axis)",
+  "description": "Per-band Gaussian spectral-response-function resample of both EnMAP scenes' persistent-wet-core test pixels onto Satellite 813's published band configuration. EnMAP's source wavelength axis is REAL (data/metadata/enmap_band_characterisation.json, cross-validated against DLR's own STAC eo:bands metadata) -- this REVERSES the prior inland_simulator_built=false decision now that the condition that decision itself named for reversal is met. 813's own band grid remains the one explicit, documented assumption (spec_813(), copied unmodified from DesalGuard-main), matching DesalGuard's own one-assumption standard for its Tanager-to-813 simulator.",
+  "reference": "pipeline/satellite813.py; DesalGuard-main/pipeline/satellite813.py gaussian_srf_matrix()/resample_spectra() (copied verbatim, general method); data/metadata/enmap_band_characterisation.json (real EnMAP source axis)",
+  "parameters": {
+   "spec_813_defaults": "lo=400, hi=1700, sampling=5.0, n_bands=205, spatial_m=20.0",
+   "min_support": 0.5,
+   "gaussian_truncate_sigma": 3.0,
+   "reflectance_scale": "1/10000"
+  },
+  "inputs": [
+   "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "/mnt/attach/outputs/813-inland-standalone-complement/data/metadata/enmap_band_characterisation.json",
+   "https://spaceacademy-hackathons.space.gov.ae/data"
+  ],
+  "units_out": "simulated 813-band reflectance (unitless, EnMAP DN/10000 convention), NaN where unsupported",
+  "assumptions": [
+   "813's band layout is evenly spaced across its published range (DesalGuard-main's own explicit, documented assumption in spec_813(), reproduced unmodified here) -- the ONE remaining assumption in this simulation, same as DesalGuard's own Tanager-to-813 case."
+  ],
+  "limitations": [
+   "No spatial resampling: EnMAP's 30 m stays 30 m, not upsampled to 813's 20 m (would invent spatial detail the source never measured -- same position DesalGuard-main's own simulator takes).",
+   "Only the persistent-wet-core test pixels (10 per date) are resampled and saved per-pixel here, not the full AOI window -- this project's validated water population, per docs/WATER_MASK.md section 12.",
+   "813 bands below EnMAP's real coverage floor (EnMAP starts at 420 nm; 813's published range starts at 400 nm) have NO real EnMAP support at any pixel and come back NaN -- a real, computed finding (see unsupported_813_wavelength_ranges_nm in the saved report), not an approximation.",
+   "813's own configuration remains assumed (evenly-spaced across its published range) -- this simulation is only as faithful as that published-spec assumption, exactly DesalGuard's own caveat for its Tanager simulator."
+  ]
+ },
+ "code_version": "uncommitted",
+ "schema_version": "1.0",
+ "processed_utc": "2026-09-19T11:35:48Z",
+ "environment": {
+  "python": "3.11.15",
+  "platform": "Linux"
+ },
+ "extra": {
+  "summary": {
+   "2022-09-08": {
+    "n_813_bands_with_real_support": 196,
+    "n_813_bands_without_real_support": 9
+   },
+   "2024-04-24": {
+    "n_813_bands_with_real_support": 196,
+    "n_813_bands_without_real_support": 9
+   }
+  }
+ }
+}

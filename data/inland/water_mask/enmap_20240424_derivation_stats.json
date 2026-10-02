@@ -1,0 +1,28 @@
+{
+ "date_label": "20240424",
+ "geotiff": "sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+ "precropped": true,
+ "window_shape": [
+  25,
+  30
+ ],
+ "px_inside_locked_polygon": 84,
+ "px_water_final": 4,
+ "px_water_inside_polygon": 4,
+ "px_water_outside_polygon": 0,
+ "wet_fraction_of_polygon_pct": 4.761904761904762,
+ "brightness_max": 0.11,
+ "short_long_index_min": 0.0,
+ "min_component_px": 3,
+ "buffer_px": 0,
+ "scipy_available": true,
+ "bad_bands_dropped": [
+  130,
+  131,
+  132,
+  133,
+  134
+ ],
+ "px_water_raw": 8,
+ "px_water_after_components": 4
+}

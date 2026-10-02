@@ -1,0 +1,28 @@
+{
+ "_schema": "SourceRecord, per pipeline/provenance.py (carried over from DesalGuard-main unmodified)",
+ "_note": "sha256 not yet computed -- device shell could not reach the mounted file when this record was written (see local integrity check note below). Compute with sha256sum against the file in 'sourced data/' before treating this record as tamper-evident, and fill the field in then.",
+ "satellite": "EnMAP",
+ "sensor": "HSI (VNIR + SWIR)",
+ "scene_id": "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z",
+ "acquisition_utc": "2024-04-24T07:30:16.236194Z",
+ "product": "ENMAP_HSI_L2A",
+ "processing_level": "L2A",
+ "provider": "DLR / EOC Geoservice",
+ "licence": "proprietary (per STAC collection record license field -- NOT CC-BY; exact redistribution/display terms not yet confirmed, see docs/DATA_ACCESS_AUDIT.md section 1)",
+ "native_resolution_m": 30.0,
+ "bands_used": [],
+ "wavelengths_nm": [],
+ "units": "surface reflectance (card4l:specification = SR), produced under correctionType = Land_Mode, waterReflectanceProduct = NA -- not a water-specific atmospheric correction. See docs/DATA_ACCESS_AUDIT.md before assuming this behaves like DesalGuard-main's Tanager surface reflectance over water.",
+ "quality_mask": "separate COG assets shipped alongside the image: quality_classes, quality_cloud, quality_cloud_shadow, quality_haze, quality_cirrus, quality_snow, defective_pixel_mask (not yet downloaded/inspected)",
+ "access_url": "https://download.geoservice.dlr.de/ENMAP/files/L2A/2024/04/24/DT0000070441/06/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-SPECTRAL_IMAGE_COG.TIF",
+ "local_path": "sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-SPECTRAL_IMAGE_COG.tiff",
+ "sha256": "",
+ "notes": "Downloaded directly by project owner via DLR/UMS self-service account (see docs/DATA_ACCESS_AUDIT.md section 3). Downloaded file size 421,431,498 bytes vs product's own reported size 362,650,458 bytes (METADATA.XML <base><size>) -- difference attributed to COG re-encoding on download, not verified further. Footprint confirmed by point-in-polygon test to fully contain the locked aoi/shawka_dam.geojson polygon (50/50 vertices), using tile _006_ specifically -- the sibling tile _005_ from the same datatake does NOT contain the AOI. Scene quality per its own METADATA.XML: cloudCover 0, hazeCover 0, cirrusCover 0, snowCover 0, waterCover 0 (scene-wide flag, not a per-pixel AOI statement), overallQuality 0 (nominal per DLR FAQ), sceneSZA (solar zenith) 16 deg, deadPixelsVNIR 137, deadPixelsSWIR 1509, defectivePixelsVNIR 2, defectivePixelsSWIR 12, productScreeningResult OK / failedGroups NONE. Citation from the product itself: \"DLR (2026): EnMAP L0 Product 0000070441_06_L0_20240424T200611_010402_20260318 doi: 10.15489/rlyibn8gjc58 Processed to level 2A (version: 010502, parameters: U0BLNNTS322G)\".",
+ "derivatives": {
+  "aoi_crop": {
+   "path": "sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "bytes": 264247,
+   "how": "This full file (421,431,498 bytes) exceeds this Cowork session's per-file device-staging cap (~400 MiB) and was never brought into the cloud workspace whole. device_bash, which would normally crop it in place on the project owner's machine, was blocked for the whole project by a tracked Windows-mount issue. The project owner ran scripts/crop_enmap_scene.py locally instead (same AOI-bbox + 150 m buffer window used for the 2022-09-08 scene) and the resulting 264,247-byte, 224-band crop was staged normally. See data/water_mask/provenance_20240424.json and docs/WATER_MASK.md sections 8-9 for what was derived from it."
+  }
+ }
+}

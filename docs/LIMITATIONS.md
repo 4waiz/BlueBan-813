@@ -326,3 +326,44 @@ remains untested.
 * We did not suppress the temporal result that downgraded our own headline
   event from HIGH_PRIORITY.
 * We did not convert an index into a concentration without calibration data.
+
+---
+
+## Inland complement: Shawka Dam (appended 2026-10-02)
+
+The inland module ([`docs/inland/`](inland/README.md)) has its own limitations, stated
+in its documents and summarised here in the same form: what it is, what it means,
+what would remove it. Two caveats are carried over exactly:
+
+* **Licence.** EnMAP's license is "proprietary" with redistribution terms not yet confirmed for public submission. *Means:* per-pixel EnMAP reflectance layers and spectra are
+  kept out of the public repository and site (`data/inland/restricted/`,
+  gitignored); only derived masks, scores and counts are published, with
+  attribution. *Removed by:* written confirmation of the redistribution and display
+  terms from DLR.
+* **Detector size.** the anomaly/fingerprint results are based on a ~10-17 pixel background population, not a calibrated detector. *Means:* RX scores and fingerprint classes on the wet
+  core are descriptive. The test pixels are also part of the background they are
+  scored against, so the 0 RX events on both dates is structural, not evidence of
+  normal water. *Removed by:* a larger water body or more dates, and a background
+  population disjoint from the test pixels.
+
+Further limitations:
+
+* **Two dates, and the second does not confirm the first.** With unchanged
+  thresholds the 2022-09-08 mask has 10 px and the 2024-04-24 mask 4 px, with no overlap; the
+  persistent core (10 px) rests on darkness on both dates, and a real MNDWI finds
+  0 px. *Removed by:* a third EnMAP date. The open archive already lists
+  candidates whose footprints contain the polygon (2024-04-20 at 4 % cloud,
+  2023-12-30 and 2024-11-22 at 7 %).
+* **Temporal flags are within chance.** 7 of 28 observations flag at |z| > 1.5, and pure
+  noise would flag 3.7–12.2 depending on how correlated the four indices are. The
+  cross-sensor Sep–Oct 2025 cluster is the readable part. *Removed by:* a longer
+  baseline (Sentinel-2 since 2017) and a seasonal climatology.
+* **Land correction over water.** EnMAP L2A here is Land_Mode surface reflectance,
+  not a water-leaving product. *Removed by:* EnMAP's water mode or an aquatic
+  atmospheric correction.
+* **A drying target.** The most recent imagery (Sep–Oct 2025) shows 0.2–1.0 % of
+  the AOI wet; the next acquisition may have no water to analyse. Sentinel-3 OLCI
+  cannot help (the pool is sub-pixel at 300 m).
+* **Band table.** The per-band wavelengths used for both dates match the
+  2024-04-24 item only (REVIEW_FLAGS F2). *Removed by:* re-running the 2022-09-08
+  derivations with that item's own table, which needs the raw scene from the module owner.

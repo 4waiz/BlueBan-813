@@ -1,0 +1,46 @@
+{
+ "2022-09-08": {
+  "enmap_wavelength_range_nm": [
+   420.0,
+   2450.0
+  ],
+  "spec813_wavelength_range_nm": [
+   400.0,
+   1700.0
+  ],
+  "overlap_range_nm": [
+   420.0,
+   1700.0
+  ],
+  "overlap_width_nm": 1280.0,
+  "enmap_n_bands_valid_this_aoi": 218,
+  "enmap_avg_band_spacing_nm": 9.355,
+  "spec813_n_bands": 205,
+  "spec813_avg_band_spacing_nm": 6.373,
+  "spatial_resolution_ratio_enmap_over_813": 1.5,
+  "note": "Coverage/configuration comparison only -- NOT a per-band or per-pixel spectral simulation. EnMAP's spectral range fully contains 813's published range (420-2450 nm vs 400-1700 nm, overlapping at 420-1700 nm). On a whole-range-AVERAGE basis (not a per-band claim), EnMAP's 218 valid bands across its much wider 2030 nm range average ~9.4 nm/band, coarser than 813's published config averaging ~6.4 nm/band across its narrower 1300 nm range -- i.e. 813's published configuration is the denser one on this whole-range average, not EnMAP; EnMAP's own per-band resolution within its VNIR portion is likely finer than this whole-range average suggests (nominal 6.5 nm VNIR / 10 nm SWIR per config/project.yaml), but that per-band detail cannot be placed without the still-missing wavelength table, so it is not claimed here. EnMAP is spatially coarser (30 m vs 813's 20 m) -- the direction DesalGuard-main's own simulator also does not correct for (it states outright that upsampling Tanager's 30 m to 813's 20 m 'would invent spatial detail the source never measured' and declines to do it -- same reasoning applies here).",
+  "decision": "This coarse comparison is retained alongside, not instead of, a real per-band simulator: as of 2026-09-19 data/metadata/enmap_band_characterisation.json provides EnMAP's real per-band wavelength grid (pulled from DLR's own STAC eo:bands metadata, cross-validated -- see that file's source.cross_validation field), so simulate_813_enmap() below performs the real Gaussian-SRF resample onto 813's published (still assumed, per spec_813()) configuration. See pipeline/satellite813.py module docstring and docs/SATELLITE_813_DECISION.md for the full reasoning behind this reversal from the original inland_simulator_built=false decision."
+ },
+ "2024-04-24": {
+  "enmap_wavelength_range_nm": [
+   420.0,
+   2450.0
+  ],
+  "spec813_wavelength_range_nm": [
+   400.0,
+   1700.0
+  ],
+  "overlap_range_nm": [
+   420.0,
+   1700.0
+  ],
+  "overlap_width_nm": 1280.0,
+  "enmap_n_bands_valid_this_aoi": 219,
+  "enmap_avg_band_spacing_nm": 9.312,
+  "spec813_n_bands": 205,
+  "spec813_avg_band_spacing_nm": 6.373,
+  "spatial_resolution_ratio_enmap_over_813": 1.5,
+  "note": "Coverage/configuration comparison only -- NOT a per-band or per-pixel spectral simulation. EnMAP's spectral range fully contains 813's published range (420-2450 nm vs 400-1700 nm, overlapping at 420-1700 nm). On a whole-range-AVERAGE basis (not a per-band claim), EnMAP's 219 valid bands across its much wider 2030 nm range average ~9.3 nm/band, coarser than 813's published config averaging ~6.4 nm/band across its narrower 1300 nm range -- i.e. 813's published configuration is the denser one on this whole-range average, not EnMAP; EnMAP's own per-band resolution within its VNIR portion is likely finer than this whole-range average suggests (nominal 6.5 nm VNIR / 10 nm SWIR per config/project.yaml), but that per-band detail cannot be placed without the still-missing wavelength table, so it is not claimed here. EnMAP is spatially coarser (30 m vs 813's 20 m) -- the direction DesalGuard-main's own simulator also does not correct for (it states outright that upsampling Tanager's 30 m to 813's 20 m 'would invent spatial detail the source never measured' and declines to do it -- same reasoning applies here).",
+  "decision": "This coarse comparison is retained alongside, not instead of, a real per-band simulator: as of 2026-09-19 data/metadata/enmap_band_characterisation.json provides EnMAP's real per-band wavelength grid (pulled from DLR's own STAC eo:bands metadata, cross-validated -- see that file's source.cross_validation field), so simulate_813_enmap() below performs the real Gaussian-SRF resample onto 813's published (still assumed, per spec_813()) configuration. See pipeline/satellite813.py module docstring and docs/SATELLITE_813_DECISION.md for the full reasoning behind this reversal from the original inland_simulator_built=false decision."
+ }
+}

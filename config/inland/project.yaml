@@ -1,0 +1,623 @@
+# 813 Inland Complement — Shawka Dam
+# All values here are traceable to a documented source. See docs/DATA_ACCESS_AUDIT.md
+# and docs/AOI_SELECTION.md.
+#
+# This is a standalone complement to the team's coastal PoC (DesalGuard-main /
+# BLUEBAN 813), not a fork or a dependency of it. Nothing here reads from or
+# writes to that repository. Structure mirrors it intentionally so that if the
+# team later wants to fold this in, it is a copy-and-namespace operation, not
+# a rewrite.
+
+project:
+  name: 813 Inland Complement
+  tagline: The challenge lists rivers and reservoirs alongside coastal zones. This is the inland half of the answer.
+  team: Kanban
+  challenge: Water Quality & Inland/Coastal Water Intelligence
+  programme: Arab Youth Space Hackathon 2026 — 813 Challenge
+  version: 0.4.0
+  status: >
+    PIPELINE CONSTRUCTION — REAL EnMAP WAVELENGTH TABLE OBTAINED, WATER
+    MASK REDESIGNED (SUCCESS), ANOMALY/FINGERPRINT LAYER EXTENDED
+    (CYANO_LIKE), SATELLITE 813 SIMULATOR REVERSED-IN, TEMPORAL DETECTOR
+    BUILT. Updated 2026-09-19 (second pass, same day as the water-mask
+    redesign below). The single most consequential open item — EnMAP's
+    real per-band wavelength/FWHM table — was obtained via the DLR STAC
+    catalog's own eo:bands metadata (not the blocked METADATA.XML route)
+    and cross-validated (docs/WATER_MASK.md section 14.1). This unblocked
+    three things explicitly left open pending it: (1) a real-band MNDWI
+    was built and directly compared against the existing band-GROUPS
+    persistent_wet_core() — it does NOT recover the same 10-pixel core at
+    any tested threshold, which independently reproduces (with real named
+    bands, not a coarse proxy) the same cross-date spectral-shape
+    instability section 9 already found, REINFORCING
+    persistent_wet_core()'s darkness-persistence redesign rather than
+    undermining it (docs/WATER_MASK.md section 14.2); (2)
+    pipeline/fingerprint.py's CYANO_LIKE class is now computable and was
+    run — it clears its evidence gate for 1 of 20 test-core pixels
+    (secondary to CDOM_LIKE there, never top-class for any pixel) — see
+    docs/ANOMALY_AND_FINGERPRINT.md section 3.2a; (3) the Satellite 813
+    decision is REVERSED — a real per-band Gaussian-SRF simulator is now
+    built (pipeline/satellite813.py:simulate_813_enmap()), since the
+    two-assumption problem the original decision turned on no longer
+    applies once EnMAP's grid is real — see
+    docs/SATELLITE_813_DECISION.md. Separately, the reused 14-month S2/
+    Landsat baseline was wired into an actual multi-scene temporal
+    deviation detector (not just a single-date plausibility check) —
+    docs/TEMPORAL_BASELINE_DETECTOR.md; it flags a real, cross-sensor-
+    corroborated turbidity/chlorophyll deviation in Sep-Oct 2025, the same
+    window already known to be the driest in the series. pipeline/
+    anomaly.py and pipeline/fingerprint.py's group-based classes continue
+    to run against both dates within the validated wet core —
+    docs/ANOMALY_AND_FINGERPRINT.md documents a real, stated statistical
+    limitation (background population is tens, not thousands, of pixels)
+    rather than a calibrated result. Every field below is a locked input,
+    a verified external fact, an explicit placeholder, or a computed
+    result with its derivation documented. Two questions remain explicitly
+    open for the team, not decided here: the backup-dam candidate, and
+    whether inland coverage is strictly required for the submission.
+  relationship_to_team_submission: >
+    Standalone complement, built in its own folder. Does not merge into,
+    edit, or depend on DesalGuard-main. Reuses two pieces of data from an
+    earlier, separate, paused project (BluePulse-813) by copy, not by
+    reference — see data/metadata/ and docs/AOI_SELECTION.md for exactly
+    what was reused and cited.
+
+# ---------------------------------------------------------------------------
+# AOI — locked polygon, not a search-radius approximation
+# ---------------------------------------------------------------------------
+aoi:
+  id: AE-SHAWKA
+  name: Shawka Dam
+  country: United Arab Emirates
+  emirate: Ras Al Khaimah
+  # Locked polygon supplied by project owner: aoi/shawka_dam.geojson
+  # (irregular ~660 m x 460 m dam-pool trace, not a bbox approximation).
+  bbox: [56.040957, 25.103107, 56.047007, 25.10721]
+  polygon_source: aoi/shawka_dam.geojson
+  polygon_area_deg2_approx: 0.000012      # ~small; wadi-channel trace, not open-water-only
+  note: >
+    The polygon traces the wadi channel, not just the current wet extent.
+    AOI-mean water indices read negative (dry) in every one of 14 sampled
+    historical months. A real, trackable wet core exists at the pixel
+    level inside the polygon (max NDWI 0.41), but it is small, seasonal,
+    and was trending toward dry in the two most recent sampled months
+    (Sep-Oct 2025). See docs/AOI_SELECTION.md section on wet-core evidence
+    before assuming standing water is present on any given date.
+
+# ---------------------------------------------------------------------------
+# SENSOR CASCADE — status per sensor is a checked fact, not an assumption.
+# See docs/DATA_ACCESS_AUDIT.md for how each line was verified.
+# ---------------------------------------------------------------------------
+sensors:
+  stage_a_regional_watch:
+    sensor: Sentinel-3 OLCI
+    product: sentinel-3-olci-wfr-l2-netcdf
+    provider: Microsoft Planetary Computer (ESA/Copernicus)
+    status: CONFIRMED UNUSABLE for this AOI
+    reason: >
+      WFR L2 is land-masked at 300 m native resolution; the AOI is
+      sub-pixel and mostly land at that scale. 0 valid water pixels
+      returned across 6 sampled scenes (BluePulse-813 audit, reused here).
+      Do not re-attempt without a materially different AOI.
+
+  stage_b_spatial_detail_and_temporal_baseline:
+    sensors: [Sentinel-2 MSI, Landsat 8/9 OLI-TIRS]
+    products: [sentinel-2-l2a, landsat-c2-l2]
+    provider: Microsoft Planetary Computer (ESA/Copernicus, USGS)
+    status: BASELINE IN HAND (reused, not recollected)
+    source: >
+      BluePulse-813 (earlier, separate, paused project) — 14 monthly
+      observations per sensor, Sep 2023-Oct 2025, lowest-cloud scene per
+      month. Copied into data/ here; original stays in BluePulse-813 and
+      is not modified.
+    caveat: >
+      Landsat OLI has no red-edge band; its chlorophyll/red-tide proxies
+      use a NIR/Red two-band ratio, a coarser analogue of the Sentinel-2
+      red-edge form. Carried over as-is from the source data's own note.
+
+  stage_c_spectral_forensics:
+    sensor: EnMAP HSI (VNIR + SWIR)
+    product: ENMAP_HSI_L2A
+    provider: DLR / EOC Geoservice
+    status: DATA IN HAND for 2 scenes; STAC-confirmed for 3 more
+    reason_tanager_not_used: >
+      Planet Tanager-1's open STAC catalog was enumerated across all 9
+      collections (not just coastal-water-bodies): 276 items total as of
+      the check date, exactly one of which touches the UAE at all (the
+      Tarif/Abu Dhabi coastal scene DesalGuard-main already uses). Zero
+      Tanager coverage anywhere inland in the UAE. See
+      docs/DATA_ACCESS_AUDIT.md.
+    licence_flag: >
+      EnMAP L2A's own STAC collection record states license: "proprietary"
+      (not CC-BY like Tanager). Access requires a DLR/UMS account and its
+      Acceptable Use Policy. Flagged here deliberately, not buried — see
+      docs/DATA_ACCESS_AUDIT.md section 1 before treating this data the
+      same way as the openly-licensed Tanager source.
+
+  stage_d_thermal_context:
+    status: NOT YET BUILT
+    note: Deferred to the pipeline-construction phase, mirroring DesalGuard-main's Landsat stage once one exists here.
+
+# ---------------------------------------------------------------------------
+# EnMAP SCENES — selected in docs/AOI_SELECTION.md
+# ---------------------------------------------------------------------------
+enmap:
+  spec:
+    n_bands: 224
+    n_bands_source: >
+      Counted directly from the 2022-09-08 GeoTIFF's own file attributes —
+      both rasterio (ds.count) and the raw TIFF IFD (SamplesPerPixel /
+      BitsPerSample tag count) agree: 224. NOT yet independently re-verified
+      against the 2024-04-24 scene (that file, 421,431,498 bytes, exceeds
+      this environment's per-file staging cap and could not be opened for
+      pixel-level work — see docs/WATER_MASK.md open items) — assumed same
+      band count as the same product type/version (V010502), not verified
+      for that file specifically.
+      Note: this does NOT match DLR's own EnMAP HSI Product Specification
+      document (EN-PCV-ICD-2009-2), which states the nominal design is 91
+      VNIR + 131 SWIR = 222 bands. 224 (this file) vs 222 (nominal ICD
+      spec) is a real, stated discrepancy, not reconciled here — plausibly
+      a processor-version or band-configuration difference over the
+      product's history (DLR's own FAQ separately notes a SWIR band
+      configuration change in July 2023), not investigated further.
+    wavelength_range_nm: [420.0, 2450.0]
+    wavelength_range_source: >
+      DLR's own EnMAP HSI Instrument Specification
+      (https://www.enmap.org/data/doc/EnMAP_Specs.pdf): "Spectral range:
+      420 nm - 2450 nm" (VNIR 420-1000 nm, SWIR 900-2450 nm, overlapping
+      900-1000 nm). This is the mission's own primary technical document,
+      not Wikipedia.
+    vnir_range_nm: [420.0, 1000.0]
+    swir_range_nm: [900.0, 2450.0]
+    fwhm_nominal_nm: {vnir: 6.5, swir: 10.0}
+    fwhm_nominal_source: >
+      Same DLR EnMAP_Specs.pdf document ("Spectral sampling distance:
+      6.5 nm VNIR / 10 nm SWIR"). This is the INSTRUMENT-level nominal
+      design figure; see band_characterisation_table below for the real
+      per-band values, now obtained.
+    spatial_resolution_m: 30.0
+    spatial_resolution_source: >
+      Confirmed two independent ways: (1) DLR's own EnMAP_Specs.pdf states
+      "Ground Sampling Distance: 30 m x 30 m"; (2) the 2022-09-08 GeoTIFF's
+      own geotransform (ModelPixelScaleTag) is (30.0, 30.0) exactly.
+    swath_km: 30.0
+    swath_km_source: 'DLR''s own EnMAP_Specs.pdf ("swath width: 30 km").'
+    band_characterisation_table: >
+      OBTAINED (2026-09-19), via a different route than originally
+      planned. The METADATA.XML download path described below (kept for
+      the record) remains blocked -- never obtained. Instead, the real
+      per-band center wavelength + FWHM was pulled from the DLR STAC
+      catalog's own eo:bands field on each EnMAP STAC item, which carries
+      the same per-band values without that authenticated XML download.
+      Cross-validated by independently re-fetching the same field multiple
+      times (different STAC item URLs, both acquired scenes; different
+      request chunking) and checking bit-for-bit numeric agreement, plus
+      two physical-plausibility checks (VNIR/SWIR detector-overlap FWHM
+      alternation; the empirically-found nodata band gaps landing exactly
+      on a genuine gap in the real band-centre sequence). Saved at
+      data/metadata/enmap_band_characterisation.json (224 bands, with its
+      own source/cross_validation/caveat fields). Full write-up:
+      docs/WATER_MASK.md section 14.1. This unblocked a real-band MNDWI
+      (docs/WATER_MASK.md section 14.2), pipeline/fingerprint.py's
+      CYANO_LIKE class (docs/ANOMALY_AND_FINGERPRINT.md section 3.2a),
+      and pipeline/satellite813.py's per-band simulator
+      (docs/SATELLITE_813_DECISION.md section 3).
+
+      Original (blocked) route, kept for the record: EnMAP's own FAQ
+      states METADATA.XML carries a specific/bandCharacterisation
+      structure per band; neither downloaded GeoTIFF embeds it (checked
+      directly at the raw TIFF-tag level for the 2022-09-08 file -- no
+      band descriptions, no per-band tags, no GDAL_METADATA band array),
+      and the copy of that scene's METADATA.XML pasted into this
+      project's chat history was truncated before reaching that section.
+      The actual XML file was never saved locally and this route remains
+      unobtained -- the residual caveat in the STAC-derived table (see
+      its own source.caveat field) is that agreement across independent
+      STAC fetches is strong evidence against hallucination but is not
+      the same as independently re-deriving the numbers from this raw
+      XML.
+
+  candidate_scenes_footprint_verified:
+    # All 5 confirmed by point-in-polygon test of the ACTUAL STAC item
+    # footprint geometry against the locked aoi/shawka_dam.geojson polygon
+    # (50/50 polygon vertices inside each footprint) -- not bbox overlap,
+    # and not the earlier Wadi Shawka geotag point.
+    - id: ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z
+      date: '2022-09-08'
+      cloud_cover_pct: 0
+      overall_quality: 0        # DLR code 0 = nominal (per EnMAP FAQ)
+      status: ACQUIRED
+    - id: ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z
+      date: '2024-04-24'
+      cloud_cover_pct: 0
+      overall_quality: 0
+      status: ACQUIRED
+    - id: ENMAP01-____L2A-DT0000069894_20240420T072639Z_001_V010502_20260316T072928Z
+      date: '2024-04-20'
+      cloud_cover_pct: 4
+      overall_quality: 0
+      status: not yet downloaded
+    - id: ENMAP01-____L2A-DT0000055859_20231230T072337Z_014_V010502_20260121T021149Z
+      date: '2023-12-30'
+      cloud_cover_pct: 7
+      overall_quality: 0
+      status: not yet downloaded
+    - id: ENMAP01-____L2A-DT0000102385_20241122T072642Z_006_V010502_20260624T043554Z
+      date: '2024-11-22'
+      cloud_cover_pct: 7
+      overall_quality: 0
+      status: not yet downloaded
+
+  excluded_scenes:
+    # Caught during due diligence, not by inspection of cloud/quality alone:
+    # 3 scenes matched the search bbox with eo:cloud_cover=0 and
+    # enmap:overallQuality=2, which looked best at first glance. All 3 are
+    # ASCENDING-node passes at sun_elevation = 0.0 (night). The EnMAP FAQ
+    # states overallQuality=2 specifically means LOW QUALITY, assigned when
+    # sun elevation <= 0. Excluded; kept here so nobody re-adds them later
+    # by re-running the same search without the same check.
+    - id: ENMAP01-____L2A-DT0000154725_20250925T191313Z_001_V010502_20250926T190150Z
+      reason: nighttime ascending pass, sun_elevation=0, overallQuality=2 (LOW QUALITY per DLR FAQ)
+    - id: ENMAP01-____L2A-DT0000154726_20250924T184811Z_001_V010502_20250925T165420Z
+      reason: same as above
+    - id: ENMAP01-____L2A-DT0000154727_20250921T190945Z_001_V010502_20250923T101714Z
+      reason: same as above
+
+  atmospheric_correction_finding: >
+    Land_Mode / waterReflectanceProduct:NA, addressed directly (not built on
+    top of silently) — see docs/WATER_MASK.md section "Land_Mode" and
+    docs/DATA_ACCESS_AUDIT.md section 2.1 for the full sourcing. Plain
+    conclusion: this IS a real, bounded limitation, not a non-issue — DLR's
+    own Land_Mode processor note states its water-vapor retrieval "is not
+    valid over dark surfaces (water)" and substitutes the LAND-average
+    water-vapor value over water pixels rather than retrieving it locally,
+    because these two scenes were never run through EnMAP's separate
+    water-specific processor (Water_Mode / Combined mode with a dedicated
+    water-leaving-reflectance product). This can bias ABSOLUTE reflectance
+    over the wet core, especially near the APDA water-vapor channels
+    (~0.94/1.13 micron). It is not treated as fatal to the water_mask work
+    above because that work is (a) a broad-band, threshold-based
+    classification rather than an absolute-radiometry retrieval, and (b)
+    independently validated against a baseline (reused S2/Landsat NDWI)
+    that was never subject to this same processing assumption. It WOULD
+    matter if this project later computes an absolute water-quality metric
+    (turbidity, chlorophyll proxy, etc.) directly from these two scenes'
+    reflectance values over the wet-core pixels — flagged here so that
+    step does not build on top of this silently either.
+
+  acquired_files:
+    # Local to this project only. See data/metadata/ for full per-file
+    # provenance records.
+    - scene_date: '2022-09-08'
+      local_path: sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff
+      bytes_on_disk: 415173616
+    - scene_date: '2024-04-24'
+      local_path: sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-SPECTRAL_IMAGE_COG.tiff
+      bytes_on_disk: 421431498
+      staging_note: >
+        Full file is over this environment's per-file staging cap and was
+        never brought into the cloud workspace whole. A local AOI-cropped
+        derivative was used for pixel-level work instead — see
+        aoi_crop_derivative below.
+      aoi_crop_derivative:
+        local_path: sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff
+        bytes_on_disk: 264247
+        produced_by: scripts/crop_enmap_scene.py (run locally by the project owner)
+
+# ---------------------------------------------------------------------------
+# SATELLITE 813 — same programme-wide fact DesalGuard-main documents.
+# A per-band inland simulator IS now built -- see satellite_813_inland below.
+# ---------------------------------------------------------------------------
+satellite_813:
+  status: NOT AVAILABLE (incubation-only, programme-wide — see DesalGuard-main/docs/813_PRODUCT_NOTES.md)
+  inland_simulator_built: true   # REVERSED 2026-09-19 (was false) -- see satellite_813_inland below and docs/SATELLITE_813_DECISION.md
+  open_question_RESOLVED: >
+    DesalGuard-main simulates 813's spectral configuration from real
+    Tanager reflectance, using a real measured source wavelength grid.
+    This project originally had no equivalent real source grid for EnMAP,
+    so a faithful per-band simulator was decided against. As of
+    2026-09-19, enmap.spec.band_characterisation_table is obtained (real
+    per-band EnMAP wavelengths, via DLR's STAC eo:bands metadata), which
+    is exactly the condition the original decision named for reversal --
+    813's grid remains the one assumed axis (matching DesalGuard's own
+    Tanager situation), so the simulator is now built. Full reasoning in
+    docs/SATELLITE_813_DECISION.md and the satellite_813_inland block
+    further down this file.
+
+# ---------------------------------------------------------------------------
+# ALGORITHM PARAMETERS — placeholders only. Nothing below has been run or
+# tuned against this AOI's actual pixels. Values shown are DesalGuard-main's
+# coastal defaults, copied as a starting point per the "mirror his
+# conventions" instruction, not as validated settings for a wadi dam pool.
+# ---------------------------------------------------------------------------
+water_mask:
+  status: >
+    TWO-DATE COMPARISON DONE. Same unchanged thresholds run against both
+    acquired EnMAP scenes; the second date does NOT cleanly confirm the
+    first (see result_2024_04_24.key_finding below and
+    docs/WATER_MASK.md section 9). Thresholds remain v1 — not re-fit in
+    this pass, since the point of this pass was to test whether they
+    generalize unchanged, not to re-tune them.
+  module: pipeline/water_mask.py
+  derivation_script: scripts/derive_water_mask.py
+  crop_script: >
+    scripts/crop_enmap_scene.py — needed for the 2024-04-24 scene, which
+    at 421,431,498 bytes exceeds this environment's per-file staging cap
+    and was cropped locally by the project owner instead (device_bash,
+    which would normally do this in-place, stayed blocked by a tracked
+    Windows-mount issue for the whole project). See docs/WATER_MASK.md
+    section 8 for how the crop was verified pixel-grid-identical to the
+    2022-09-08 window before comparing across dates.
+  full_writeup: docs/WATER_MASK.md
+  note: >
+    NOT DesalGuard-main's MNDWI/NIR coastal thresholds — those were not
+    carried forward as working values, per explicit instruction. Derived
+    from scratch against this AOI's own EnMAP pixel histogram (2022-09-08
+    scene, 84-pixel locked-polygon window) because neither downloaded
+    GeoTIFF carries a per-band wavelength table yet (see enmap.spec.
+    band_characterisation_table above), the approach uses broad,
+    band-index-ordered GROUPS (short/mid/long thirds of the valid band
+    sequence) rather than a single named MNDWI/NDWI band pair.
+  method: >
+    Two criteria, both required: (1) brightness (mean reflectance across
+    all valid bands) < brightness_max; (2) short_long_index
+    ((short_group - long_group)/(short_group + long_group)) >
+    short_long_index_min — water absorbs the SWIR-proxy group far more
+    than the visible-proxy group; this AOI's own bare soil/rock does not.
+  parameters:
+    brightness_max: 0.11
+    short_long_index_min: 0.0
+    min_component_px: 3    # NOT DesalGuard's 50 — this AOI's whole sampled
+                            # window is 84 px; a 50 px filter would delete
+                            # the entire wet core.
+    buffer_px: 0            # NOT DesalGuard's 2 — an erosion buffer this
+                            # AOI's size would very likely erase the signal.
+  result_2022_09_08:
+    px_water_final: 10
+    px_inside_locked_polygon: 84
+    wet_fraction_of_polygon_pct: 11.9
+    px_water_outside_locked_polygon: 0   # leakage check — zero, checked not assumed
+    validation_against_reused_baseline: >
+      11.9% sits inside the range the reused 14-month S2/Landsat NDWI
+      series records for this AOI's wetter months (8.6-16.1%, Nov-Dec
+      2023) and above its driest (0.2-1.0%, Sep-Oct 2025) — an
+      order-of-magnitude plausibility check, not a precise match
+      (different year, sensor, and resolution).
+  result_2024_04_24:
+    px_water_final: 4
+    px_inside_locked_polygon: 84
+    wet_fraction_of_polygon_pct: 4.8
+    px_water_outside_locked_polygon: 0
+    bad_bands_dropped: 5   # vs 6 for 2022-09-08 -- observed, not reconciled
+    validation_against_reused_baseline: >
+      Weaker check than 2022-09-08: the reused baseline has no scene
+      between 2024-02-23 and 2024-09-04, so nothing directly tests this
+      date. 4.8% is not inconsistent with the neighboring Jan-Feb 2024
+      (7.7-8.9%) and Sep 2024-Feb 2025 (1.7-12.2%) brackets, but that is
+      not the same as a direct match.
+    key_finding: >
+      Zero spatial overlap between the two dates' final masks. The
+      physical patch that was the 2022-09-08 wet core is still the
+      darkest broadband patch in 2024-04-24 (brightness 0.035-0.05,
+      comparable or darker), but its short_long_index flips to strongly
+      NEGATIVE (-0.15 to -0.33, opposite sign from 2022-09-08), so it
+      fails the second criterion. The 4 pixels the 2024-04-24 run DID
+      select were among the brightest, driest pixels in 2022-09-08
+      (0.30-0.36 reflectance then). Conclusion stated plainly in
+      docs/WATER_MASK.md section 9: this complicates, not confirms, the
+      single-date "recurring wet core" read — broadband darkness at that
+      location is reasonably stable across dates, but the spectral-shape
+      criterion built from one date's histogram does not clearly
+      transfer to the next. Not resolved or re-tuned in this pass.
+  open_items:
+    - >
+      RESOLVED: the short_long_index criterion not generalizing across
+      dates is now addressed by persistent_wet_core() (see
+      water_mask_v2_persistent_core below and docs/WATER_MASK.md
+      section 12) — a criterion derived from both dates jointly rather
+      than fit to one. water_mask()/short_long_index themselves are
+      unchanged, kept as the historical single-date record.
+    - >
+      Thresholds for water_mask() (v1, single-date) remain untouched;
+      persistent_wet_core() (v2, two-date) has its own parameter block
+      below, independently derived.
+    - >
+      No baseline scene exists for March-August 2024, so the 2024-04-24
+      result has a weaker independent check than 2022-09-08's. Still open.
+    - >
+      RESOLVED 2026-09-19: exact per-band wavelength/FWHM table is now in
+      hand (see enmap.spec.band_characterisation_table above), unblocking
+      pipeline/fingerprint.py's CYANO_LIKE class and
+      pipeline/satellite813.py's per-band simulator. See
+      docs/ANOMALY_AND_FINGERPRINT.md and docs/SATELLITE_813_DECISION.md.
+
+water_mask_v2_persistent_core:
+  status: >
+    BUILT AND VALIDATED against both acquired EnMAP scenes jointly. Genuine
+    two-date-derived redesign of water_mask's second criterion, requested
+    after short_long_index was found not to transfer (see water_mask.
+    result_2024_04_24.key_finding and docs/WATER_MASK.md section 9).
+    Reported as a SUCCESS: a criterion that generalizes across both dates
+    was found, not a second failure.
+  module: pipeline/water_mask.py (function persistent_wet_core)
+  derivation_script: scripts/derive_persistent_wet_core.py
+  full_writeup: docs/WATER_MASK.md section 12
+  method: >
+    A pixel qualifies if mean broadband reflectance is below darkness_max
+    in EVERY supplied date (max(brightness_2022, brightness_2024) <
+    darkness_max) — temporal persistence of broadband darkness, replacing
+    the single-date spectral-shape criterion (short_long_index) that did
+    not transfer.
+  parameters:
+    darkness_max: 0.10
+    min_component_px: 3
+    buffer_px: 0
+  validation:
+    threshold_sweep_tested: [0.078, 0.08, 0.085, 0.09, 0.10, 0.11, 0.12, 0.13]
+    leakage_outside_locked_polygon_across_full_sweep: 0
+    connected_components_across_full_sweep: 1 (every threshold tested)
+    result_at_default_threshold_px: 10
+    result_location: rows 7-10, cols 13-15 of the shared pixel grid — IDENTICAL
+      to the original 2022-09-08-only short_long_index result's location.
+  open_items:
+    - >
+      Validated against only 2 dates — a much weaker basis than a dense
+      time series would give. Stated, not overclaimed, in
+      docs/WATER_MASK.md section 12.3.
+    - >
+      Does not establish broadband-darkness persistence as a general
+      inland water-masking recipe beyond this AOI.
+  real_band_mndwi_comparison: >
+    2026-09-19: a real-band MNDWI (persistent_wet_core_mndwi(), same
+    two-date persistence structure, Xu 2006 formula on the real 561/1609
+    nm bands nearest the 560/1610 nm literature targets) was built and
+    directly compared against this darkness-based result. It does NOT
+    recover the same 10-pixel core at any threshold in a 9-point sweep
+    (0 pixel overlap) -- this independently reproduces, with real named
+    bands rather than the coarse GROUPS proxy, the exact cross-date
+    spectral-shape sign-flip water_mask.result_2024_04_24.key_finding
+    already found. REINFORCES this darkness-persistence redesign as the
+    right call for cross-date robustness at this AOI, rather than
+    undermining it. Full comparison: docs/WATER_MASK.md section 14.2;
+    raw numbers: data/water_mask/persistent_wet_core_mndwi_comparison.json.
+
+anomaly:
+  status: >
+    BUILT AND RUN against both acquired EnMAP scenes, within the validated
+    persistent_wet_core mask. NOT a coastal-parameter port — see
+    docs/ANOMALY_AND_FINGERPRINT.md for full derivation and the stated
+    small-sample-size limitation (background population ~28-34 pooled
+    pixel-spectra vs. DesalGuard's presumably-thousands-strong coastal
+    background).
+  module: pipeline/anomaly.py (function rx_anomaly)
+  derivation_script: scripts/derive_anomaly_and_fingerprint.py
+  full_writeup: docs/ANOMALY_AND_FINGERPRINT.md
+  coastal_method_for_reference: rx_mahalanobis (DesalGuard-main pipeline/anomaly.py — interface shape mirrored, not its coastal parameter values)
+  result: >
+    No test-core pixel in either date exceeds the empirical RX threshold —
+    expected, not surprising, given the test population is a strict subset
+    of the background population at this AOI's scale (see
+    docs/ANOMALY_AND_FINGERPRINT.md section 2.3), not evidence of "no
+    anomalies present."
+  parameters:
+    n_groups: 6
+    n_components_used: 4
+    alpha: 0.10   # PLACEHOLDER — widened from DesalGuard's 0.01, see docs/ANOMALY_AND_FINGERPRINT.md section 4
+    shrinkage: 0.15   # PLACEHOLDER
+  open_items:
+    - >
+      Background population is too small for a calibrated false-alarm
+      rate — scores are a relative ranking only. Stated plainly, not
+      hidden. See docs/ANOMALY_AND_FINGERPRINT.md section 2.2.
+
+fingerprint:
+  status: >
+    BUILT. Group-based classes (BACKGROUND_WATER/SEDIMENT_LIKE/BLOOM_LIKE/
+    CDOM_LIKE/SURFACE_FILM_LIKE/UNKNOWN_ANOMALY) as before. CYANO_LIKE was
+    blocked by the missing per-band wavelength table -- now OBTAINED
+    (enmap.spec.band_characterisation_table) and CYANO_LIKE is BUILT and
+    RUN as of 2026-09-19 (see docs/ANOMALY_AND_FINGERPRINT.md section
+    3.2a). BOTTOM_INFLUENCED remains explicitly not computed -- a
+    distance-from-shore geometry gap unrelated to the wavelength table,
+    not silently omitted (section 3.3).
+  module: pipeline/fingerprint.py (function fingerprint_pixel)
+  full_writeup: docs/ANOMALY_AND_FINGERPRINT.md
+  result_summary: >
+    2022-09-08 core: 10/10 pixels BACKGROUND_WATER. 2024-04-24 core:
+    7/10 CDOM_LIKE, 2/10 BACKGROUND_WATER, 1/10 BLOOM_LIKE — directionally
+    consistent with the independently-found short_long_index sign flip for
+    this same date (docs/WATER_MASK.md section 9), a modest cross-module
+    consistency check, not forced.
+  cyano_like_result: >
+    2026-09-19: computable now, scored via this AOI's own background d620
+    distribution (n=34, mean=0.02147, std=0.01672, pooled 17px/2dates) z-
+    scored, gated on co-occurring red-edge support -- not DesalGuard's
+    absolute d620>0.03. Across all 20 test-core pixels (10/date x2 dates):
+    0/10 clear the gate on 2022-09-08 (no red-edge co-signal that date);
+    1/10 clear it on 2024-04-24 (pixel r7c15, d620_z=1.32, score=1.323) but
+    stays SECONDARY there (CDOM_LIKE scores higher, 1.954, remains top
+    class). CYANO_LIKE is never the top class for any of the 20 pixels.
+    Full detail: docs/ANOMALY_AND_FINGERPRINT.md section 3.2a.
+  open_items:
+    - >
+      Evidence WEIGHTS (including CYANO_LIKE's z>1.0 gate) are
+      structurally-reasoned placeholders, not fit against labeled data
+      (none exists for this AOI).
+    - >
+      BOTTOM_INFLUENCED remains excluded -- a distance-from-shore geometry
+      gap, not recoverable by the wavelength table alone.
+
+satellite_813_inland:
+  status: >
+    REVISED (2026-09-19): a per-band/per-pixel EnMAP-to-813 Gaussian-SRF
+    simulator IS now built, reversing the original same-day decision. See
+    docs/SATELLITE_813_DECISION.md for the full reasoning — the original
+    decision turned on needing to assume EnMAP's per-band wavelength grid
+    IN ADDITION TO 813's already-assumed grid; EnMAP's grid is now real
+    (enmap.spec.band_characterisation_table), so only 813's grid remains
+    assumed, matching DesalGuard-main's own one-assumption Tanager
+    situation. The coarse spectral-configuration comparison (below,
+    result_summary_coverage) remains built too, as a companion view, not
+    withdrawn.
+  module: pipeline/satellite813.py (spec_813, gaussian_srf_matrix,
+    resample_spectra, simulate_813_enmap)
+  derivation_scripts: [scripts/derive_813_coverage_comparison.py, scripts/derive_813_simulation.py]
+  full_writeup: docs/SATELLITE_813_DECISION.md
+  result_summary_coverage: >
+    EnMAP's spectral range (420-2450 nm) fully contains 813's published
+    range (400-1700 nm); overlap 420-1700 nm. EnMAP is spatially coarser
+    (30 m vs 813's 20 m) — not corrected for, same reasoning DesalGuard's
+    own simulator uses to decline spatial upsampling.
+  result_summary_simulation: >
+    196 of 813's 205 published bands (96%) have real EnMAP source support,
+    for both dates. The 9 unsupported bands split into two real, disjoint
+    gaps: 2 bands at 400.0-406.4 nm (below EnMAP's real 418.4 nm coverage
+    floor) and 7 bands at 1400.5-1438.7 nm (inside EnMAP's own real
+    wavelength-axis gap around the water-vapor absorption discontinuity,
+    docs/WATER_MASK.md section 14.1). At the 10 persistent-wet-core test
+    pixels, additional 813 bands come back NaN per-pixel from real EnMAP
+    nodata: 11 extra (2022-09-08), 9 extra (2024-04-24). Full per-pixel
+    simulated 813-band spectra saved in
+    data/satellite813/enmap_to_813_simulation.json.
+  one_remaining_assumption: >
+    813's own band layout is evenly spaced across its published range
+    (spec_813(), copied unmodified from DesalGuard-main's own explicit,
+    documented assumption) -- the ONE assumption left in this simulation,
+    the same one DesalGuard-main's own Tanager-to-813 simulation carries.
+
+temporal:
+  status: >
+    BUILT (2026-09-19). A multi-scene z-score deviation detector now runs
+    against the full 28-observation (14 S2 + 14 Landsat) shawka_dam
+    baseline, scored per-sensor against this AOI's own population --
+    replacing the prior single-date min/max-range plausibility check.
+  module: pipeline/temporal.py (function detect_temporal_deviations)
+  derivation_script: scripts/derive_temporal_baseline_detector.py
+  full_writeup: docs/TEMPORAL_BASELINE_DETECTOR.md
+  baseline_source: BluePulse-813 shawka_dam rows, data/baseline_indices_s2_landsat.csv (14 months per sensor, Sep 2023-Oct 2025)
+  result_summary: >
+    7/28 observations flagged (|z|>1.5 on NDCI/NDTI/RedTideIndex/NDWI
+    against that sensor's own 14-obs population). 4 of 7 cluster in
+    Sep-Oct 2025 on BOTH sensors independently (turbidity/chlorophyll
+    proxies) -- the same window docs/AOI_SELECTION.md already flags as
+    the driest/lowest-wet-fraction in the series, now also the most
+    spectrally unusual on these proxies specifically. Neither EnMAP date
+    has a same-week baseline observation: 2022-09-08 predates the entire
+    series by ~1 year (unplaceable); 2024-04-24 falls in the baseline's
+    own known Feb-Sep 2024 coverage gap -- nearest real bracketing
+    observations are ~2 months before (unremarkable) and ~4.5 months
+    after (mild RedTideIndex deviation on Sentinel-2 only).
+  open_items:
+    - >
+      14 observations/sensor across ~2 unevenly-sampled years cannot
+      support a true month-of-year seasonal climatology -- this is a
+      deviation-from-this-AOI's-own-2-year-mean detector, described as
+      such, not a calibrated seasonal model.
+    - >
+      z_threshold=1.5 is a structurally-reasoned placeholder, not fit
+      against labeled anomalous-month examples (none exist for this AOI).
+    - >
+      persistent_wet_core() (see water_mask_v2_persistent_core above)
+      remains a separate, minimal 2-point temporal method (EnMAP-only);
+      this detector is the full-series S2/Landsat one and does not
+      replace it.

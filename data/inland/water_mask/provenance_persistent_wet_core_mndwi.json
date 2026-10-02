@@ -1,0 +1,199 @@
+{
+ "result_id": "persistent_wet_core_mndwi_enmap_20220908_20240424_shawka_dam_v1",
+ "result_kind": "water_mask",
+ "sources": [
+  {
+   "satellite": "EnMAP",
+   "sensor": "HSI (VNIR + SWIR)",
+   "scene_id": "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "acquisition_utc": "2022-09-08T07:30:13.226624Z",
+   "product": "ENMAP_HSI_L2A",
+   "processing_level": "L2A",
+   "provider": "DLR / EOC Geoservice",
+   "licence": "proprietary",
+   "native_resolution_m": 30.0,
+   "bands_used": [],
+   "wavelengths_nm": [],
+   "units": "",
+   "quality_mask": "",
+   "access_url": "",
+   "local_path": "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "sha256": "",
+   "notes": ""
+  },
+  {
+   "satellite": "EnMAP",
+   "sensor": "HSI (VNIR + SWIR)",
+   "scene_id": "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "acquisition_utc": "2024-04-24T07:30:16.236194Z",
+   "product": "ENMAP_HSI_L2A",
+   "processing_level": "L2A",
+   "provider": "DLR / EOC Geoservice",
+   "licence": "proprietary",
+   "native_resolution_m": 30.0,
+   "bands_used": [],
+   "wavelengths_nm": [],
+   "units": "",
+   "quality_mask": "",
+   "access_url": "",
+   "local_path": "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "sha256": "",
+   "notes": ""
+  }
+ ],
+ "algorithm": {
+  "name": "persistent_wet_core_mndwi (real-band MNDWI, two-date persistence)",
+  "description": "Xu (2006) MNDWI ((Green-SWIR1)/(Green+SWIR1)) using the real EnMAP bands nearest 560 nm / 1610 nm, with the same two-date persistence structure as persistent_wet_core(). Compared directly against that band-GROUPS result -- see docs/WATER_MASK.md section 14.",
+  "reference": "Xu, H. (2006). Modification of normalised difference water index (MNDWI). Int. J. Remote Sens.",
+  "parameters": {
+   "mndwi_min": 0.0,
+   "green_nm_target": 560.0,
+   "swir1_nm_target": 1610.0,
+   "green_nm_actual": 561.112,
+   "swir1_nm_actual": 1609.02
+  },
+  "inputs": [
+   "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "aoi/shawka_dam.geojson",
+   "data/metadata/enmap_band_characterisation.json"
+  ],
+  "units_out": "boolean mask, True = candidate persistent wet-core pixel",
+  "assumptions": [
+   "Band index in the GeoTIFF corresponds 1:1, in order, to the eo:bands array index from the STAC item -- standard STAC eo-extension convention, not independently re-verified against the file's own internal band descriptors (which don't exist -- see docs/WATER_MASK.md section 2).",
+   "mndwi_min=0.0 is Xu (2006)'s literature-standard threshold, not fit to this AOI -- see the threshold sweep in this record's extra field for how sensitive the result is to that choice at this AOI."
+  ],
+  "limitations": [
+   "Wavelength table itself is verified by cross-validation across two independent STAC fetches (see data/metadata/enmap_band_characterisation.json and docs/WATER_MASK.md section 14), not by an independently obtained second document (e.g. the product's own METADATA.XML, still not downloaded)."
+  ]
+ },
+ "code_version": "uncommitted",
+ "schema_version": "1.0",
+ "processed_utc": "2026-09-19T11:39:04Z",
+ "environment": {
+  "python": "3.11.15",
+  "platform": "Linux"
+ },
+ "extra": {
+  "band_groups_result": {
+   "px_final": 10,
+   "pixels_rc": [
+    [
+     7,
+     13
+    ],
+    [
+     7,
+     14
+    ],
+    [
+     7,
+     15
+    ],
+    [
+     8,
+     13
+    ],
+    [
+     8,
+     14
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     9,
+     13
+    ],
+    [
+     9,
+     14
+    ],
+    [
+     9,
+     15
+    ],
+    [
+     10,
+     13
+    ]
+   ]
+  },
+  "real_mndwi_result": {
+   "px_final": 0,
+   "pixels_rc": [],
+   "green_nm_actual": 561.112,
+   "swir1_nm_actual": 1609.02
+  },
+  "overlap_px": 0,
+  "only_mndwi_px": 0,
+  "only_groups_px": 10,
+  "mndwi_threshold_sweep": [
+   {
+    "mndwi_min": -0.1,
+    "px_raw": 5,
+    "px_final": 3,
+    "px_outside_polygon": 1,
+    "connected_components": 1
+   },
+   {
+    "mndwi_min": -0.05,
+    "px_raw": 2,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": -0.02,
+    "px_raw": 1,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": 0.0,
+    "px_raw": 1,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": 0.02,
+    "px_raw": 1,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": 0.05,
+    "px_raw": 1,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": 0.1,
+    "px_raw": 0,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": 0.15,
+    "px_raw": 0,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   },
+   {
+    "mndwi_min": 0.2,
+    "px_raw": 0,
+    "px_final": 0,
+    "px_outside_polygon": 0,
+    "connected_components": 0
+   }
+  ],
+  "px_inside_locked_polygon": 84
+ }
+}

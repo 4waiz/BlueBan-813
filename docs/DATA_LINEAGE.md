@@ -271,3 +271,41 @@ confidence is capped at 0.75.
 * Any restricted or commercial imagery.
 
 All randomised procedures are seeded (`np.random.default_rng(813)`).
+
+---
+
+## Inland complement: EnMAP and the Shawka Dam baseline (appended 2026-10-02)
+
+### EnMAP HSI Level-2A
+
+| Field | Value |
+|---|---|
+| Producer | DLR (German Aerospace Center), EnMAP ground segment |
+| Access | DLR EOC Geoservice; scenes downloaded by the module owner through a self-service registered account. Search and item metadata are open: `https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/{id}` |
+| Scenes | `ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z`; `ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z` (tile `_006_` of each) |
+| Grid | UTM 40N (EPSG:32640), 30 m; both scenes on the same lattice |
+| Product | L2A surface reflectance, Land_Mode atmospheric correction, 224 bands |
+| Licence | **proprietary** (STAC collection record, re-checked 2026-10-02) |
+
+Caveats carried over exactly: EnMAP's license is "proprietary" with redistribution terms not yet confirmed for public submission; and the anomaly/fingerprint results are based on a ~10-17 pixel background population, not a calibrated detector.
+
+**Used for:** the inland wet-core mask, RX anomaly and fingerprint, and the 813
+simulation on EnMAP. **Committed:** derived masks (`data/inland/water_mask/*_mask.npy`),
+derivation statistics, provenance, the band table and the live STAC check
+(`data/inland/metadata/enmap_stac_live_check.json`). **Not committed:** the raw
+scenes (held by the module owner, never in this repository) and the per-pixel
+reflectance layers and spectra (`data/inland/restricted/`, gitignored).
+
+### Sentinel-2 L2A and Landsat C2 L2 baseline (Shawka Dam)
+
+28 AOI-mean observations (14 per sensor, September 2023 to October 2025) via
+Microsoft Planetary Computer, in `data/inland/baseline_indices_s2_landsat.csv`
+(the file also holds 28 rows for another AOI, not used here).
+
+### Derived outputs (inland)
+
+| Output | Produced by | Inputs |
+|---|---|---|
+| `data/inland/*` | the inland module's `scripts/inland/derive_*.py` (not re-run by BLUEBAN) | EnMAP scenes, S2/Landsat baseline |
+| `outputs/inland/summary.json`, `docs/inland/REVIEW_FLAGS.md` | `scripts/inland/build_inland_bundle.py` | `data/inland/` |
+| `apps/web/public/pipeline/inland/summary.json` | `scripts/build_static_site.py` | `outputs/inland/summary.json` |

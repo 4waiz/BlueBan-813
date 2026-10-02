@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { HelpCircle, X } from "lucide-react";
+import { createPortal } from "react-dom";
 
 export const STATE_COLOR: Record<string, string> = {
   MONITORING: "#93A6CB", DETECTED: "#FFC23D", UNDER_REVIEW: "#FF4D5E",
@@ -116,9 +117,20 @@ export function WhyButton({ title, children }: { title: string; children: React.
   );
 }
 
+/**
+ * Overlays render into <body>. Any ancestor with backdrop-filter (the top bar,
+ * every .panel) becomes the containing block of position: fixed, which would
+ * otherwise clip a dialog to that box and let later content cover it.
+ */
+function BodyPortal({ children }: { children: React.ReactNode }) {
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  useEffect(() => { setEl(document.body); }, []);
+  return el ? createPortal(children, el) : null;
+}
+
 export function Drawer({ open, onClose, title, children, width = 520 }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; width?: number }) {
   return (
-    <AnimatePresence>
+    <BodyPortal><AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[60] flex justify-end bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
           <motion.aside className="panel h-full overflow-y-auto rounded-none border-l border-line p-5" style={{ width }}
@@ -132,13 +144,13 @@ export function Drawer({ open, onClose, title, children, width = 520 }: { open: 
           </motion.aside>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></BodyPortal>
   );
 }
 
 export function Modal({ open, onClose, title, children, width = 560 }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; width?: number }) {
   return (
-    <AnimatePresence>
+    <BodyPortal><AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[70] grid place-items-center bg-black/60 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
           <motion.div className="panel max-h-[88vh] w-full overflow-y-auto p-5" style={{ maxWidth: width }}
@@ -152,7 +164,7 @@ export function Modal({ open, onClose, title, children, width = 560 }: { open: b
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></BodyPortal>
   );
 }
 

@@ -76,21 +76,21 @@ export default function BandLadder({ s, showF2, height = 360, onHover }: { s: In
       const bad = dropped.has(b.n);
       out.push({ x: xOf(b.nm), w: wOf(b.fwhm), h: bad ? 0.35 : 1.25, z: Z_ENMAP, delay: i * 0.006,
         color: bad ? new THREE.Color("#5A1C2A") : wavelengthColor(b.nm),
-        info: { sensor: "EnMAP L2A", band: `B${String(b.n).padStart(3, "0")}`, nm: b.nm, fwhm: b.fwhm, note: bad ? "dropped for nodata on at least one date" : "real EnMAP band (2024-04-24 table)" } });
+        info: { sensor: "EnMAP L2A", band: `B${String(b.n).padStart(3, "0")}`, nm: b.nm, fwhm: b.fwhm, note: bad ? "missing data, not used" : "EnMAP band" } });
     });
     sat.spec813.centres_nm.forEach((nm, i) => {
       const un = isUnsupported(nm);
       out.push({ x: xOf(nm), w: wOf(sat.spec813.fwhm_nm), h: un ? 0.3 : 1.25, z: Z_813, delay: 0.25 + i * 0.006,
         color: un ? new THREE.Color("#FF4D5E") : wavelengthColor(nm).lerp(new THREE.Color("#FFFFFF"), 0.12),
-        info: { sensor: "Satellite 813 (SIMULATED)", band: `#${i + 1}`, nm, fwhm: sat.spec813.fwhm_nm, note: un ? "no real EnMAP support: left empty, not invented" : "resampled from real EnMAP bands (Gaussian SRF)" } });
+        info: { sensor: "Satellite 813 (SIMULATED)", band: `#${i + 1}`, nm, fwhm: sat.spec813.fwhm_nm, note: un ? "no EnMAP data here, so left empty" : "built from real EnMAP bands" } });
     });
     if (showF2) {
       sat.enmap_bands_package.forEach((b, i) => {
         const d = delta22[i] ?? 0, nm = b.nm + d, off = Math.abs(d) > 5;
         out.push({ x: xOf(nm), w: wOf(b.fwhm), h: off ? 1.05 : 0.55, z: Z_2022, delay: i * 0.004,
           color: off ? new THREE.Color(Math.abs(d) > 50 ? "#FF4D5E" : "#FFC23D") : new THREE.Color("#2A3F6E"),
-          info: { sensor: "EnMAP 2022-09-08 (live STAC table)", band: `B${String(b.n).padStart(3, "0")}`, nm, fwhm: b.fwhm,
-                  note: off ? `differs from the package table by ${d.toFixed(1)} nm (review flag F2)` : `within ${Math.abs(d).toFixed(2)} nm of the package table` } });
+          info: { sensor: "EnMAP Sep 2022 (real positions)", band: `B${String(b.n).padStart(3, "0")}`, nm, fwhm: b.fwhm,
+                  note: off ? `${d.toFixed(1)} nm away from the table used (note F2)` : `matches the table used` } });
       });
     }
     return out;
@@ -115,10 +115,10 @@ export default function BandLadder({ s, showF2, height = 360, onHover }: { s: In
           {links.map(({ b, d }) => (
             <Line key={b.n} points={[[xOf(b.nm), 0.02, Z_ENMAP - 0.3], [xOf(b.nm + d), 0.02, Z_2022 + 0.3]]} color={Math.abs(d) > 50 ? "#FF4D5E" : "#FFC23D"} lineWidth={1} transparent opacity={0.7} />
           ))}
-          <Label text="EnMAP L2A · 224 bands" position={[-XW / 2 + 2.4, 1.75, Z_ENMAP]} color="#EAF1FF" size={0.36} bold />
+          <Label text="EnMAP · 224 bands" position={[-XW / 2 + 2.4, 1.75, Z_ENMAP]} color="#EAF1FF" size={0.36} bold />
           <Label text="813 SIMULATED · 205 bands" position={[-XW / 2 + 2.6, 1.75, Z_813]} color="#FFC23D" size={0.36} bold />
-          {showF2 && <Label text="2022-09-08 live table" position={[xOf(1580), 1.5, Z_2022]} color="#FFD27A" size={0.36} bold />}
-          <Label text={`overlap ${ov[0]}–${ov[1]} nm`} position={[(xOf(ov[0]) + xOf(ov[1])) / 2, 1.85, 0]} color="#27C3F3" size={0.34} />
+          {showF2 && <Label text="Sep 2022 (real positions)" position={[xOf(1580), 1.5, Z_2022]} color="#FFD27A" size={0.36} bold />}
+          <Label text={`both sensors ${ov[0]}–${ov[1]} nm`} position={[(xOf(ov[0]) + xOf(ov[1])) / 2, 1.85, 0]} color="#27C3F3" size={0.34} />
           {ticks.map((nm) => (
             <group key={nm}>
               <Line points={[[xOf(nm), 0, 1.75], [xOf(nm), 0, 1.95]]} color="#5D7299" lineWidth={1} />

@@ -273,6 +273,7 @@ def review_flags(s: dict, live: dict) -> list:
     an = s["anomaly"]
     flags = [
         {"id": "F1", "severity": "high", "title": "EnMAP licence vs a public repository",
+         "plain": 'EnMAP data has a restrictive licence, so the app shows results only. Confirm the terms before submission.',
          "detail": ("The DLR STAC collection record says license \"proprietary\" (re-checked live 2026-10-02) and this "
                     "repository and its static site are public. The package's own audit says to confirm the terms before "
                     "any public repo or submission. Per-pixel reflectance layers and spectra are therefore kept out of git "
@@ -280,6 +281,7 @@ def review_flags(s: dict, live: dict) -> list:
                     f"with the attribution \"{ATTRIBUTION}\". Someone should confirm the terms with DLR before submission."),
          "evidence": "data/inland/metadata/enmap_stac_live_check.json (collection_license)"},
         {"id": "F2", "severity": "high", "title": "The band table matches the 2024-04-24 scene only",
+         "plain": 'One of the two EnMAP dates used slightly wrong positions for some infrared bands.',
          "detail": (f"Fetched from the STAC items endpoint, the 2024-04-24 table equals the package table (max |Δ| "
                     f"{d24.max():.3f} nm) but the 2022-09-08 table does not. Most bands differ by ~0.3 nm (median "
                     f"{np.median(d22):.2f} nm), but B{shift[0]:03d}-B{shift[-1]:03d} sit "
@@ -293,41 +295,50 @@ def review_flags(s: dict, live: dict) -> list:
                     "the 620 nm test is unaffected (Δ ≈ 0.3 nm)."),
          "evidence": "data/inland/metadata/enmap_stac_live_check.json vs data/inland/metadata/enmap_band_characterisation.json"},
         {"id": "F3", "severity": "low", "title": "Real band-centre range quoted as 418.4-2450.3 nm",
+         "plain": 'A quoted wavelength range is a little off. Cosmetic.',
          "detail": (f"SATELLITE_813_DECISION.md quotes the real band table as 418.4-2450.3 nm; its centres run "
                     f"{pkg[0]['nm']:.1f}-{pkg[-1]['nm']:.1f} nm (B224 = {pkg[-1]['nm']:.1f} nm). The 420-2450 nm figures "
                     "elsewhere are the instrument specification and are fine. Separately, the note inside "
                     "enmap_813_coverage_comparison.json still says the wavelength table is missing, though it was obtained the same day."),
          "evidence": "docs/inland/SATELLITE_813_DECISION.md; data/inland/satellite813/enmap_813_coverage_comparison.json"},
         {"id": "F4", "severity": "medium", "title": "Temporal flags are within chance",
+         "plain": 'Seven unusual dates is about what chance gives. Only the late-2025 cluster stands out.',
          "detail": (f"With |z| > {t['z_threshold']} on any of 4 indices, pure noise flags "
                     f"{t['chance_level']['expected_flags_if_indices_perfectly_correlated']}-"
                     f"{t['chance_level']['expected_flags_if_indices_independent']} of {t['n_observations']} observations; "
                     f"{t['n_flagged']} were flagged. The cross-sensor Sep-Oct 2025 cluster is the notable part; the count is not."),
          "evidence": "data/inland/temporal/temporal_deviations.json"},
         {"id": "F5", "severity": "medium", "title": "Zero RX events is structural",
+         "plain": 'Zero anomaly alerts comes from how the test is set up, so it does not prove clean water.',
          "detail": ("background_is_superset_of_test is true: the test pixels are part of the background they are scored "
                     "against, which pulls their Mahalanobis distance down, so 0 events cannot be read as 'no anomaly'."
                     if an.get("available") and an.get("background_is_superset_of_test") else
                     "Restricted report not present; flag carried from the integration review."),
          "evidence": "anomaly_fingerprint_report.json: background_is_superset_of_test"},
         {"id": "F6", "severity": "low", "title": "'RedTideIndex' at an inland dam",
+         "plain": "The 'red tide' index name does not fit a freshwater dam.",
          "detail": "The index name implies marine harmful algal blooms; for a freshwater wadi pool a neutral name (red-edge ratio) would avoid misreading.",
          "evidence": "data/inland/baseline_indices_s2_landsat.csv"},
         {"id": "F7", "severity": "low", "title": "Referenced per-scene water-presence CSV is missing",
+         "plain": 'A per-image water table mentioned in the notes is missing.',
          "detail": "data/shawka_dam_water_presence.csv is cited for the per-scene table but is not in the package; only the period ranges in the log survive.",
          "evidence": "docs/inland/data-access-log/shawka_dam_water_check.md"},
         {"id": "F8", "severity": "low", "title": "Baseline CSV carries other-AOI rows",
+         "plain": 'The data file also holds rows for another area. They are ignored here.',
          "detail": ("The baseline file also holds " + ", ".join(f"{n} {a}" for a, n in base["other_aois_in_file"].items())
                     + " rows that the inland docs do not mention; only the shawka_dam rows are used here."),
          "evidence": "data/inland/baseline_indices_s2_landsat.csv"},
         {"id": "F9", "severity": "low", "title": "AOI size quoted as ~660 m x 460 m",
+         "plain": 'The dam size in the notes is slightly off.',
          "detail": f"The polygon's projected extent is {g['polygon_size_m'][0]} m x {g['polygon_size_m'][1]} m (UTM 40N).",
          "evidence": "config/inland/shawka_dam.geojson"},
         {"id": "F10", "severity": "low", "title": "WATER_MASK.md section order",
+         "plain": 'Section numbers in one document are out of order.',
          "detail": ("Top-level sections in docs/inland/WATER_MASK.md run " + water_mask_sections()
                     + ": section 11 is missing and 14 comes before 13. Cosmetic, but section cross-references depend on it."),
          "evidence": "docs/inland/WATER_MASK.md"},
         {"id": "F11", "severity": "medium", "title": "The two single-date masks disagree; the MNDWI cross-check finds nothing",
+         "plain": 'The two EnMAP dates disagree on where the water is, and a standard water index finds none.',
          "detail": (f"2022-09-08: {m['2022-09-08']['n']} px; 2024-04-24: {m['2024-04-24']['n']} px with the same thresholds, "
                     f"overlapping the 2022 pixels in {overlap(m['2022-09-08'], m['2024-04-24'])}; the persistent core "
                     f"({m['persistent_core']['n']} px) shares {overlap(m['2022-09-08'], m['persistent_core'])} pixels with the 2022 mask; "
@@ -335,18 +346,22 @@ def review_flags(s: dict, live: dict) -> list:
                     "water index does not reproduce (the package documents this; it is the main thing to keep in view)."),
          "evidence": "data/inland/water_mask/*_mask.npy"},
         {"id": "F12", "severity": "low", "title": "Project naming in the inland docs",
+         "plain": "The documents use the project's earlier name.",
          "detail": ("The inland docs refer to the coastal project as DesalGuard-main and describe it as the Gulf of Annaba PoC "
                     "with no inland component; in BLUEBAN the coastal hero is now Fujairah (UAE), with Annaba kept as the "
                     "earlier PoC. The texts are kept verbatim; readers should map the names."),
          "evidence": "docs/inland/*.md"},
         {"id": "F13", "severity": "low", "title": "Scripts need renamed imports and the raw scenes",
+         "plain": 'Re-running the scripts needs the raw images and small code changes.',
          "detail": "scripts/inland/*.py import pipeline.satellite813 / pipeline.provenance (BLUEBAN's coastal modules) and read 'sourced data/' raw scenes, which are not here and will not be sourced without the owner. 2022-09-08 also predates the S2/Landsat baseline by about a year.",
          "evidence": "scripts/inland/README.md"},
         {"id": "F14", "severity": "low", "title": "224 vs 222 bands",
+         "plain": 'The band count differs between the data (224) and the spec sheet (222).',
          "detail": ("The package already flags that the 2022-09-08 GeoTIFF has 224 bands while DLR's product specification "
                     "states a nominal 91 VNIR + 131 SWIR = 222. Still unreconciled; the STAC tables for both dates also list 224."),
          "evidence": "docs/inland/DATA_ACCESS_AUDIT.md"},
         {"id": "F15", "severity": "info", "title": "Crop window reconstructed, not shipped",
+         "plain": 'We rebuilt the image grid ourselves. It matches the original exactly.',
          "detail": (f"The window transform is not in the package. Rebuilt from DLR's STAC grid and the documented crop rule, it has "
                     f"{g['n_inside_reconstructed']} pixels inside the polygon (package: {m['px_inside_locked_polygon_reported']}), "
                     f"and {m['persistent_core']['n_inside_reconstructed_polygon']}/{m['persistent_core']['n']} wet-core pixels fall inside it."),
@@ -360,11 +375,11 @@ def write_flags_md(flags: list) -> None:
              "Generated by `scripts/inland/build_inland_bundle.py` when the inland package was integrated",
              "(2026-10-02). Per the integration brief these are **flagged, not fixed**: nothing in the",
              "teammate's files was changed. Each flag names the evidence it rests on.", "",
-             "| # | Severity | Flag |", "|---|---|---|"]
-    lines += [f"| {f['id']} | {f['severity']} | {f['title']} |" for f in flags]
+             "| # | Severity | Flag | In short |", "|---|---|---|---|"]
+    lines += [f"| {f['id']} | {f['severity']} | {f['title']} | {f['plain']} |" for f in flags]
     lines.append("")
     for f in flags:
-        lines += [f"## {f['id']}. {f['title']}", "", f["detail"], "", f"*Evidence:* `{f['evidence']}`", ""]
+        lines += [f"## {f['id']}. {f['title']}", "", f"**In short:** {f['plain']}", "", f["detail"], "", f"*Evidence:* `{f['evidence']}`", ""]
     os.makedirs(os.path.dirname(FLAGS_MD), exist_ok=True)
     with open(FLAGS_MD, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines))

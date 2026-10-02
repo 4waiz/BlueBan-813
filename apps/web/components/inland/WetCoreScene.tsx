@@ -159,7 +159,7 @@ function Window({ s, layer, onHover, reduce, hover }: {
           ))}
         </group>
       )}
-      {layer === "mndwi_core" && <Label text="real MNDWI: 0 px pass on both dates" position={[cx, TILE_IN + 2.6, cz]} color="#FF8A3D" size={0.6} bold />}
+      {layer === "mndwi_core" && <Label text="Water index: 0 pixels" position={[cx, TILE_IN + 2.6, cz]} color="#FF8A3D" size={0.6} bold />}
       <pointLight position={[cx, 3.2, cz]} color="#27C3F3" intensity={layer === "mndwi_core" ? 4 : 14} distance={12} decay={1.6} />
       <group ref={beam}>
         <mesh position={[0, 1.6, 0]} raycast={() => null} userData={{ base: 0.09 }}>

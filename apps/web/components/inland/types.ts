@@ -26,7 +26,7 @@ export interface Observation {
   z: Record<string, number>; max_abs_z: number; flagged: boolean; flagged_index: string | null;
 }
 
-export interface ReviewFlag { id: string; severity: "high" | "medium" | "low" | "info"; title: string; detail: string; evidence: string }
+export interface ReviewFlag { id: string; severity: "high" | "medium" | "low" | "info"; title: string; plain?: string; detail: string; evidence: string }
 
 export interface InlandSummary {
   generated_utc: string;

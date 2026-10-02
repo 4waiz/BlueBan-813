@@ -42,6 +42,12 @@ export const STATE_TEXT: Record<string, string> = {
   PRODUCTION: "Live", CANDIDATE: "New model", LAB_PENDING: "At the lab", RESULT_RECEIVED: "Result in", INSUFFICIENT_EVIDENCE: "Inconclusive",
 };
 
+/** Sentence-case plain words for any workflow code (for selects, popups and toasts). */
+export function statusText(code: string): string {
+  const t = STATE_TEXT[code] ?? code.replace(/_/g, " ").toLowerCase();
+  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+}
+
 export function Chip({ label, color, dot = true, className = "" }: { label: string; color?: string; dot?: boolean; className?: string }) {
   const c = color || STATE_COLOR[label] || "#93A6CB";
   return (

@@ -17,7 +17,7 @@ import {
 import type { Aoi, AssetRow, Incident, IncidentSummary, LayerRef, Sample } from "@/lib/engine/types";
 import { pipelineUrl } from "@/lib/engine";
 import { registerIcons } from "./icons";
-import { fmt, STATE_COLOR, toast } from "@/components/ui";
+import { fmt, STATE_COLOR, statusText, toast } from "@/components/ui";
 
 export type MapTool = "none" | "draw-aoi" | "place-asset" | "measure";
 export type MapMode = "2d" | "3d" | "split";
@@ -217,7 +217,7 @@ export default function IncidentMap(props: Props) {
       const p = f.properties as Record<string, string>;
       const html = f.layer.id === "assets" ? `<div style="font-weight:700">${p.name}</div><div style="color:#93A6CB;font-size:11px">${p.type.replace(/_/g, " ")} · ${p.source}</div>`
         : f.layer.id === "stations" ? `<div style="font-weight:700">${p.name}</div><div style="color:#93A6CB;font-size:11px">EAD ${p.kind === "AUTOMATED_BUOY" ? "automated buoy" : "sampling site"} · location only, no readings</div>`
-        : `<div style="font-weight:700">${p.id}</div><div style="color:#93A6CB;font-size:11px">${p.status.replace(/_/g, " ")}${p.role === "negative_control" ? " · known false alarm (kept as a test)" : ""}</div>`;
+        : `<div style="font-weight:700">${p.id}</div><div style="color:#93A6CB;font-size:11px">${statusText(p.status)}${p.role === "negative_control" ? " · known false alarm (kept as a test)" : ""}</div>`;
       pop.setLngLat(e.lngLat).setHTML(html).addTo(m);
     };
     const leave = () => { m.getCanvas().style.cursor = ""; pop.remove(); };

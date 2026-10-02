@@ -6,7 +6,7 @@ import { AlertTriangle, Check, ChevronLeft, ChevronRight, FlaskConical, RefreshC
 import type { Decision, EventType, Incident } from "@/lib/engine/types";
 import { EVENT_TYPES } from "@/lib/engine/rules";
 import { getOperator, mutate, pipelineUrl } from "@/lib/engine";
-import { Chip, fmt, Kind, Meter, Modal, SimBadge, Tabs, toast, WhyButton } from "@/components/ui";
+import { Chip, fmt, Kind, Meter, Modal, SimBadge, STATE_TEXT, Tabs, toast, WhyButton } from "@/components/ui";
 import SpectrumPlot from "@/components/spectra/SpectrumPlot";
 
 type Tab = "overview" | "spectral" | "temporal" | "assets" | "actions";
@@ -69,7 +69,7 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
     setBusy(decision);
     try {
       const r = await mutate((e) => e.review(inc.id, { reviewer, decision, note, evidence_viewed: [...viewed], ...extra }));
-      toast(`${DECISION_DONE[decision] || spaced(decision)}. Status: ${spaced(r.status_before)} → ${spaced(r.status_after)}.${r.label_id ? " Added to LEARN as a training example." : ""}`);
+      toast(`${DECISION_DONE[decision] || spaced(decision)}. Status: ${(STATE_TEXT[r.status_before] ?? spaced(r.status_before)).toLowerCase()} → ${(STATE_TEXT[r.status_after] ?? spaced(r.status_after)).toLowerCase()}.${r.label_id ? " Added to LEARN as a training example." : ""}`);
       setNote(""); setReclass(false);
     } catch (e) { toast((e as Error).message, "err"); } finally { setBusy(null); }
   };

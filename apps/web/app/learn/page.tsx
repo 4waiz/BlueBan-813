@@ -12,6 +12,14 @@ import { getOperator, mutate, useEngineQuery } from "@/lib/engine";
 import type { GateCheck, LabelRow, ModelRecord } from "@/lib/engine/types";
 import { Chip, fmt, Panel, toast } from "@/components/ui";
 
+/** Plain names for the model's built-in tests (the engine keeps its identifiers). */
+const MODEL_TEST_LABEL: Record<string, string> = {
+  predictions_finite: "no broken outputs", probabilities_in_unit_interval: "scores between 0 and 1",
+  concentrations_positive: "no negative values", deterministic: "same answer every time",
+  artifact_roundtrip_identical: "saves and reloads exactly", missing_features_imputed_not_nan: "copes with missing data",
+  feature_schema_declared: "inputs documented",
+};
+
 const METRICS: [string, string, boolean][] = [["auprc", "Detection score", true], ["auroc", "Ranking score", true], ["f1", "Overall (F1)", true], ["precision", "Correct alerts", true], ["recall", "Events caught", true], ["brier", "Probability error", false], ["ece", "Calibration error", false]];
 const METRIC_HINT: Record<string, string> = {
   auprc: "AUPRC: area under the precision-recall curve. 0 to 1, higher is better.",
@@ -94,7 +102,7 @@ function GateView({ checks }: { checks: GateCheck[] }) {
             <div className="font-semibold">{label[c.name] || c.name}</div>
             {c.name === "primary_metric_not_worse" && c.detail != null && (() => { const d = c.detail as { candidate: number; production: number; diff_ci95: number[] }; return <div className="hud-value text-[11px] text-muted">new {fmt.num(d.candidate, 3)} vs live {fmt.num(d.production, 3)} · likely difference [{fmt.num(d.diff_ci95?.[0], 3)}, {fmt.num(d.diff_ci95?.[1], 3)}]</div>; })()}
             {c.name === "validation_dataset_unchanged" && c.detail != null && <div className="hud-value text-[11px] text-muted">{(c.detail as { frozen: string }).frozen}</div>}
-            {c.name === "model_test_suite" && Array.isArray(c.detail) && <div className="text-[11px] text-muted">{(c.detail as GateCheck[]).map((t) => `${t.passed ? "✓" : "✗"} ${t.name.replace(/_/g, " ")}`).join(" · ")}</div>}
+            {c.name === "model_test_suite" && Array.isArray(c.detail) && <div className="text-[11px] text-muted">{(c.detail as GateCheck[]).map((t) => `${t.passed ? "✓" : "✗"} ${MODEL_TEST_LABEL[t.name] || t.name.replace(/_/g, " ")}`).join(" · ")}</div>}
           </div>
         </div>
       ))}

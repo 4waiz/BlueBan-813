@@ -12,7 +12,7 @@ import { Download, FlaskConical, MapPinned, Plus, Trash2, Upload } from "lucide-
 import { getOperator, mutate, useEngineQuery, useStatic } from "@/lib/engine";
 import type { Sample } from "@/lib/engine/types";
 import { MEASUREMENT_PARAMETERS, PARAMETER_LABEL } from "@/lib/engine/rules";
-import { Chip, fmt, Modal, Panel, toast } from "@/components/ui";
+import { Chip, fmt, Modal, Panel, statusText, toast } from "@/components/ui";
 import { download } from "@/lib/report";
 
 const IncidentMap = dynamic(() => import("@/components/map/IncidentMap"), { ssr: false });
@@ -86,7 +86,7 @@ function Field() {
         <div className="panel flex flex-wrap items-center gap-3 px-4 py-3">
           <MapPinned size={18} className="text-cyan" />
           <select value={iid || ""} onChange={(e) => router.replace(`/field?id=${e.target.value}`)} className="rounded-md border border-line bg-deep px-3 py-1.5 text-[12.5px]">
-            {(list.data || []).map((i) => <option key={i.id} value={i.id}>{i.id} · {i.status.replace(/_/g, " ")}</option>)}
+            {(list.data || []).map((i) => <option key={i.id} value={i.id}>{i.id} · {statusText(i.status)}</option>)}
           </select>
           {inc && <Chip label={inc.status} />}
           <div className="ml-auto flex gap-2">

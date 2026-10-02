@@ -106,7 +106,7 @@ def test_new_operational_incident_raises_one_factual_alert(client):
     mine = [a for a in alerts if a["incident_id"] == IID]
     assert len(mine) == 1
     msg = mine[0]["message"]
-    assert msg.startswith("New coastal anomaly detected near") and "Analyst review required." in msg
+    assert msg.startswith("Unusual water spotted near") and "Needs an analyst's review." in msg
     assert "toxic" not in msg.lower() and "confirmed" not in msg.lower()
     from services.api import loop
     loop.store().upsert_incident(payload())               # re-ingesting the same incident

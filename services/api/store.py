@@ -356,12 +356,12 @@ class Store:
                        _canon(evidence_viewed or []), before, after))
             disposition = None
             if after == "CONFIRMED":
-                disposition = (f"CONFIRMED_{basis.upper()}: optical event confirmed by "
-                               f"{'field evidence' if basis == 'field' else 'analyst review'}"
-                               f"; substance/species unconfirmed"
-                               + ("" if basis == "field" else " without field sample"))
+                disposition = (f"Confirmed by "
+                               f"{'field evidence' if basis == 'field' else 'an analyst'}"
+                               f": the unusual water is real. The substance or species is not confirmed"
+                               + ("." if basis == "field" else " without a water sample."))
             elif after == "FALSE_POSITIVE":
-                disposition = f"FALSE_POSITIVE ({basis} review)"
+                disposition = f"False alarm ({basis} review)"
             self._set_status(c, iid, after, disposition,
                              new_hypothesis if new_hypothesis else None)
             self._audit(c, reviewer, f"review.{decision.lower()}", "incident", iid,

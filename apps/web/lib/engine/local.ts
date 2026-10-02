@@ -196,8 +196,8 @@ export class LocalEngine implements Engine {
       inc.updated_at = review.created_at;
       if (body.new_hypothesis) inc.event_type_hypothesis = body.new_hypothesis as Incident["event_type_hypothesis"];
       if (after === "CONFIRMED")
-        inc.disposition = `CONFIRMED_${basis.toUpperCase()}: optical event confirmed by ${basis === "field" ? "field evidence" : "analyst review"}; substance/species unconfirmed${basis === "field" ? "" : " without field sample"}`;
-      else if (after === "FALSE_POSITIVE") inc.disposition = `FALSE_POSITIVE (${basis} review)`;
+        inc.disposition = `Confirmed by ${basis === "field" ? "field evidence" : "an analyst"}: the unusual water is real. The substance or species is not confirmed${basis === "field" ? "" : " without a water sample"}.`;
+      else if (after === "FALSE_POSITIVE") inc.disposition = `False alarm (${basis} review)`;
       await this.appendAudit(reviewer, `review.${body.decision.toLowerCase()}`, "incident", id,
         { review_id: review.id, from: before, to: after, model_id: inc.model_id, new_hypothesis: body.new_hypothesis || null, basis });
       const lab = labelFromReview(body.decision, review.previous_hypothesis, body.new_hypothesis, basis);

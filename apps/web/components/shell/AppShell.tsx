@@ -66,13 +66,13 @@ function TopBar({ aois, models }: { aois: Aoi[]; models: ModelRecord[] }) {
       </Link>
       <div className="hidden h-11 w-px bg-edge xl:block" />
       <div className="hidden min-w-0 flex-1 items-center gap-2 xl:flex">
-        <TopStat icon={<Dot color={fresh != null && fresh < 6 ? "#23D484" : "#FFC23D"} pulse />} k="REAL-TIME MONITORING" v="UAE Coastline" sub={`${uae.length} AOIs`} />
+        <TopStat icon={<Dot color={fresh != null && fresh < 6 ? "#23D484" : "#FFC23D"} pulse />} k="SATELLITE MONITORING" v="UAE coastline" sub={`${uae.length} areas`} />
         <TopStat icon={<BrainCircuit size={20} className="text-nominal" />} k="ACTIVE MODEL"
-          v={prod ? <span>v{prod.version} <span className="text-nominal">(Production)</span></span> : "loading"} sub={prod?.model_type === "rules" ? "rule-based triage" : "learned triage"} />
+          v={prod ? <span>v{prod.version} <span className="text-nominal">(Live)</span></span> : "loading"} sub={prod?.model_type === "rules" ? "rule-based triage" : "learned triage"} />
         <TopStat icon={<CalendarClock size={20} className="text-beam2" />} k="LAST OBSERVATION" v={fmt.utc(last)}
-          sub={<span className="flex items-center gap-1.5">Sentinel-2 L2A · <SimBadge text="813 SIM" /> · Sentinel-3</span>} />
-        <TopStat icon={<Satellite size={20} className="text-cyan" />} k="NEXT PASS (NOMINAL)"
-          v={np ? `in ${np.inText}` : "n/a"} sub={np ? `${np.platform} · orbit ${np.orbit}` : "no pattern"} />
+          sub={<span className="flex items-center gap-1.5">Sentinel-2 · <SimBadge text="813 SIM" /> · Sentinel-3</span>} />
+        <TopStat icon={<Satellite size={20} className="text-cyan" />} k="NEXT PASS (EXPECTED)"
+          v={np ? `in ${np.inText}` : "n/a"} sub={np ? `${np.platform} · orbit ${np.orbit}` : "no schedule"} />
       </div>
       <div className="ml-auto flex items-center gap-3">
         <Link href="/judge" className="btn btn-primary hidden md:inline-flex"><Presentation size={15} /> Judge Mode</Link>
@@ -80,12 +80,12 @@ function TopBar({ aois, models }: { aois: Aoi[]; models: ModelRecord[] }) {
           <div className="hud-value text-[20px] font-semibold text-ink">{now ? now.toISOString().slice(11, 19) : "--:--:--"} <span className="text-[11px] text-muted">UTC</span></div>
           <div className="text-[10.5px] text-muted">{now ? now.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) : ""}</div>
         </div>
-        <button onClick={() => { setDraft(op); setEdit(true); }} className="grid h-10 w-10 place-items-center rounded-full border border-line bg-panel2 text-[12px] font-bold text-ink hover:border-beam2" title={op ? `Operator: ${op}` : "Set operator name"}>
+        <button onClick={() => { setDraft(op); setEdit(true); }} className="grid h-10 w-10 place-items-center rounded-full border border-line bg-panel2 text-[12px] font-bold text-ink hover:border-beam2" title={op ? `Operator: ${op}` : "Set your name"}>
           {op ? op.slice(0, 2).toUpperCase() : <UserRound size={18} />}
         </button>
       </div>
-      <Modal open={edit} onClose={() => setEdit(false)} title="Operator identity" width={420}>
-        <p className="mb-3 text-[12.5px] text-muted">Every review, sample and promotion is recorded under this name in the audit log.</p>
+      <Modal open={edit} onClose={() => setEdit(false)} title="Your name" width={420}>
+        <p className="mb-3 text-[12.5px] text-muted">Your reviews, samples and model approvals are saved under this name in the audit log.</p>
         <input className="mb-3 w-full rounded-md border border-line bg-deep px-3 py-2 text-[13px] outline-none focus:border-beam2" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="e.g. analyst.awaiz" maxLength={60} />
         <div className="flex justify-end gap-2">
           <button className="btn" onClick={() => setEdit(false)}>Cancel</button>
@@ -122,12 +122,12 @@ function MissionRail({ incidents, aois, models, labels }: { incidents: IncidentS
   const newLabels = labels.filter((l) => l.source !== "cross_sensor_reference" && (!prod?.promoted_at || l.created_at > prod.promoted_at));
   const uae = aois.filter((a) => a.id.startsWith("AE-"));
   const items: { href: string; label: string; sub: string; icon: React.ReactNode; state: RailState; note: string }[] = [
-    { href: "/watch", label: "WATCH", sub: "Monitoring", icon: <Binoculars size={22} />, state: uae.length ? "ok" : "idle", note: `${uae.length} AOIs` },
-    { href: "/incidents", label: "DETECT", sub: "Anomalies", icon: <Radar size={22} />, state: review.length ? "attention" : "ok", note: `${open.length} open` },
-    { href: "/spectra", label: "DIAGNOSE", sub: "Spectral evidence", icon: <Waves size={22} />, state: "ok", note: "S2 + 813 sim" },
-    { href: "/field", label: "VERIFY", sub: "Field validation", icon: <ShieldCheck size={22} />, state: field.length ? "attention" : review.length ? "attention" : "ok", note: `${review.length} to review` },
+    { href: "/watch", label: "WATCH", sub: "Monitoring", icon: <Binoculars size={22} />, state: uae.length ? "ok" : "idle", note: `${uae.length} areas` },
+    { href: "/incidents", label: "DETECT", sub: "Unusual water", icon: <Radar size={22} />, state: review.length ? "attention" : "ok", note: `${open.length} open` },
+    { href: "/spectra", label: "DIAGNOSE", sub: "Colour fingerprint", icon: <Waves size={22} />, state: "ok", note: "S2 + 813 sim" },
+    { href: "/field", label: "VERIFY", sub: "Field samples", icon: <ShieldCheck size={22} />, state: field.length ? "attention" : review.length ? "attention" : "ok", note: `${review.length} to review` },
     { href: "/incident", label: "ACT", sub: "Response", icon: <Siren size={22} />, state: open.length ? "attention" : "idle", note: open.length ? "actions due" : "none" },
-    { href: "/learn", label: "LEARN", sub: "Model improvement", icon: <Sparkles size={22} />, state: cand ? "attention" : "ok", note: cand ? "candidate ready" : `${newLabels.length} new labels` },
+    { href: "/learn", label: "LEARN", sub: "Model improvement", icon: <Sparkles size={22} />, state: cand ? "attention" : "ok", note: cand ? "new model ready" : `${newLabels.length} new labels` },
   ];
   const nav = [
     { href: "/incidents", label: "INCIDENTS", icon: <ClipboardCheck size={16} />, badge: open.length },
@@ -176,8 +176,8 @@ function Footer({ incidents, aois, labels, models }: { incidents: IncidentSummar
   const prod = models.find((m) => m.status === "PRODUCTION");
   const queued = labels.filter((l) => l.source !== "cross_sensor_reference" && (!prod?.promoted_at || l.created_at > prod.promoted_at)).length;
   const stats: [string, string | number, string][] = [
-    ["Active incidents", open, "#FF4D5E"], ["Monitoring AOIs", uae.length, "#FFC23D"],
-    ["AOI observations (7d)", scenes7, "#EAF1FF"], ["Labels queued for LEARN", queued, "#27C3F3"],
+    ["Active incidents", open, "#FF4D5E"], ["Areas monitored", uae.length, "#FFC23D"],
+    ["Observations (7 days)", scenes7, "#EAF1FF"], ["New labels for LEARN", queued, "#27C3F3"],
   ];
   return (
     <footer className="flex h-[44px] shrink-0 items-center gap-5 border-t border-edge/70 bg-void/80 px-4 text-[11px] short:h-[38px]">

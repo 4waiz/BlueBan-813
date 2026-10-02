@@ -8,51 +8,51 @@ export function incidentReportMd(inc: Incident): string {
   const L: string[] = [];
   L.push(`# Incident report ${inc.id}`, "");
   L.push(`**Status:** ${inc.status}  `);
-  L.push(`**Event type (hypothesis):** ${inc.event_type_hypothesis} - ${EVENT_TYPES[inc.event_type_hypothesis] || ""}  `);
-  L.push(`**AOI:** ${inc.aoi_name || inc.aoi_id}  `);
-  L.push(`**Observation:** ${inc.observation_time}  `, `**Detected:** ${inc.detected_at}  `, `**Raised by model:** ${inc.model_id}  `);
-  L.push(`**Severity / confidence:** ${v(inc.severity, 2)} / ${v(inc.confidence, 2)} (reported separately, never multiplied)  `);
-  if (inc.disposition) L.push(`**Disposition:** ${inc.disposition}  `);
-  L.push("", "> Optical satellite evidence identifies an anomaly in how the water scatters and absorbs light. It does not identify a species, a toxin or a substance. Field sampling and laboratory analysis confirm.", "");
+  L.push(`**Suspected type:** ${inc.event_type_hypothesis} - ${EVENT_TYPES[inc.event_type_hypothesis] || ""}  `);
+  L.push(`**Monitored area:** ${inc.aoi_name || inc.aoi_id}  `);
+  L.push(`**Observed:** ${inc.observation_time}  `, `**Detected:** ${inc.detected_at}  `, `**Flagged by model:** ${inc.model_id}  `);
+  L.push(`**Severity / confidence:** ${v(inc.severity, 2)} / ${v(inc.confidence, 2)} (shown separately, never combined)  `);
+  if (inc.disposition) L.push(`**Outcome:** ${inc.disposition}  `);
+  L.push("", "> Satellite images show unusual water colour. They cannot identify a species, a toxin or a substance. Only water samples and lab tests can confirm what it is.", "");
   const rec = inc.recommendation;
   if (rec) {
     L.push("## Recommended action", `**${rec.action}** (priority ${rec.priority})`);
     rec.reasons.forEach((r) => L.push(`- ${r}`));
-    if (rec.required_evidence.length) { L.push("", "Required evidence:"); rec.required_evidence.forEach((r) => L.push(`- ${r}`)); }
-    if (rec.decision_deadline_utc) L.push("", `Decision deadline: ${rec.decision_deadline_utc}`);
+    if (rec.required_evidence.length) { L.push("", "Evidence needed:"); rec.required_evidence.forEach((r) => L.push(`- ${r}`)); }
+    if (rec.decision_deadline_utc) L.push("", `Decide by: ${rec.decision_deadline_utc}`);
     L.push("");
   }
-  L.push("## Evidence", "### Temporal context");
-  L.push(`- Seasonal percentile of the primary indicator: ${v(inc.temporal?.seasonal_percentile, 1)} (n = ${inc.temporal?.n_seasonal ?? "n/a"})`);
+  L.push("## Evidence", "### Compared with past years");
+  L.push(`- Main indicator, percentile vs the same season in past years: ${v(inc.temporal?.seasonal_percentile, 1)} (images compared: ${inc.temporal?.n_seasonal ?? "n/a"})`);
   const feats = { ...(inc.water_quality?.estimates || {}), ...(inc.water_quality?.features || {}) };
   if (Object.keys(feats).length) {
-    L.push("### Water-quality indicators", "| Indicator | Value | Units | Kind | Seasonal pct |", "|---|---|---|---|---|");
+    L.push("### Water-quality indicators", "| Indicator | Value | Units | Type | Percentile vs past years |", "|---|---|---|---|---|");
     Object.entries(feats).forEach(([k, e]) => L.push(`| ${e.label || k} | ${v(e.value)} | ${e.units || ""} | ${e.quantity_kind} | ${v(e.seasonal_percentile, 0)} |`));
   }
   const ag = inc.sensor_agreement || {};
   if (Object.keys(ag).length) {
-    L.push("### Cross-sensor evidence");
+    L.push("### Satellite agreement");
     Object.entries(ag).forEach(([k, a]) => L.push(`- ${k}: ${a.agrees ? "agrees" : a.agrees === false ? "does not agree" : "not available"}${a.note ? ` - ${a.note}` : ""}`));
   }
   if (inc.quality_flags?.length) { L.push("### Quality flags"); inc.quality_flags.forEach((q) => L.push(`- ${q}`)); }
   if (inc.reviews?.length) {
-    L.push("", "## Operator reviews", "| When | Reviewer | Decision | From -> to | Note |", "|---|---|---|---|---|");
+    L.push("", "## Operator reviews", "| When | Reviewer | Decision | Status change | Note |", "|---|---|---|---|---|");
     inc.reviews.forEach((r) => L.push(`| ${r.created_at} | ${r.reviewer} | ${r.decision}${r.new_hypothesis ? ` -> ${r.new_hypothesis}` : ""} | ${r.status_before} -> ${r.status_after} | ${(r.note || "").replace(/\|/g, "/")} |`));
   }
   if (inc.samples?.length) {
-    L.push("", "## Field sampling plan", "| Code | Role | Lat | Lon | Status |", "|---|---|---|---|---|");
+    L.push("", "## Water sampling plan", "| Code | Role | Lat | Lon | Status |", "|---|---|---|---|---|");
     inc.samples.forEach((s) => L.push(`| ${s.code} | ${s.role} | ${s.lat.toFixed(5)} | ${s.lon.toFixed(5)} | ${s.status} |`));
   }
   if (inc.measurements?.length) {
-    L.push("", "## Field and laboratory measurements", "| Parameter | Value | Unit | Sample | Method | QC | Entered by |", "|---|---|---|---|---|---|---|");
+    L.push("", "## Field and lab results", "| Parameter | Value | Unit | Sample | Method | Quality check | Entered by |", "|---|---|---|---|---|---|---|");
     inc.measurements.forEach((m) => L.push(`| ${m.parameter} | ${m.value} | ${m.unit} | ${m.sample_id || ""} | ${m.method || ""} | ${m.qc_flag} | ${m.entered_by} |`));
   }
   if (inc.provenance?.sources?.length) {
-    L.push("", "## Provenance", "| Sensor | Scene | Acquired | Level | Provider | Licence |", "|---|---|---|---|---|---|");
+    L.push("", "## Data sources", "| Sensor | Image ID | Taken | Processing level | Provider | Licence |", "|---|---|---|---|---|---|");
     inc.provenance.sources.forEach((s) => L.push(`| ${s.sensor || s.satellite || ""} | ${s.scene_id || ""} | ${s.acquisition_utc || ""} | ${s.processing_level || ""} | ${s.provider || ""} | ${s.licence || ""} |`));
   }
   if (inc.audit_trail?.length) {
-    L.push("", "## Audit trail (hash-chained)", "| Seq | When | Actor | Action | Hash |", "|---|---|---|---|---|");
+    L.push("", "## Tamper-proof log", "| # | When | Who | Action | Hash |", "|---|---|---|---|---|");
     [...inc.audit_trail].sort((a, b) => a.seq - b.seq).forEach((a) => L.push(`| ${a.seq} | ${a.at} | ${a.actor} | ${a.action} | \`${a.hash.slice(0, 16)}\` |`));
   }
   L.push("", "_Generated by BLUEBAN 813. Built by Team Kanban._");

@@ -51,6 +51,30 @@ def log(m):
     print(f"[{time.strftime('%H:%M:%S')}] {m}", flush=True)
 
 
+#: Plain names used in incident text (the feature codes stay in the data).
+PLAIN_FEATURE = {"NDCI": "chlorophyll index", "MCI": "chlorophyll peak index", "FAI": "floating algae index",
+                 "TUR_NECHAD2016": "turbidity", "HUE_ANGLE": "water colour", "CDOM_RATIO": "dissolved organics index"}
+PLAIN_REFERENCE = {"CHL_NN": "Chlorophyll estimate", "TSM_NN": "Sediment estimate"}
+
+
+def temporal_note(prim: str, n_clim: int, res_m: float) -> str:
+    return (f"Compared with {n_clim} images from the same season in other years "
+            f"({PLAIN_FEATURE.get(prim, prim)}, {res_m:.0f} m pixels).")
+
+
+def s2_note(z: float, pct: float) -> str:
+    return f"score {z:.1f} vs past years, {pct:.0f}th percentile for the season"
+
+
+def olci_note(o: dict) -> str:
+    dtm = o["dt_minutes"]
+    when = "at the same time as" if round(dtm) == 0 else f"{abs(dtm):.0f} min {'before' if dtm < 0 else 'after'}"
+    units = o["units"].replace("mg m^-3", "mg/m³")
+    return (f"{PLAIN_REFERENCE.get(o['variable'], o['variable'])} {o['region_median']:.2f} vs "
+            f"{o['background_median']:.2f} {units} around it (x{o['ratio']:.2f}), {when} Sentinel-2. "
+            "A separate satellite's estimate, not a water sample.")
+
+
 def _grid_window(center_lonlat, half_km, aoi_bbox):
     lon, lat = center_lonlat
     dlat = half_km / 110.57
@@ -483,9 +507,9 @@ def main():
             "Indices are proxies; no local calibration exists (no public UAE in-situ data)",
             "Seasonal climatology built from a finite archive (2017-2026)"])
 
-    etypes = {"BLOOM_LIKE": "High chlorophyll / bloom-like anomaly",
-              "SEDIMENT_LIKE": "Turbidity / suspended-sediment anomaly",
-              "SURFACE_FILM_LIKE": "Surface / floating material anomaly"}
+    etypes = {"BLOOM_LIKE": "Possible algae bloom (high chlorophyll)",
+              "SEDIMENT_LIKE": "Muddy water (suspended sediment)",
+              "SURFACE_FILM_LIKE": "Floating material or surface film"}
     inc = {
         "id": a.id, "status": a.status, "aoi_id": a.aoi, "aoi_name": aoi["name"],
         "detected_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -501,31 +525,27 @@ def main():
                      "label": "Chlorophyll proxy (NDCI)", "seasonal_percentile": med(pmaps["NDCI"], event),
                      "z": med(zmaps["NDCI"], event), "baseline_median": med(meds["NDCI"], event)},
             "MCI": {"value": med(F["MCI"], event), "units": "reflectance", "quantity_kind": "PROXY",
-                    "label": "Red-edge peak (MCI)", "seasonal_percentile": med(pmaps["MCI"], event),
+                    "label": "Chlorophyll peak (MCI)", "seasonal_percentile": med(pmaps["MCI"], event),
                     "z": med(zmaps["MCI"], event), "baseline_median": med(meds["MCI"], event)},
             "TUR_NECHAD2016": {"value": med(F["TUR_NECHAD2016"], event), "units": "FNU",
-                               "quantity_kind": "GENERIC_CALIBRATION", "label": "Turbidity (Nechad, not locally validated)",
+                               "quantity_kind": "GENERIC_CALIBRATION", "label": "Turbidity (generic formula)",
                                "seasonal_percentile": med(pmaps["TUR_NECHAD2016"], event),
                                "baseline_median": med(meds["TUR_NECHAD2016"], event)},
             "HUE_ANGLE": {"value": med(F["HUE_ANGLE"], event), "units": "degrees", "quantity_kind": "COLORIMETRIC",
-                          "label": "Water-colour hue angle", "z": med(zmaps["HUE_ANGLE"], event),
+                          "label": "Water colour (hue)", "z": med(zmaps["HUE_ANGLE"], event),
                           "seasonal_percentile": med(pmaps["HUE_ANGLE"], event),
                           "baseline_median": med(meds["HUE_ANGLE"], event)}}},
         "temporal": {"seasonal_percentile": pmed, "n_seasonal": int(np.nanmedian(nclim[event])),
                      "persistence_frac": cand["features"].get("persistence_frac"),
-                     "note": f"Per-pixel robust z and percentile of {prim} against {len(clim)} same-season "
-                             f"acquisitions from other years at {a.res:.0f} m.",
+                     "note": temporal_note(prim, len(clim), a.res),
                      "series": [{"date": r_["date"], "value": ((r_.get("all") or {}).get(prim) or {}).get("p95")}
                                 for r_ in ws["rows"] if "error" not in r_ and (r_.get("all") or {}).get("n_water", 0) > 500]},
         "spatial": {"rx_percentile": cand["features"].get("rx_pct")},
         "sensor_agreement": {
-            "Sentinel-2 L2A": {"agrees": True, "note": f"z {zmed:.1f}, {pmed:.0f}th seasonal pct"},
-            "Sentinel-3 OLCI": {**olci, "note": olci.get("note") or (
-                f"{olci['variable']} {olci['region_median']:.2f} vs {olci['background_median']:.2f} {olci['units']} "
-                f"around it (x{olci['ratio']:.2f}), {olci['dt_minutes']:+.0f} min from Sentinel-2; "
-                "an independent sensor and retrieval, not in-situ truth")}},
-        "quality_flags": [f"Glint-affected water fraction {glint_frac:.0%} (B11 > 0.0215; SWIR-offset corrected)",
-                          f"Median distance to shore {dshore_km:.2f} km" if dshore_km is not None else "distance to shore unknown"],
+            "Sentinel-2 L2A": {"agrees": True, "note": s2_note(zmed, pmed)},
+            "Sentinel-3 OLCI": {**olci, "note": olci.get("note") or olci_note(olci)}},
+        "quality_flags": [f"Sun glint on {glint_frac:.0%} of the water",
+                          f"About {dshore_km:.2f} km from shore" if dshore_km is not None else "Distance to shore unknown"],
         "exposure": exp_rows[:8],
         "field_validation": {"status": "NOT_STARTED"},
         "provenance": prov.to_dict(),

@@ -88,31 +88,31 @@ def annaba_incident() -> dict | None:
         "severity": round(e["severity"], 4), "confidence": round(e["confidence"], 4),
         "priority": e["assessment"]["priority"], "model_id": "triage-1.0.0",
         "role": "negative_control",
-        "title": "Spatial anomaly stood down: persistent coastal feature",
-        "summary": ("RX flags a 1.13 km² nearshore region at the 99.7th percentile of the scene's water, "
-                    "with a sediment-like spectrum. Against 428 Sentinel-2 observations of the same zone "
-                    "(2020-2025) it sits at the 6.6th seasonal percentile: cleaner than usual. BlueBan "
-                    "stands down. This is the false-alarm suppression the product is built around."),
+        "title": "Stood down: a permanent coastal feature, not a new event",
+        "summary": ("A 1.13 km² patch near the shore stands out from the rest of the scene (99.7th percentile) "
+                    "and looks like sediment. But 428 Sentinel-2 images of the same spot (2020-2025) show it is "
+                    "normal for the season (6.6th percentile), even cleaner than usual. So BlueBan stands down. "
+                    "Avoiding false alarms like this is what the product is built for."),
         "geometry": primary["geometry"], "centroid": g["centroid_lonlat"], "area_km2": g["area_km2"],
         "water_quality": {"features": {
             "NDCI": {"value": idx["NDCI"]["event_median"], "units": "dimensionless", "quantity_kind": "PROXY",
                      "baseline_median": idx["NDCI"]["background_median"], "label": "Chlorophyll proxy (NDCI)"},
             "TURBIDITY_PROXY": {"value": idx["TURBIDITY_PROXY"]["event_median"], "units": "dimensionless",
-                                "quantity_kind": "PROXY", "label": "Turbidity proxy (red/green)",
+                                "quantity_kind": "PROXY", "label": "Turbidity proxy (red/green ratio)",
                                 "baseline_median": idx["TURBIDITY_PROXY"]["background_median"],
                                 "seasonal_percentile": t["seasonal_percentile"]},
             "FAI": {"value": idx["FAI"]["event_median"], "units": "reflectance", "quantity_kind": "PROXY",
                     "label": "Floating Algae Index"}}},
         "temporal": {"seasonal_percentile": t["seasonal_percentile"], "n_seasonal": t["n_seasonal"],
                      "persistence_frac": None,
-                     "note": "Zone P95 of the turbidity proxy against 106 same-season Sentinel-2 observations."},
+                     "note": "Turbidity compared with 106 Sentinel-2 images from the same season."},
         "spatial": {"rx_percentile": e["anomaly"]["event_percentile_in_scene"]},
         "sensor_agreement": {
-            "Tanager-1 (hyperspectral)": {"agrees": True, "note": "RX 99.7th percentile of scene water"},
-            "Sentinel-2 L2A baseline": {"agrees": False, "note": "6.6th seasonal percentile (428 obs)"},
-            "813 (simulated)": {"agrees": True, "note": "simulated from Tanager; not independent"}},
-        "quality_flags": ["Nearshore: median 90 m from shore; bottom reflectance is a competing explanation",
-                          "Cloud 0.08 %, product bad bands excluded (58 of 426)"],
+            "Tanager-1 (hyperspectral)": {"agrees": True, "note": "Stands out from the scene's water (99.7th percentile)"},
+            "Sentinel-2 L2A baseline": {"agrees": False, "note": "Normal for the season (6.6th percentile, 428 images)"},
+            "813 (simulated)": {"agrees": True, "note": "Simulated from Tanager, so not independent"}},
+        "quality_flags": ["About 90 m from shore, so the seabed may be showing through",
+                          "Cloud 0.08 %. 58 of 426 bad bands left out"],
         "exposure": exposure,
         "field_validation": {"status": "NOT_REQUIRED (stood down)"},
         "provenance": {"sources": prov.get("sources", []), "algorithm": prov.get("algorithm"),

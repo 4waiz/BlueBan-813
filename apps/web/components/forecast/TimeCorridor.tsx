@@ -47,7 +47,7 @@ function Corridor({ steps, sel }: { steps: DriftStep[]; sel: number }) {
 export default function TimeCorridor({ steps, height = 260, wind }: { steps: DriftStep[] | null; height?: number | string; wind?: { speed_kmh?: number; from?: string } | null }) {
   const [sel, setSel] = useState(0);
   const ok = useMemo(() => (steps || []).filter((s) => s.centroid && Number.isFinite(s.centroid[0])), [steps]);
-  if (!ok.length) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>No drift scenario for this incident</div>;
+  if (!ok.length) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>No drift forecast for this incident</div>;
   return (
     <div className="relative" style={{ height }}>
       <Canvas camera={{ position: [0, -0.4, 4.6], fov: 38 }} dpr={[1, 1.75]}>
@@ -56,7 +56,7 @@ export default function TimeCorridor({ steps, height = 260, wind }: { steps: Dri
         <OrbitControls enablePan={false} minDistance={2.5} maxDistance={7} />
       </Canvas>
       {wind && <div className="panel-flat absolute right-2 top-9 px-2 py-1 text-[10.5px] text-muted">Wind {wind.speed_kmh?.toFixed(0)} km/h from {wind.from}</div>}
-      <div className="absolute left-2 top-2 rounded bg-void/80 px-2 py-1 text-[10px] font-bold tracking-wider text-caution">SCENARIO TRAJECTORY ESTIMATE · wind-only</div>
+      <div className="absolute left-2 top-2 rounded bg-void/80 px-2 py-1 text-[10px] font-bold tracking-wider text-caution" title="Moved by wind only (about 3 % of wind speed) plus spreading. No tides or currents. Not a validated ocean forecast.">WIND-ONLY SCENARIO</div>
       <div className="absolute inset-x-2 bottom-2 flex items-center gap-2">
         {ok.map((s, i) => (
           <button key={s.hours} onClick={() => setSel(i)} className={`flex-1 rounded-md border px-1 py-1 text-[11px] font-semibold ${i === sel ? "border-beam bg-beam/20 text-ink" : "border-edge text-muted"}`}>{s.hours === 0 ? "Now" : `+${s.hours}h`}</button>

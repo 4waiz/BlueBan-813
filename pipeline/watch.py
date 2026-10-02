@@ -296,12 +296,17 @@ def _grid_from_dict(d: dict) -> AoiGrid:
                    tuple(d["shape"]), d["resolution_m"])
 
 
+def datatake_tag(date: str, orbit, platform) -> str:
+    """Cache/sidecar name of one datatake: date, relative orbit, platform suffix."""
+    return f"{date}_R{int(orbit):03d}_{(platform or 'S2')[-2:]}"
+
+
 def process_datatake(args) -> dict:
     """One datatake -> one time-series row (+ cache file). Runs in a worker process."""
     key, item_dicts, grid_d, cache_dir, zones_path = args
     import json as _json
     import pystac
-    tag = f"{key[0]}_R{int(key[1]):03d}_{(key[2] or 'S2')[-2:]}"
+    tag = datatake_tag(key[0], key[1], key[2])
     sidecar = os.path.join(cache_dir, f"{tag}.row.json") if cache_dir else None
     if sidecar and os.path.exists(sidecar) and os.path.exists(os.path.join(cache_dir, f"{tag}.npz")):
         with open(sidecar, encoding="utf-8") as f:                 # resume: already processed
@@ -333,13 +338,17 @@ def process_datatake(args) -> dict:
 
 def screen_aoi(aoi_id: str, bbox, start: str, end: str, resolution_m: float = 60.0,
                max_cloud: float = 30.0, workers: int = 6, zones: str | None = None,
-               cache_dir: str | None = None, progress=print) -> dict:
+               cache_dir: str | None = None, progress=print, reuse: dict | None = None) -> dict:
     """Screen every usable acquisition over one AOI. Returns the time series.
 
     Datatakes are processed in separate PROCESSES: a network stall inside GDAL
     can hold the GIL, and in a thread pool that freezes every worker. With
     ``cache_dir`` set, each acquisition's water-masked feature rasters are also
     written there (float16 ``.npz``, gitignored) for per-pixel climatologies.
+
+    ``reuse`` maps datatake tags to rows from a previous run: those datatakes are
+    not read again (their cached raster must still exist when ``cache_dir`` is
+    set), so a refresh only screens what is new.
     """
     from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 
@@ -355,8 +364,19 @@ def screen_aoi(aoi_id: str, bbox, start: str, end: str, resolution_m: float = 60
     gd = _grid_to_dict(grid)
     tasks = [(key, [it.to_dict() for it in items], gd, cache_dir, zones_path)
              for key, items in groups]
+    reused = []
+    if reuse:
+        fresh = []
+        for t in tasks:
+            tag = datatake_tag(*t[0][:3])
+            if tag in reuse and (not cache_dir or os.path.exists(os.path.join(cache_dir, f"{tag}.npz"))):
+                reused.append(reuse[tag])
+            else:
+                fresh.append(t)
+        progress(f"  {aoi_id}: {len(reused)} datatakes already screened, {len(fresh)} new")
+        tasks = fresh
     t0 = time.time()
-    rows, pending, started = [], {}, {}
+    rows, pending, started = list(reused), {}, {}
     stall_s, done_n = 300.0, 0
     ex = ProcessPoolExecutor(max_workers=workers)
     queue = list(tasks)

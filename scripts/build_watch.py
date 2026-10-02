@@ -7,6 +7,10 @@ and, with ``--cache``, per-acquisition feature rasters under
 Usage:
     python scripts/build_watch.py --res 120 --start 2023-01-01 --end 2026-09-30
     python scripts/build_watch.py --aoi AE-FUJ --res 60 --start 2019-01-01 --cache
+    python scripts/build_watch.py --res 120 --start 2021-01-01 --end 2026-10-31 --cache --incremental
+
+``--incremental`` keeps the rows already in ``outputs/watch/<AOI>.json`` and
+screens only datatakes that are not there yet (a refresh takes minutes, not hours).
 """
 from __future__ import annotations
 
@@ -35,6 +39,8 @@ def main():
     ap.add_argument("--cache", action="store_true")
     ap.add_argument("--suffix", default="")
     ap.add_argument("--zones", default="none", choices=["none", "worldcover"])
+    ap.add_argument("--incremental", action="store_true",
+                    help="reuse rows already in outputs/watch/<AOI>.json; screen only new datatakes")
     a = ap.parse_args()
 
     cfg = yaml.safe_load(open(os.path.join(ROOT, "config", "aois_uae.yaml"),
@@ -50,13 +56,23 @@ def main():
         # whole process pool. With --cache every finished datatake has a sidecar,
         # so retrying resumes where it stopped instead of failing the AOI.
         from concurrent.futures.process import BrokenProcessPool
+        reuse = None
+        prev = os.path.join(ROOT, "outputs", "watch", f"{aoi_id}{a.suffix}.json")
+        if a.incremental and os.path.exists(prev):
+            with open(prev, encoding="utf-8") as f:
+                old = json.load(f)
+            if old.get("grid", {}).get("resolution_m") == a.res and old.get("max_cloud") == a.max_cloud:
+                reuse = {watch.datatake_tag(r["date"], r["relative_orbit"], r.get("platform")): r
+                         for r in old["rows"] if "error" not in r and r.get("relative_orbit") is not None}
+            else:
+                print("  previous run used other settings; screening everything", flush=True)
         for attempt in range(1, 6):
             try:
                 ts = watch.screen_aoi(aoi_id, cfg[aoi_id]["bbox"], a.start, a.end,
                                       resolution_m=a.res, max_cloud=a.max_cloud,
                                       workers=a.workers, cache_dir=cache,
                                       zones=None if a.zones == "none" else a.zones,
-                                      progress=lambda m: print(m, flush=True))
+                                      progress=lambda m: print(m, flush=True), reuse=reuse)
                 break
             except BrokenProcessPool as e:
                 if attempt == 5 or not cache:

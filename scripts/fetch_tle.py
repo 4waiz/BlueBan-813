@@ -18,18 +18,18 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #: Satellite name on CelesTrak -> (key, role in BLUEBAN 813)
 WANTED = {
-    "SENTINEL-2A": ("S2A", "Sentinel-2 MSI: primary detection sensor"),
-    "SENTINEL-2B": ("S2B", "Sentinel-2 MSI: primary detection sensor"),
-    "SENTINEL-2C": ("S2C", "Sentinel-2 MSI: primary detection sensor"),
-    "SENTINEL-3A": ("S3A", "Sentinel-3 OLCI: cross-sensor reference"),
-    "SENTINEL-3B": ("S3B", "Sentinel-3 OLCI: cross-sensor reference"),
-    "SENTINEL-1A": ("S1A", "Sentinel-1 SAR: optional surface-dark-anomaly mode"),
-    "SENTINEL-1C": ("S1C", "Sentinel-1 SAR: optional surface-dark-anomaly mode"),
-    "SENTINEL-1D": ("S1D", "Sentinel-1 SAR: optional surface-dark-anomaly mode"),
-    "LANDSAT 8": ("L8", "Landsat 8 OLI/TIRS: thermal context"),
-    "LANDSAT 9": ("L9", "Landsat 9 OLI-2/TIRS-2: thermal context"),
-    "PACE": ("PACE", "NASA PACE OCI hyperspectral ocean colour (imaged the 2024 Gulf of Oman bloom)"),
-    "TANAGER-1": ("TAN1", "Planet Tanager-1 hyperspectral: source pixels of the simulated 813 product"),
+    "SENTINEL-2A": ("S2A", "Sentinel-2: main satellite for spotting changes"),
+    "SENTINEL-2B": ("S2B", "Sentinel-2: main satellite for spotting changes"),
+    "SENTINEL-2C": ("S2C", "Sentinel-2: main satellite for spotting changes"),
+    "SENTINEL-3A": ("S3A", "Sentinel-3: second-satellite check"),
+    "SENTINEL-3B": ("S3B", "Sentinel-3: second-satellite check"),
+    "SENTINEL-1A": ("S1A", "Sentinel-1 radar: optional check for dark patches (possible oil)"),
+    "SENTINEL-1C": ("S1C", "Sentinel-1 radar: optional check for dark patches (possible oil)"),
+    "SENTINEL-1D": ("S1D", "Sentinel-1 radar: optional check for dark patches (possible oil)"),
+    "LANDSAT 8": ("L8", "Landsat 8: water temperature context"),
+    "LANDSAT 9": ("L9", "Landsat 9: water temperature context"),
+    "PACE": ("PACE", "NASA PACE: hyperspectral ocean colour (saw the 2024 Gulf of Oman bloom)"),
+    "TANAGER-1": ("TAN1", "Planet Tanager-1: real hyperspectral pixels used to simulate 813"),
 }
 
 

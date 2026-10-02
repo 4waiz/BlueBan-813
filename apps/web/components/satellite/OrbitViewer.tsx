@@ -459,7 +459,7 @@ const SPEEDS = [1, 30, 120, 600, 3600];
 
 function BandStrip({ k }: { k: SensorKey }) {
   const s = SENSORS[k];
-  if (!s.bands.length) return <div className="text-[11px] text-muted">Active microwave (C-band, 5.405 GHz): no optical bands.</div>;
+  if (!s.bands.length) return <div className="text-[11px] text-muted">Radar (5.405 GHz): no colour bands.</div>;
   const lo = 340, hi = Math.max(1750, ...s.bands.map(([c]) => c + 20)), W = 300;
   const x = (nm: number) => 6 + ((nm - lo) / (hi - lo)) * (W - 12);
   return (
@@ -486,7 +486,7 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
     // Satellite 813: ILLUSTRATIVE sun-synchronous orbit (500 km, 97.4 deg, 10:30 descending node).
     const t0 = Date.parse(tle.fetched_utc);
     const rtasc = sunPos(jday(new Date(t0))).rtasc;
-    out.unshift({ key: "813", name: "Satellite 813", sensor: "813", color: SENSORS["813"].color, role: "Illustrative orbit: not published",
+    out.unshift({ key: "813", name: "Satellite 813", sensor: "813", color: SENSORS["813"].color, role: "Orbit not published: shown for illustration",
       synth: { a: RE + 500, inc: 97.4 * DEG, raan0: rtasc + 157.5 * DEG, u0: 0, t0 } });
     return out;
   }, [tle]);
@@ -630,7 +630,7 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
           <div className="hud-value text-[12px] text-cyan">{fmtUTC(clock.current)} · {fmtGST(clock.current)} {speed > 1 && playing ? <span className="text-caution">· ×{speed}</span> : null}{!playing && <span className="text-muted"> · paused</span>}</div>
         </div>
         <div className="pointer-events-auto flex gap-2">
-          <button onClick={toggleFs} className="btn px-3 py-2" title="Browser full screen">{fs ? <Minimize size={16} /> : <Maximize size={16} />}</button>
+          <button onClick={toggleFs} className="btn px-3 py-2" title="Full screen">{fs ? <Minimize size={16} /> : <Maximize size={16} />}</button>
           <button onClick={onExit} className="btn px-3 py-2" title="Close (Esc)"><X size={16} /> Close</button>
         </div>
       </div>
@@ -661,7 +661,7 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
         <div className="absolute right-3 top-[104px] max-h-[calc(100%-230px)] w-[330px] overflow-y-auto rounded-lg border border-edge bg-void/80 p-3 backdrop-blur short:top-[92px]">
           <div className="flex items-center justify-between">
             <div className="font-display text-[19px] font-bold">{sel.name}</div>
-            {sel.synth ? <span className="rounded border border-caution/60 px-1.5 py-0.5 text-[10px] font-bold text-caution">ILLUSTRATIVE ORBIT</span> : <span className="hud-value text-[11px] text-muted">NORAD {sel.norad}</span>}
+            {sel.synth ? <span className="rounded border border-caution/60 px-1.5 py-0.5 text-[10px] font-bold text-caution">ILLUSTRATIVE ORBIT</span> : <span className="hud-value text-[11px] text-muted" title="Satellite catalogue number">NORAD {sel.norad}</span>}
           </div>
           <div className="text-[12px]" style={{ color: selSpec.color }}>{selSpec.kind}</div>
           <div className="mt-1 text-[11.5px] text-muted">{sel.role}</div>
@@ -670,17 +670,17 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
             <div className="kv"><span>Longitude</span><span className="hud-value">{live ? `${(live.lla.lon / DEG).toFixed(2)}°` : "…"}</span></div>
             <div className="kv"><span>Altitude</span><span className="hud-value">{live ? `${live.lla.alt.toFixed(0)} km` : "…"}</span></div>
             <div className="kv"><span>Speed</span><span className="hud-value">{live ? `${live.lla.vel.toFixed(2)} km/s` : "…"}</span></div>
-            <div className="kv"><span>Period</span><span className="hud-value">{period ? `${period.toFixed(1)} min` : "n/a"}</span></div>
-            <div className="kv"><span>Inclination</span><span className="hud-value">{inc ? `${inc.toFixed(2)}°` : "n/a"}</span></div>
-            <div className="kv"><span>Swath</span><span className="hud-value">{selSpec.swath_km ? `${selSpec.swath_km.toLocaleString()} km` : "not published"}</span></div>
-            <div className="kv"><span>In sunlight</span><span className="hud-value">{sunlit == null ? "…" : sunlit ? "yes" : "no (eclipse)"}</span></div>
+            <div className="kv"><span>One orbit</span><span className="hud-value">{period ? `${period.toFixed(1)} min` : "n/a"}</span></div>
+            <div className="kv"><span>Orbit tilt</span><span className="hud-value">{inc ? `${inc.toFixed(2)}°` : "n/a"}</span></div>
+            <div className="kv" title="Width of the strip the sensor images"><span>Coverage</span><span className="hud-value">{selSpec.swath_km ? `${selSpec.swath_km.toLocaleString()} km` : "unpublished"}</span></div>
+            <div className="kv"><span>Sunlit</span><span className="hud-value">{sunlit == null ? "…" : sunlit ? "yes" : "no (in shadow)"}</span></div>
           </div>
-          <div className="mt-1 text-[10.5px] text-dim">{sel.synth ? "813 orbit, altitude, swath and spacecraft are not published: 500 km sun-synchronous orbit shown for illustration; the marker is abstract." : `TLE epoch ${sel.epoch?.slice(0, 16).replace("T", " ")} UTC (${tleAgeDays != null ? `${Math.abs(tleAgeDays).toFixed(1)} d ${tleAgeDays >= 0 ? "old" : "ahead"}` : ""}) · SGP4 · swath: ${selSpec.swath_src}`}</div>
-          <div className="mt-3 hud-kicker">Band layout · {selSpec.range}</div>
+          <div className="mt-1 text-[10.5px] text-dim" title={sel.synth ? "Sun-synchronous orbit at 500 km. The marker is abstract." : "Positions are computed with SGP4 from public two-line orbit elements (TLE)."}>{sel.synth ? "813's orbit, height, coverage and spacecraft are not published. This 500 km orbit is for illustration only." : `Orbit data from ${sel.epoch?.slice(0, 16).replace("T", " ")} UTC (${tleAgeDays != null ? `${Math.abs(tleAgeDays).toFixed(1)} days ${tleAgeDays >= 0 ? "old" : "ahead"}` : ""}) · width source: ${selSpec.swath_src}`}</div>
+          <div className="mt-3 hud-kicker">Bands · {selSpec.range}</div>
           <BandStrip k={sel.sensor} />
-          <div className="mt-2 hud-kicker">{sel.synth ? "Spectral fan" : `Next UAE passes · 7 days (${selSpec.optical ? "daylight, " : ""}within the swath)`}</div>
-          {sel.synth ? <p className="text-[11.5px] text-muted">The fan below the marker is the published 813 band set: 205 narrow bands from 400 to 1700 nm, visible colours then false colours for the near- and short-wave infrared, swept the way a push-broom imager reads a line.</p>
-            : passes == null ? <p className="text-[11.5px] text-muted">Predicting…</p>
+          <div className="mt-2 hud-kicker">{sel.synth ? "Colour fan" : `Next UAE passes · 7 days (${selSpec.optical ? "daylight, " : ""}in view)`}</div>
+          {sel.synth ? <p className="text-[11.5px] text-muted">The fan under the marker shows 813&apos;s published bands: 205 narrow bands from 400 to 1700 nm. Infrared is drawn in false colour. The sweep shows how the sensor reads one line at a time.</p>
+            : passes == null ? <p className="text-[11.5px] text-muted">Finding passes…</p>
               : passes.length === 0 ? <p className="text-[11.5px] text-muted">No UAE pass in the next 7 days of simulated time.</p>
                 : <ul className="mt-1 space-y-1">{passes.map((p, i) => (
                   <li key={i} className="flex items-center justify-between rounded-md border border-edge bg-deep/60 px-2 py-1 text-[11.5px]">
@@ -704,14 +704,14 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
           onChange={(e) => { clock.current = startMs.current + Number(e.target.value) * 3600e3; }} className="min-w-[160px] flex-1 accent-[#27C3F3]" aria-label="Time offset (hours)" />
         <span className="hud-value w-[62px] text-[11px] text-muted">{((clock.current - startMs.current) / 3600e3 >= 0 ? "+" : "") + ((clock.current - startMs.current) / 3600e3).toFixed(1)} h</span>
         <span className="mx-1 h-5 w-px bg-edge" />
-        {([["orbits", "Orbits"], ["swaths", "Swaths"], ["labels", "Labels"], ["aois", "AOIs"], ["night", "City lights"], ["glint", "Sun glint"], ["clouds", "Clouds (static)"], ["atmosphere", "Atmosphere"]] as [keyof typeof layers, string][]).map(([k, lab]) => (
+        {([["orbits", "Orbits"], ["swaths", "Coverage"], ["labels", "Labels"], ["aois", "Areas"], ["night", "City lights"], ["glint", "Sun glint"], ["clouds", "Clouds (not live)"], ["atmosphere", "Atmosphere"]] as [keyof typeof layers, string][]).map(([k, lab]) => (
           <button key={k} onClick={() => setLayers((l) => ({ ...l, [k]: !l[k] }))} className={`rounded-md border px-2 py-1 text-[11px] ${layers[k] ? "border-cyan/60 text-ink" : "border-edge text-dim"}`}>{lab}</button>))}
         <span className="mx-1 h-5 w-px bg-edge" />
         <button onClick={camUAE} className="btn px-2 py-1 text-[11px]"><Radar size={13} /> UAE</button>
         <button onClick={camGlobe} className="btn px-2 py-1 text-[11px]"><Globe2 size={13} /> Globe</button>
       </div>
-      <div className="mt-1 truncate text-[10px] text-dim" title="Earth: NASA Blue Marble / Black Marble. The cloud layer is a static texture, not the actual cloud cover. Orbits: CelesTrak TLE snapshot, SGP4 (satellite.js). Swaths from published instrument specifications. Satellite 813 orbit and marker are illustrative.">
-        Earth: NASA Blue Marble / Black Marble · clouds: static texture, not actual cover · orbits: {tle.source}, snapshot {tle.fetched_utc.slice(0, 10)}, SGP4 (satellite.js) · swaths: published instrument specs · Satellite 813 orbit and marker are illustrative
+      <div className="mt-1 truncate text-[10px] text-dim" title="Earth: NASA Blue Marble / Black Marble. The cloud layer is a static texture, not the actual cloud cover. Orbits: CelesTrak TLE snapshot, computed with SGP4 (satellite.js). Coverage widths from published instrument specifications. Satellite 813 orbit and marker are illustrative.">
+        Satellite 813 orbit and marker are illustrative · Earth: NASA Blue Marble / Black Marble · clouds: sample image, not live · orbits: {tle.source}, {tle.fetched_utc.slice(0, 10)} · coverage widths: published specs
       </div>
       </div>
       {hovered && hovered !== selected && positions.current.get(hovered) && (

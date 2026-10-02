@@ -79,7 +79,7 @@ def test_recommendation_never_orders_a_shutdown_and_stands_down_on_controls():
 
 def test_alert_text_is_factual_not_alarmist():
     msg = I.alert_message(payload())
-    assert "Analyst review required" in msg and "97th seasonal percentile" in msg
+    assert "Needs an analyst's review" in msg and "97th percentile for this season" in msg
     for word in ("DANGER", "TOXIC", "confirmed"):
         assert word.lower() not in msg.lower()
 
@@ -105,7 +105,7 @@ def test_review_is_persisted_with_label_and_audit(store):
     assert inc["reviews"][0]["reviewer"] == "analyst.a"
     assert inc["reviews"][0]["previous_hypothesis"] == "BLOOM_LIKE"
     assert inc["reviews"][0]["model_id"] == "triage-1.0.0"
-    assert "substance/species unconfirmed" in inc["disposition"]
+    assert "species is not confirmed" in inc["disposition"]
     labels = store.labels("triage")
     assert len(labels) == 1 and labels[0]["target"]["y"] == 1
     assert labels[0]["source"] == "analyst_review"

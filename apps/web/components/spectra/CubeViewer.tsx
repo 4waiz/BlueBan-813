@@ -123,8 +123,8 @@ export default function CubeViewer({ name, height = 300, onSpectrum, compact = f
     });
     onSpectrum({ wavelengths_nm: meta.wavelengths_nm, values: vals, row: r, col: c });
   };
-  if (err) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>Spectral cube unavailable: {err}</div>;
-  if (!meta || !data) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>Loading spectral cube…</div>;
+  if (err) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>3D cube not available ({err})</div>;
+  if (!meta || !data) return <div className="grid place-items-center text-[12px] text-dim" style={{ height }}>Loading 3D cube…</div>;
   return (
     <div style={{ height }} className="relative">
       <Canvas camera={{ position: [0, 0, 4.4], fov: 42 }} dpr={[1, 1.75]} gl={{ antialias: true }}>
@@ -133,14 +133,14 @@ export default function CubeViewer({ name, height = 300, onSpectrum, compact = f
         <OrbitControls enablePan enableZoom minDistance={2.2} maxDistance={8} />
       </Canvas>
       <div className="absolute left-2 top-2 rounded bg-void/80 px-2 py-1 text-[10px] font-bold tracking-wider text-muted">
-        SPECTRAL DATA CUBE · not a physical ocean volume
+        Cube depth = wavelength, not sea depth
       </div>
       <div className="absolute inset-x-2 bottom-2 flex items-center gap-2">
         <span className="hud-value w-[62px] text-[11px] text-caution">{Math.round(meta.wavelengths_nm[sel])} nm</span>
         <input type="range" min={0} max={meta.shape[0] - 1} value={sel} onChange={(e) => setSel(Number(e.target.value))} className="flex-1 accent-[#FFC23D]" aria-label="Wavelength slice" />
         {!compact && <button onClick={() => setScanning((s) => !s)} className="btn px-2 py-1 text-[11px]">{scanning ? "Stop scan" : "Scan"}</button>}
       </div>
-      {!compact && <div className="absolute right-2 top-2 max-w-[48%] text-right text-[10px] text-muted">{meta.sensor}{meta.simulated ? " · SIMULATED" : ""} · click the bright slice for a pixel spectrum</div>}
+      {!compact && <div className="absolute right-2 top-2 max-w-[48%] text-right text-[10px] text-muted">{meta.sensor}{meta.simulated ? " · SIMULATED" : ""} · click the bright slice for one pixel&apos;s spectrum</div>}
     </div>
   );
 }

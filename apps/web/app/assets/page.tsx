@@ -68,12 +68,12 @@ function Assets() {
 
   return (
     <div className="grid h-full min-h-0 gap-3 p-3 short:gap-2 short:p-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(380px,1fr)]">
-      <Panel title="Asset map" kicker={inc ? `Exposure for ${inc.id}` : "Coastal assets"} bodyClass="relative min-h-0">
+      <Panel title="Asset map" kicker={inc ? `Assets at risk · ${inc.id}` : "Coastal assets"} bodyClass="relative min-h-0">
         <IncidentMap incident={inc} incidents={inc ? [{ id: inc.id, status: inc.status, aoi_id: inc.aoi_id, centroid: inc.centroid, title: inc.title, event_type_hypothesis: inc.event_type_hypothesis, priority: inc.priority, observation_time: inc.observation_time } as never] : []}
           aois={aois} assets={assets} onPlaceAsset={(lon, lat) => setDraft({ lon, lat })} compact showTimeline={false} initialMode="2d" />
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded-md bg-void/80 px-2 py-1 text-[11px] text-muted">Use the map’s place-asset tool to add a facility.</div>
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-md bg-void/80 px-2 py-1 text-[11px] text-muted">To add a site, use the pin tool on the map.</div>
       </Panel>
-      <Panel title="Asset register" kicker={`${assets.length} assets · OpenStreetMap + operator`} bodyClass="flex min-h-0 flex-col gap-2 p-3">
+      <Panel title="Asset list" kicker={`${assets.length} assets · from OpenStreetMap and operators`} bodyClass="flex min-h-0 flex-col gap-2 p-3">
         <div className="flex flex-wrap gap-1">
           <button onClick={() => setType("")} className={`rounded-md border px-2 py-1 text-[11px] ${!type ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted"}`}>All {assets.length}</button>
           {Object.entries(counts).map(([t, n]) => <button key={t} onClick={() => setType(t === type ? "" : t)} className={`rounded-md border px-2 py-1 text-[11px] ${type === t ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted"}`}><span className="mr-1 inline-block h-2 w-2 rounded-full" style={{ background: TYPES[t]?.color || "#93A6CB" }} />{TYPES[t]?.label || t} {n}</button>)}
@@ -90,7 +90,7 @@ function Assets() {
               </tr>))}</tbody>
           </table>
         </div>
-        <p className="text-[11px] text-dim">Distance and direction from the incident centroid only. Intake positions are not public and are never estimated; an operator can place a known intake on the map.</p>
+        <p className="text-[11px] text-dim">Straight-line distance and direction from the incident's centre. Intake locations are not public, so we never guess them. You can add a known intake on the map.</p>
       </Panel>
       <Modal open={!!draft} onClose={() => setDraft(null)} title="Add asset" width={420}>
         <div className="space-y-2 text-[12.5px]">

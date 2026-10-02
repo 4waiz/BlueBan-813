@@ -17,7 +17,7 @@ import {
 import type { Aoi, AssetRow, Incident, IncidentSummary, LayerRef, Sample } from "@/lib/engine/types";
 import { pipelineUrl } from "@/lib/engine";
 import { registerIcons } from "./icons";
-import { fmt, STATE_COLOR, toast } from "@/components/ui";
+import { fmt, STATE_COLOR, statusText, toast } from "@/components/ui";
 
 export type MapTool = "none" | "draw-aoi" | "place-asset" | "measure";
 export type MapMode = "2d" | "3d" | "split";
@@ -70,6 +70,8 @@ interface Props {
   onMoveSample?: (s: Sample, lon: number, lat: number) => void;
   onDrawAoi?: (bbox: [number, number, number, number]) => void;
   onPlaceAsset?: (lon: number, lat: number) => void;
+  /** What the pin tool adds on this screen (defaults to an asset). */
+  placeLabel?: string;
   onPixel?: (p: PixelValues) => void;
   compact?: boolean;
   initialMode?: MapMode;
@@ -214,8 +216,8 @@ export default function IncidentMap(props: Props) {
       if (!f) return;
       const p = f.properties as Record<string, string>;
       const html = f.layer.id === "assets" ? `<div style="font-weight:700">${p.name}</div><div style="color:#93A6CB;font-size:11px">${p.type.replace(/_/g, " ")} · ${p.source}</div>`
-        : f.layer.id === "stations" ? `<div style="font-weight:700">${p.name}</div><div style="color:#93A6CB;font-size:11px">EAD ${p.kind === "AUTOMATED_BUOY" ? "automated buoy" : "sampling site"} · location only</div>`
-        : `<div style="font-weight:700">${p.id}</div><div style="color:#93A6CB;font-size:11px">${p.status.replace(/_/g, " ")}${p.role === "negative_control" ? " · negative control" : ""}</div>`;
+        : f.layer.id === "stations" ? `<div style="font-weight:700">${p.name}</div><div style="color:#93A6CB;font-size:11px">EAD ${p.kind === "AUTOMATED_BUOY" ? "automated buoy" : "sampling site"} · location only, no readings</div>`
+        : `<div style="font-weight:700">${p.id}</div><div style="color:#93A6CB;font-size:11px">${statusText(p.status)}${p.role === "negative_control" ? " · known false alarm (kept as a test)" : ""}</div>`;
       pop.setLngLat(e.lngLat).setHTML(html).addTo(m);
     };
     const leave = () => { m.getCanvas().style.cursor = ""; pop.remove(); };
@@ -333,7 +335,7 @@ export default function IncidentMap(props: Props) {
       m.dragPan.enable();
       const a = start, b = e.lngLat; start = null;
       const bbox: [number, number, number, number] = [Math.min(a.lng, b.lng), Math.min(a.lat, b.lat), Math.max(a.lng, b.lng), Math.max(a.lat, b.lat)];
-      if (bbox[2] - bbox[0] < 0.01 || bbox[3] - bbox[1] < 0.01) { toast("AOI too small: drag a larger box", "err"); return; }
+      if (bbox[2] - bbox[0] < 0.01 || bbox[3] - bbox[1] < 0.01) { toast("Area too small: drag a bigger box", "err"); return; }
       setTool("none");
       props.onDrawAoi?.(bbox);
     };
@@ -368,15 +370,15 @@ export default function IncidentMap(props: Props) {
     if (a) map.current.fitBounds([[a.bbox[0], a.bbox[1]], [a.bbox[2], a.bbox[3]]], { padding: 40 });
     else if (s) map.current.flyTo({ center: [s.lon, s.lat], zoom: 12 });
     else if (hit) map.current.flyTo({ center: [hit[1], hit[2]], zoom: 10 });
-    else toast(`No place, AOI or asset matches "${search}"`, "err");
+    else toast(`No place, area or asset matches "${search}"`, "err");
   };
 
   const layerDefs: { key: string; label: string; note?: string }[] = [
-    { key: "rgb", label: "True colour" }, { key: "ndci", label: "Chlorophyll proxy (NDCI)" },
-    { key: "ndci_z", label: "NDCI anomaly vs season" }, { key: "mci", label: "MCI (red-edge peak)" },
-    { key: "turbidity", label: "Turbidity (Nechad, generic cal.)" }, { key: "anomaly", label: "RX spectral anomaly" },
-    { key: "hue", label: "Water-colour hue angle" }, { key: "s813", label: "813 hyperspectral (sim.)" },
-    { key: "olci", label: "Sentinel-3 OLCI" }, { key: "sar", label: "Sentinel-1 SAR" },
+    { key: "rgb", label: "True colour" }, { key: "ndci", label: "Chlorophyll index (NDCI)" },
+    { key: "ndci_z", label: "Chlorophyll vs past years" }, { key: "mci", label: "Chlorophyll peak (MCI)" },
+    { key: "turbidity", label: "Turbidity (not calibrated)" }, { key: "anomaly", label: "Spectral anomaly score" },
+    { key: "hue", label: "Water colour (hue)" }, { key: "s813", label: "Simulated 813 (hyperspectral)" },
+    { key: "olci", label: "Sentinel-3 check" }, { key: "sar", label: "Sentinel-1 radar" },
     { key: "thermal", label: "Landsat thermal" }, { key: "water", label: "Water mask" },
   ];
 
@@ -388,7 +390,7 @@ export default function IncidentMap(props: Props) {
       </div>
       {mode === "split" && (
         <>
-          <div className="map-pill absolute left-3 top-16 z-10">BEFORE · {timeline[tIdx ?? 0]?.date || "baseline"}</div>
+          <div className="map-pill absolute left-3 top-16 z-10">BEFORE · {timeline[tIdx ?? 0]?.date || "earlier"}</div>
           <div className="map-pill absolute right-16 top-16 z-10">INCIDENT · {timeline[timeline.length - 1]?.date || incident?.observation_time?.slice(0, 10)}</div>
         </>
       )}
@@ -397,15 +399,15 @@ export default function IncidentMap(props: Props) {
       {!compact && (
         <div className="absolute left-3 right-16 top-3 z-10 flex flex-wrap items-center gap-2">
           <div className="panel-flat flex p-1">
-            {([["2d", "2D Map", <MapIcon key="m" size={14} />], ["3d", "3D Globe", <Globe2 key="g" size={14} />], ["split", "Split View", <SplitSquareHorizontal key="s" size={14} />]] as const).map(([k, l, ic]) => (
+            {([["2d", "2D Map", <MapIcon key="m" size={14} />], ["3d", "3D Globe", <Globe2 key="g" size={14} />], ["split", "Before / after", <SplitSquareHorizontal key="s" size={14} />]] as const).map(([k, l, ic]) => (
               <button key={k} onClick={() => setMode(k)} className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] font-semibold ${mode === k ? "bg-beam text-white shadow-beam" : "text-muted hover:text-ink"}`}>{ic}{l}</button>
             ))}
           </div>
           {timeline.length > 0 && showTimeline && (
             <div className="panel-flat flex min-w-[320px] flex-1 items-center gap-3 px-3 py-1.5">
               <span className="hud-value text-[11.5px] text-ink">{timeline[tIdx ?? 0]?.date}</span>
-              <input name="timeline" type="range" min={0} max={timeline.length - 1} value={tIdx ?? 0} onChange={(e) => { setPlaying(false); setTIdx(Number(e.target.value)); }} className="flex-1 accent-[#2F7BFF]" aria-label="Time scrubber" />
-              <span className="text-[10.5px] text-muted">{timeline.length} acquisitions</span>
+              <input name="timeline" type="range" min={0} max={timeline.length - 1} value={tIdx ?? 0} onChange={(e) => { setPlaying(false); setTIdx(Number(e.target.value)); }} className="flex-1 accent-[#2F7BFF]" aria-label="Image date" />
+              <span className="text-[10.5px] text-muted">{timeline.length} images</span>
               <button onClick={() => setPlaying((p) => !p)} className="grid h-7 w-7 place-items-center rounded-full bg-beam text-white" aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause size={13} /> : <Play size={13} />}</button>
             </div>
           )}
@@ -415,14 +417,14 @@ export default function IncidentMap(props: Props) {
       {/* right tool column */}
       {!compact && (
         <div className="panel-flat absolute right-3 top-3 z-10 flex flex-col gap-1 p-1">
-          <ToolBtn title="Search place / AOI / asset" active={searchOpen} onClick={() => { setSearchOpen((v) => !v); setPanel(true); }} icon={<Search size={16} />} />
+          <ToolBtn title="Search places, areas and assets" active={searchOpen} onClick={() => { setSearchOpen((v) => !v); setPanel(true); }} icon={<Search size={16} />} />
           <ToolBtn title="Layers" active={panel} onClick={() => setPanel((p) => !p)} icon={<Layers size={16} />} />
-          <ToolBtn title="Draw a new AOI (drag a box)" active={tool === "draw-aoi"} onClick={() => setTool(tool === "draw-aoi" ? "none" : "draw-aoi")} icon={<SquareDashedMousePointer size={16} />} />
-          <ToolBtn title="Place an operator asset" active={tool === "place-asset"} onClick={() => setTool(tool === "place-asset" ? "none" : "place-asset")} icon={<MapPinPlus size={16} />} />
+          <ToolBtn title="Add a monitored area (drag a box)" active={tool === "draw-aoi"} onClick={() => setTool(tool === "draw-aoi" ? "none" : "draw-aoi")} icon={<SquareDashedMousePointer size={16} />} />
+          <ToolBtn title={props.placeLabel || "Add your own asset (e.g. a desalination plant)"} active={tool === "place-asset"} onClick={() => setTool(tool === "place-asset" ? "none" : "place-asset")} icon={<MapPinPlus size={16} />} />
           <ToolBtn title="Measure distance" active={tool === "measure"} onClick={() => setTool(tool === "measure" ? "none" : "measure")} icon={<Ruler size={16} />} />
-          <ToolBtn title="Fit incident" onClick={() => { const b = incident?.layers?.bounds; if (b && map.current) map.current.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: 60 }); }} icon={<Crosshair size={16} />} />
+          <ToolBtn title="Zoom to incident" onClick={() => { const b = incident?.layers?.bounds; if (b && map.current) map.current.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: 60 }); }} icon={<Crosshair size={16} />} />
           <ToolBtn title="Reset view" onClick={() => map.current?.flyTo({ center: [55.2, 25.0], zoom: 6.4, pitch: mode === "3d" ? 48 : 0, bearing: 0 })} icon={<RotateCcw size={16} />} />
-          <ToolBtn title="Fullscreen" onClick={() => wrap.current?.requestFullscreen?.()} icon={<Maximize2 size={16} />} />
+          <ToolBtn title="Full screen" onClick={() => wrap.current?.requestFullscreen?.()} icon={<Maximize2 size={16} />} />
         </div>
       )}
 
@@ -430,7 +432,7 @@ export default function IncidentMap(props: Props) {
       {!compact && panel && (
         <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="panel absolute right-14 top-14 z-10 max-h-[calc(100%-120px)] w-[228px] overflow-y-auto p-2.5">
           {searchOpen && <div className="mb-2 flex gap-1">
-            <input name="map-search" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} placeholder="Search place, AOI, asset" className="w-full rounded-md border border-line bg-deep px-2 py-1.5 text-[12px] outline-none focus:border-beam2" />
+            <input name="map-search" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} placeholder="Place, area or asset" className="w-full rounded-md border border-line bg-deep px-2 py-1.5 text-[12px] outline-none focus:border-beam2" />
             <button onClick={doSearch} className="btn px-2 py-1"><Search size={13} /></button>
           </div>}
           <div className="hud-kicker mb-1 mt-2">Incident layers</div>
@@ -444,7 +446,7 @@ export default function IncidentMap(props: Props) {
             );
           })}
           <div className="hud-kicker mb-1 mt-3">Context</div>
-          {[["assets", "Critical assets (OSM)"], ["stations", "EAD monitoring stations"], ["aois", "Monitoring AOIs"]].map(([k, l]) => (
+          {[["assets", "Key assets (OpenStreetMap)"], ["stations", "EAD monitoring stations"], ["aois", "Monitored areas"]].map(([k, l]) => (
             <label key={k} className="flex items-center justify-between py-1 text-[12px] text-ink"><span>{l}</span>
               <input type="checkbox" checked={!!active[k]} onChange={(e) => setActive((a) => ({ ...a, [k]: e.target.checked }))} className="accent-[#2F7BFF]" /></label>
           ))}
@@ -460,7 +462,7 @@ export default function IncidentMap(props: Props) {
 
       {tool !== "none" && !compact && (
         <div className="map-pill absolute bottom-14 left-1/2 z-10 -translate-x-1/2 text-[12px]">
-          {tool === "draw-aoi" ? "Drag a box on the map to create an AOI" : tool === "place-asset" ? "Click the map to place an operator asset" : `Measure: click points · ${fmt.km(measureM)}`}
+          {tool === "draw-aoi" ? "Drag a box on the map to add a monitored area" : tool === "place-asset" ? `Click the map: ${(props.placeLabel || "Add your asset").toLowerCase()}` : `Measure: click points · ${fmt.km(measureM)}`}
         </div>
       )}
 

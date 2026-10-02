@@ -27,9 +27,9 @@ const statusColor = (s: string) => (s.startsWith("USED") ? "#23D484" : s.startsW
 function Policy({ p }: { p: Status["data_policy"] }) {
   const items: [string, string, string][] = [
     ["Real Satellite 813 data used", p.real_813_data_used ? "YES" : "NO", p["813_status"]],
-    ["Public UAE in-situ measurements", p.in_situ_available ? "AVAILABLE" : "NONE", "No per-sample chlorophyll / turbidity / TSS found; EAD station LOCATIONS only"],
-    ["Physical concentrations", "NOT REPORTED", p.quantification],
-    ["OLCI cross-sensor archive", p.olci_archive_end.split(" ")[0], "Sentinel-3 OLCI WFR on the Planetary Computer ends here; later incidents have no OLCI check"],
+    ["Public UAE water samples", p.in_situ_available ? "AVAILABLE" : "NONE", "No public chlorophyll, turbidity or sediment results. EAD shares station locations only."],
+    ["Concentration values", "NOT REPORTED", p.quantification],
+    ["Sentinel-3 check ends", p.olci_archive_end.split(" ")[0], "Our Sentinel-3 archive (Planetary Computer) stops on this date. Later incidents get no second-satellite check."],
   ];
   return (
     <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
@@ -45,10 +45,10 @@ function Policy({ p }: { p: Status["data_policy"] }) {
 
 function Lineage({ l }: { l: NonNullable<Status["lineage"]> }) {
   const steps: [string, string, string][] = [
-    ["WATCH", l.watch.datatakes.toLocaleString(), `Sentinel-2 datatakes over ${l.watch.aois} AOIs (${l.watch.ok.toLocaleString()} read)`],
-    ["DETECT", l.detect.candidates.toLocaleString(), `candidates from ${l.detect.pixel_level.toLocaleString()} pixel-level dates of ${l.detect.acquisitions.toLocaleString()}`],
-    ["OLCI", l.olci_extracts.toLocaleString(), "same-morning Sentinel-3 extracts (windowed reads)"],
-    ["LABELS", l.labels.n.toLocaleString(), `cross-sensor references, ${l.labels.validation} frozen for validation`],
+    ["WATCH", l.watch.datatakes.toLocaleString(), `Sentinel-2 images over ${l.watch.aois} areas (${l.watch.ok.toLocaleString()} read)`],
+    ["DETECT", l.detect.candidates.toLocaleString(), `possible events, from ${l.detect.pixel_level.toLocaleString()} of ${l.detect.acquisitions.toLocaleString()} dates checked pixel by pixel`],
+    ["SENTINEL-3", l.olci_extracts.toLocaleString(), "same-morning Sentinel-3 views for the second check"],
+    ["LABELS", l.labels.n.toLocaleString(), `from the Sentinel-3 check, ${l.labels.validation} held back for testing`],
     ["INCIDENTS", String(l.incidents.length), l.incidents.join(", ")],
   ];
   return (
@@ -76,17 +76,17 @@ function AuditLog() {
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
         <select value={type} onChange={(e) => setType(e.target.value)} className="rounded-md border border-line bg-deep px-2 py-1 text-[12px]">
-          {types.map((t) => <option key={t} value={t}>{t || "all entities"}</option>)}
+          {types.map((t) => <option key={t} value={t}>{t || "all records"}</option>)}
         </select>
-        <button className="btn px-2 py-1 text-[12px]" onClick={async () => { const { getEngine } = await import("@/lib/engine"); setVerify(await getEngine().verifyAudit()); }}><Fingerprint size={14} /> Verify hash chain</button>
+        <button className="btn px-2 py-1 text-[12px]" onClick={async () => { const { getEngine } = await import("@/lib/engine"); setVerify(await getEngine().verifyAudit()); }}><Fingerprint size={14} /> Check for tampering</button>
         {verify && (verify.ok
-          ? <span className="flex items-center gap-1 text-[12px] text-nominal"><CheckCircle2 size={14} /> intact · {verify.n} events</span>
-          : <span className="flex items-center gap-1 text-[12px] text-critical"><CircleX size={14} /> broken at event {verify.first_bad_seq}</span>)}
-        <span className="ml-auto text-[11px] text-dim">Each event stores the SHA-256 of the previous one: editing any past event breaks every hash after it.</span>
+          ? <span className="flex items-center gap-1 text-[12px] text-nominal"><CheckCircle2 size={14} /> Intact · {verify.n} events checked</span>
+          : <span className="flex items-center gap-1 text-[12px] text-critical"><CircleX size={14} /> Broken at event {verify.first_bad_seq}</span>)}
+        <span className="ml-auto text-[11px] text-dim" title="Each event stores the SHA-256 hash of the event before it.">Each event is sealed to the one before it. Editing a past event breaks the chain.</span>
       </div>
       <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
         <table className="w-full text-[11.5px]">
-          <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">#</th><th className="px-2 text-left">When (UTC)</th><th className="px-2 text-left">Actor</th><th className="px-2 text-left">Action</th><th className="px-2 text-left">Entity</th><th className="px-2 text-left">Hash</th></tr></thead>
+          <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">#</th><th className="px-2 text-left">When (UTC)</th><th className="px-2 text-left">Who</th><th className="px-2 text-left">Action</th><th className="px-2 text-left">Record</th><th className="px-2 text-left" title="First 12 characters of the event's SHA-256 hash">Seal</th></tr></thead>
           <tbody>
             {rows.map((a: AuditEvent) => (
               <tr key={a.seq} className="border-b border-edge/50" title={JSON.stringify(a.detail)}>
@@ -97,7 +97,7 @@ function AuditLog() {
                 <td className="px-2">{a.entity_type} <span className="text-dim">{a.entity_id}</span></td>
                 <td className="hud-value px-2 text-dim">{a.hash.slice(0, 12)}…</td>
               </tr>))}
-            {!rows.length && <tr><td colSpan={6} className="p-4 text-center text-muted">No events yet. Reviews, samples, training and promotions will appear here.</td></tr>}
+            {!rows.length && <tr><td colSpan={6} className="p-4 text-center text-muted">No events yet. Reviews, samples, training and model approvals will show here.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -124,7 +124,7 @@ function Docs() {
           </button>))}
       </div>
       <div className="min-h-0 overflow-y-auto rounded-md border border-edge bg-deep/40 px-5 py-3">
-        {key ? <Markdown text={text} /> : <p className="text-[13px] text-muted">Pick a document: the audits, the event register, methodology, limitations, the validation report and the archived earlier conclusions (kept, marked historical).</p>}
+        {key ? <Markdown text={text} /> : <p className="text-[13px] text-muted">Pick a document on method, limits, data audits or validation. Older conclusions stay in the archive, marked historical.</p>}
       </div>
     </div>
   );
@@ -138,22 +138,22 @@ export default function DataPage() {
     <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] gap-3 overflow-hidden p-3 short:gap-2 short:p-2">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <div className="hud-kicker">Data · provenance, policy and audit {s && `· bundle ${fmt.utc(s.generated_utc)}`}</div>
+          <div className="hud-kicker">Data · sources and audit log {s && `· updated ${fmt.utc(s.generated_utc)}`}</div>
           <h1 className="font-display text-[22px] font-bold tracking-wide">Where every number comes from</h1>
         </div>
         <div className="flex gap-1">
-          {([["sources", "Sources & lineage", <Database key="d" size={14} />], ["audit", "Audit log", <ShieldCheck key="a" size={14} />], ["docs", "Documents", <FileText key="f" size={14} />]] as const).map(([k, label, icon]) => (
+          {([["sources", "Sources", <Database key="d" size={14} />], ["audit", "Audit log", <ShieldCheck key="a" size={14} />], ["docs", "Documents", <FileText key="f" size={14} />]] as const).map(([k, label, icon]) => (
             <button key={k} onClick={() => setTab(k)} className={`btn px-3 py-1.5 text-[12px] ${tab === k ? "border-beam bg-beam/15" : ""}`}>{icon}{label}</button>))}
         </div>
       </div>
-      {s ? <Policy p={s.data_policy} /> : <div className="text-muted">{st.error ? `status.json missing: ${st.error}` : "Loading…"}</div>}
+      {s ? <Policy p={s.data_policy} /> : <div className="text-muted">{st.error ? `Could not load status.json: ${st.error}` : "Loading…"}</div>}
       {tab === "sources" && s && (
         <div className="grid min-h-0 gap-3 overflow-y-auto">
-          {s.lineage && <Panel title="Pipeline lineage" kicker="Counts read from outputs/ at bundle time" bodyClass="p-3"><Lineage l={s.lineage} /></Panel>}
-          <Panel title="Source register" kicker="Provider · licence · what it is used for" bodyClass="p-3">
+          {s.lineage && <Panel title="From satellite to incident" kicker="Counts read from the pipeline outputs" bodyClass="p-3"><Lineage l={s.lineage} /></Panel>}
+          <Panel title="Data sources" kicker="Who provides it · licence · what we use it for" bodyClass="p-3">
             <div className="overflow-x-auto">
               <table className="w-full text-[12px]">
-                <thead><tr className="border-b border-edge text-dim"><th className="px-2 py-1.5 text-left">Source</th><th className="px-2 text-left">Provider</th><th className="px-2 text-left">Licence</th><th className="px-2 text-left">Role</th><th className="px-2 text-left">Status</th></tr></thead>
+                <thead><tr className="border-b border-edge text-dim"><th className="px-2 py-1.5 text-left">Source</th><th className="px-2 text-left">Provider</th><th className="px-2 text-left">Licence</th><th className="px-2 text-left">Used for</th><th className="px-2 text-left">Status</th></tr></thead>
                 <tbody>{(s.sources || []).map((r) => (
                   <tr key={r.name} className="border-b border-edge/50 align-top">
                     <td className="px-2 py-1.5 font-semibold">{r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-cyan">{r.name}<ExternalLink size={11} /></a> : r.name}</td>
@@ -164,10 +164,10 @@ export default function DataPage() {
                   </tr>))}</tbody>
               </table>
             </div>
-            <p className="mt-2 text-[11px] text-dim">Restricted downloads (authenticated platforms, commercial imagery) never leave data/raw/private/, which is gitignored. Nothing on this page or in the repository is restricted data.</p>
+            <p className="mt-2 text-[11px] text-dim">Restricted data (login-only platforms, commercial imagery) stays in data/raw/private/, which is kept out of the repository. Nothing on this page or in the repository is restricted data.</p>
           </Panel>
         </div>)}
-      {tab === "audit" && <Panel title="Audit log · this workspace" bodyClass="min-h-0 p-3" className="min-h-0"><AuditLog /></Panel>}
+      {tab === "audit" && <Panel title="Audit log" kicker="Tamper-proof · this workspace" bodyClass="min-h-0 p-3" className="min-h-0"><AuditLog /></Panel>}
       {tab === "docs" && <Panel title="Documentation" bodyClass="min-h-0 p-3" className="min-h-0"><Docs /></Panel>}
     </div>
   );

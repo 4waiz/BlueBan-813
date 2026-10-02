@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { HelpCircle, X } from "lucide-react";
+import { createPortal } from "react-dom";
 
 export const STATE_COLOR: Record<string, string> = {
   MONITORING: "#93A6CB", DETECTED: "#FFC23D", UNDER_REVIEW: "#FF4D5E",
@@ -35,12 +36,24 @@ export function Panel({ title, right, children, className = "", bodyClass = "", 
   );
 }
 
+/** Plain words for workflow codes; the code still picks the colour. */
+export const STATE_TEXT: Record<string, string> = {
+  DETECTED: "New", UNDER_REVIEW: "Under review", FIELD_VALIDATION_REQUIRED: "Needs field check", FALSE_POSITIVE: "False alarm",
+  PRODUCTION: "Live", CANDIDATE: "New model", LAB_PENDING: "At the lab", RESULT_RECEIVED: "Result in", INSUFFICIENT_EVIDENCE: "Inconclusive",
+};
+
+/** Sentence-case plain words for any workflow code (for selects, popups and toasts). */
+export function statusText(code: string): string {
+  const t = STATE_TEXT[code] ?? code.replace(/_/g, " ").toLowerCase();
+  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+}
+
 export function Chip({ label, color, dot = true, className = "" }: { label: string; color?: string; dot?: boolean; className?: string }) {
   const c = color || STATE_COLOR[label] || "#93A6CB";
   return (
     <span className={`chip ${className}`} style={{ color: c, borderColor: `${c}66`, background: `${c}14` }}>
       {dot && <span className="h-1.5 w-1.5 rounded-full" style={{ background: c }} />}
-      {label.replace(/_/g, " ")}
+      {STATE_TEXT[label] ?? label.replace(/_/g, " ")}
     </span>
   );
 }
@@ -91,12 +104,14 @@ export function Tween({ value, digits = 2, suffix = "", className = "" }: { valu
 
 export function Kind({ kind }: { kind?: string }) {
   if (!kind) return null;
-  const map: Record<string, [string, string]> = {
-    PROXY: ["PROXY", "#93A6CB"], GENERIC_CALIBRATION: ["GENERIC CAL.", "#FFC23D"],
-    CALIBRATED: ["CALIBRATED", "#23D484"], COLORIMETRIC: ["COLOUR", "#27C3F3"],
+  const map: Record<string, [string, string, string]> = {
+    PROXY: ["PROXY", "#93A6CB", "An index, not a measured concentration"],
+    GENERIC_CALIBRATION: ["APPROX.", "#FFC23D", "Published generic formula, not checked against UAE water samples"],
+    CALIBRATED: ["CALIBRATED", "#23D484", "Calibrated against local water samples"],
+    COLORIMETRIC: ["COLOUR", "#27C3F3", "A measure of water colour"],
   };
-  const [l, c] = map[kind] || [kind, "#93A6CB"];
-  return <span className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider" style={{ color: c, background: `${c}18`, border: `1px solid ${c}44` }}>{l}</span>;
+  const [l, c, tip] = map[kind] || [kind, "#93A6CB", ""];
+  return <span title={tip || undefined} className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider" style={{ color: c, background: `${c}18`, border: `1px solid ${c}44` }}>{l}</span>;
 }
 
 export function SimBadge({ text = "813 SIMULATED" }: { text?: string }) {
@@ -116,9 +131,20 @@ export function WhyButton({ title, children }: { title: string; children: React.
   );
 }
 
+/**
+ * Overlays render into <body>. Any ancestor with backdrop-filter (the top bar,
+ * every .panel) becomes the containing block of position: fixed, which would
+ * otherwise clip a dialog to that box and let later content cover it.
+ */
+function BodyPortal({ children }: { children: React.ReactNode }) {
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  useEffect(() => { setEl(document.body); }, []);
+  return el ? createPortal(children, el) : null;
+}
+
 export function Drawer({ open, onClose, title, children, width = 520 }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; width?: number }) {
   return (
-    <AnimatePresence>
+    <BodyPortal><AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[60] flex justify-end bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
           <motion.aside className="panel h-full overflow-y-auto rounded-none border-l border-line p-5" style={{ width }}
@@ -132,13 +158,13 @@ export function Drawer({ open, onClose, title, children, width = 520 }: { open: 
           </motion.aside>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></BodyPortal>
   );
 }
 
 export function Modal({ open, onClose, title, children, width = 560 }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; width?: number }) {
   return (
-    <AnimatePresence>
+    <BodyPortal><AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[70] grid place-items-center bg-black/60 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
           <motion.div className="panel max-h-[88vh] w-full overflow-y-auto p-5" style={{ maxWidth: width }}
@@ -152,7 +178,7 @@ export function Modal({ open, onClose, title, children, width = 560 }: { open: b
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence></BodyPortal>
   );
 }
 

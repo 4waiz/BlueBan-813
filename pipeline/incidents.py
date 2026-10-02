@@ -45,14 +45,14 @@ DECISIONS = ("CONFIRM", "FALSE_POSITIVE", "RECLASSIFY", "NEEDS_FIELD_SAMPLE",
 
 #: Event-type vocabulary. Optical hypotheses, deliberately not substance names.
 EVENT_TYPES = {
-    "BLOOM_LIKE": "High chlorophyll / bloom-like anomaly",
-    "SEDIMENT_LIKE": "Turbidity / suspended-sediment anomaly",
-    "SURFACE_FILM_LIKE": "Surface film / floating material anomaly",
-    "SURFACE_DARK_ANOMALY": "SAR surface dark anomaly (oil-spill lookalike set)",
-    "CDOM_LIKE": "Dissolved organic matter anomaly",
-    "BOTTOM_INFLUENCED": "Shallow bottom / benthic signal (not a water event)",
-    "PERSISTENT_FEATURE": "Persistent coastal feature (not a new event)",
-    "UNKNOWN_ANOMALY": "Unclassified water anomaly",
+    "BLOOM_LIKE": "Possible algae bloom (high chlorophyll)",
+    "SEDIMENT_LIKE": "Muddy water (suspended sediment)",
+    "SURFACE_FILM_LIKE": "Floating material or surface film",
+    "SURFACE_DARK_ANOMALY": "Dark patch on radar (often an oil lookalike)",
+    "CDOM_LIKE": "Stained water (dissolved organic matter)",
+    "BOTTOM_INFLUENCED": "Seabed showing through (not a water event)",
+    "PERSISTENT_FEATURE": "Permanent coastal feature (not a new event)",
+    "UNKNOWN_ANOMALY": "Unusual water, type unclear",
 }
 
 # Allowed (from_state, decision) -> to_state for analyst reviews.
@@ -186,26 +186,25 @@ def recommend(inc: dict, next_pass: dict | None = None) -> Recommendation:
 
     reasons = []
     if pct is not None:
-        reasons.append(f"Primary indicator at the {_fmt_pct(pct)} seasonal percentile "
-                       f"for this location.")
+        reasons.append(f"Main indicator at the {_fmt_pct(pct)} percentile "
+                       f"for this place and season.")
     if inc.get("spatial", {}).get("rx_percentile") is not None:
-        reasons.append(f"Spatial anomaly at the "
-                       f"{_fmt_pct(inc['spatial']['rx_percentile'])} percentile of "
-                       f"the scene's water population.")
+        reasons.append(f"Stands out from the surrounding water "
+                       f"({_fmt_pct(inc['spatial']['rx_percentile'])} percentile).")
     if n_agree:
-        reasons.append(f"{n_agree} independent sensor(s) agree: "
+        reasons.append(f"{n_agree} satellite source(s) agree: "
                        + ", ".join(k for k, v in agree.items()
                                    if isinstance(v, dict) and v.get("agrees")) + ".")
     if conf is not None:
         reasons.append(f"Model confidence {conf:.2f}.")
     if not has_field:
-        reasons.append("No field measurement yet.")
+        reasons.append("No water sample yet.")
     if nearest:
-        reasons.append(f"Nearest registered asset: {nearest['asset']['name']} at "
-                       f"{nearest['distance_m'] / 1000:.1f} km.")
+        reasons.append(f"Nearest asset: {nearest['asset']['name']}, "
+                       f"{nearest['distance_m'] / 1000:.1f} km away.")
 
-    not_rec = ["Automatic plant shutdown: not recommended on satellite evidence alone.",
-               "Public health advisory: requires laboratory confirmation."]
+    not_rec = ["Automatic plant shutdown: not advised on satellite evidence alone.",
+               "Public health warning: needs a lab result first."]
     obs = inc.get("observation_time")
     deadline = None
     if obs:
@@ -222,24 +221,24 @@ def recommend(inc: dict, next_pass: dict | None = None) -> Recommendation:
     if inc.get("role") == "negative_control" or (pct is not None and pct <= 50):
         return Recommendation(
             "STAND_DOWN_CONTINUE_MONITORING", "LOW",
-            reasons + ["Observation is not unusual for this place and season: the "
-                       "spatial contrast is a persistent feature, not a new event."],
-            ["Next clear overpass"], deadline, next_pass, not_rec)
+            reasons + ["Normal for this place and season. The contrast is a "
+                       "permanent feature, not a new event."],
+            ["Next clear satellite image"], deadline, next_pass, not_rec)
     if status == "CONFIRMED" and has_field:
         return Recommendation("MANAGE_CONFIRMED_EVENT", "HIGH", reasons,
-                              ["Follow-up sampling to track decline",
-                               "Asset operator notification per their own protocol"],
+                              ["Follow-up samples to track the decline",
+                               "Tell the asset operator (their own procedure)"],
                               deadline, next_pass, not_rec)
     if not has_field and ((pct or 0) >= 90 or (sev or 0) >= 0.5):
         return Recommendation(
             "FIELD_VERIFICATION", "HIGH" if top_exp >= 0.5 or (pct or 0) >= 97 else "MEDIUM",
             reasons,
-            ["Field sample at event core with same-day background control",
-             "Chlorophyll-a (extracted), turbidity (NTU), TSS, temperature, salinity",
-             "Phytoplankton identification if a bloom is suspected"],
+            ["Water sample at the event centre, plus one from normal water the same day",
+             "Lab tests: chlorophyll-a, turbidity, suspended sediment, temperature, salinity",
+             "Algae species ID if a bloom is suspected"],
             deadline, next_pass, not_rec)
     return Recommendation("ANALYST_REVIEW", "MEDIUM", reasons,
-                          ["Analyst review of spectral and temporal evidence"],
+                          ["Analyst review of the colour and history evidence"],
                           deadline, next_pass, not_rec)
 
 
@@ -250,13 +249,13 @@ def alert_message(inc: dict) -> str:
     etype = EVENT_TYPES.get(inc.get("event_type_hypothesis"), "Water anomaly")
     agree = [k for k, v in (inc.get("sensor_agreement") or {}).items()
              if isinstance(v, dict) and v.get("agrees")]
-    parts = [f"New coastal anomaly detected near {aoi}.",
-             f"{etype} (hypothesis)."]
+    parts = [f"Unusual water spotted near {aoi}.",
+             f"Suspected: {etype}."]
     if pct is not None:
-        parts.append(f"{_fmt_pct(pct)} seasonal percentile.")
-    parts.append("Cross-sensor evidence available." if len(agree) > 1
-                 else "Single-sensor evidence.")
-    parts.append("Analyst review required.")
+        parts.append(f"{_fmt_pct(pct)} percentile for this season.")
+    parts.append("A second satellite source agrees." if len(agree) > 1
+                 else "One satellite source only.")
+    parts.append("Needs an analyst's review.")
     return " ".join(parts)
 
 

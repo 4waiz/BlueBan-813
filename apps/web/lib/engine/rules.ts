@@ -11,14 +11,14 @@ export const OPEN_STATES: IncidentStatus[] = ["MONITORING", "DETECTED", "UNDER_R
 export const DECISIONS: Decision[] = ["CONFIRM", "FALSE_POSITIVE", "RECLASSIFY", "NEEDS_FIELD_SAMPLE", "INSUFFICIENT_EVIDENCE"];
 
 export const EVENT_TYPES: Record<EventType, string> = {
-  BLOOM_LIKE: "High chlorophyll / bloom-like anomaly",
-  SEDIMENT_LIKE: "Turbidity / suspended-sediment anomaly",
-  SURFACE_FILM_LIKE: "Surface film / floating material anomaly",
-  SURFACE_DARK_ANOMALY: "SAR surface dark anomaly (oil-spill lookalike set)",
-  CDOM_LIKE: "Dissolved organic matter anomaly",
-  BOTTOM_INFLUENCED: "Shallow bottom / benthic signal (not a water event)",
-  PERSISTENT_FEATURE: "Persistent coastal feature (not a new event)",
-  UNKNOWN_ANOMALY: "Unclassified water anomaly",
+  BLOOM_LIKE: "Possible algae bloom (high chlorophyll)",
+  SEDIMENT_LIKE: "Muddy water (suspended sediment)",
+  SURFACE_FILM_LIKE: "Floating material or surface film",
+  SURFACE_DARK_ANOMALY: "Dark patch on radar (often an oil lookalike)",
+  CDOM_LIKE: "Stained water (dissolved organic matter)",
+  BOTTOM_INFLUENCED: "Seabed showing through (not a water event)",
+  PERSISTENT_FEATURE: "Permanent coastal feature (not a new event)",
+  UNKNOWN_ANOMALY: "Unusual water, type unclear",
 };
 
 const REVIEW_FROM: Record<Decision, IncidentStatus[]> = {
@@ -76,14 +76,14 @@ export function recommend(inc: Incident): Recommendation {
   const topExp = exposure.reduce((m, e) => Math.max(m, e.exposure_score ?? 0), 0);
   const nearest = [...exposure].sort((a, b) => a.distance_m - b.distance_m)[0];
   const reasons: string[] = [];
-  if (pct != null) reasons.push(`Primary indicator at the ${fmtPct(pct)} seasonal percentile for this location.`);
-  if (inc.spatial?.rx_percentile != null) reasons.push(`Spatial anomaly at the ${fmtPct(inc.spatial.rx_percentile)} percentile of the scene's water population.`);
-  if (agreeing.length) reasons.push(`${agreeing.length} independent sensor(s) agree: ${agreeing.join(", ")}.`);
+  if (pct != null) reasons.push(`Main indicator at the ${fmtPct(pct)} percentile for this place and season.`);
+  if (inc.spatial?.rx_percentile != null) reasons.push(`Stands out from the surrounding water (${fmtPct(inc.spatial.rx_percentile)} percentile).`);
+  if (agreeing.length) reasons.push(`${agreeing.length} satellite source(s) agree: ${agreeing.join(", ")}.`);
   if (conf != null) reasons.push(`Model confidence ${conf.toFixed(2)}.`);
-  if (!hasField) reasons.push("No field measurement yet.");
-  if (nearest) reasons.push(`Nearest registered asset: ${nearest.asset.name} at ${(nearest.distance_m / 1000).toFixed(1)} km.`);
-  const notRec = ["Automatic plant shutdown: not recommended on satellite evidence alone.",
-                  "Public health advisory: requires laboratory confirmation."];
+  if (!hasField) reasons.push("No water sample yet.");
+  if (nearest) reasons.push(`Nearest asset: ${nearest.asset.name}, ${(nearest.distance_m / 1000).toFixed(1)} km away.`);
+  const notRec = ["Automatic plant shutdown: not advised on satellite evidence alone.",
+                  "Public health warning: needs a lab result first."];
   let deadline: string | null = null;
   if (inc.observation_time) {
     const t0 = new Date(inc.observation_time);
@@ -96,19 +96,19 @@ export function recommend(inc: Incident): Recommendation {
     return { action: "NO_ACTION", priority: "NONE", reasons: ["Incident closed."], required_evidence: [], decision_deadline_utc: null, not_recommended: notRec };
   if (inc.role === "negative_control" || (pct != null && pct <= 50))
     return { action: "STAND_DOWN_CONTINUE_MONITORING", priority: "LOW",
-             reasons: [...reasons, "Observation is not unusual for this place and season: the spatial contrast is a persistent feature, not a new event."],
-             required_evidence: ["Next clear overpass"], decision_deadline_utc: deadline, not_recommended: notRec };
+             reasons: [...reasons, "Normal for this place and season. The contrast is a permanent feature, not a new event."],
+             required_evidence: ["Next clear satellite image"], decision_deadline_utc: deadline, not_recommended: notRec };
   if (inc.status === "CONFIRMED" && hasField)
     return { action: "MANAGE_CONFIRMED_EVENT", priority: "HIGH", reasons,
-             required_evidence: ["Follow-up sampling to track decline", "Asset operator notification per their own protocol"],
+             required_evidence: ["Follow-up samples to track the decline", "Tell the asset operator (their own procedure)"],
              decision_deadline_utc: deadline, not_recommended: notRec };
   if (!hasField && ((pct ?? 0) >= 90 || (sev ?? 0) >= 0.5))
     return { action: "FIELD_VERIFICATION", priority: topExp >= 0.5 || (pct ?? 0) >= 97 ? "HIGH" : "MEDIUM", reasons,
-             required_evidence: ["Field sample at event core with same-day background control",
-                                 "Chlorophyll-a (extracted), turbidity (NTU), TSS, temperature, salinity",
-                                 "Phytoplankton identification if a bloom is suspected"],
+             required_evidence: ["Water sample at the event centre, plus one from normal water the same day",
+                                 "Lab tests: chlorophyll-a, turbidity, suspended sediment, temperature, salinity",
+                                 "Algae species ID if a bloom is suspected"],
              decision_deadline_utc: deadline, not_recommended: notRec };
-  return { action: "ANALYST_REVIEW", priority: "MEDIUM", reasons, required_evidence: ["Analyst review of spectral and temporal evidence"],
+  return { action: "ANALYST_REVIEW", priority: "MEDIUM", reasons, required_evidence: ["Analyst review of the colour and history evidence"],
            decision_deadline_utc: deadline, not_recommended: notRec };
 }
 
@@ -116,10 +116,10 @@ export function alertMessage(inc: Incident): string {
   const pct = inc.temporal?.seasonal_percentile;
   const etype = EVENT_TYPES[inc.event_type_hypothesis] || "Water anomaly";
   const agreeing = Object.values(inc.sensor_agreement || {}).filter((v) => v && v.agrees).length;
-  const parts = [`New coastal anomaly detected near ${inc.aoi_name || inc.aoi_id}.`, `${etype} (hypothesis).`];
-  if (pct != null) parts.push(`${fmtPct(pct)} seasonal percentile.`);
-  parts.push(agreeing > 1 ? "Cross-sensor evidence available." : "Single-sensor evidence.");
-  parts.push("Analyst review required.");
+  const parts = [`Unusual water spotted near ${inc.aoi_name || inc.aoi_id}.`, `Suspected: ${etype}.`];
+  if (pct != null) parts.push(`${fmtPct(pct)} percentile for this season.`);
+  parts.push(agreeing > 1 ? "A second satellite source agrees." : "One satellite source only.");
+  parts.push("Needs an analyst's review.");
   return parts.join(" ");
 }
 

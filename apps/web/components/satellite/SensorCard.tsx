@@ -34,10 +34,10 @@ export default function SensorCard({ incident }: { incident: Incident | null }) 
           </g>
 
         </svg>
-        <Link href={`/satellite?sensor=${k}`} className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md border border-edge bg-void/70 px-2 py-1 text-[10.5px] font-semibold text-muted backdrop-blur hover:border-beam hover:text-ink" title="Open the full-screen 3D view: real orbits, swaths and UAE passes">
+        <Link href={`/satellite?sensor=${k}`} className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md border border-edge bg-void/70 px-2 py-1 text-[10.5px] font-semibold text-muted backdrop-blur hover:border-beam hover:text-ink" title="Open the full-screen 3D view: real orbits, coverage and UAE passes">
           <Maximize2 size={12} /> 3D orbits
         </Link>
-        <div className="absolute bottom-1 left-2 text-[9px] text-dim">abstract diagram · not the spacecraft&apos;s design</div>
+        <div className="absolute bottom-1 left-2 text-[9px] text-dim">illustration · not the real spacecraft</div>
         <div className="absolute left-3 top-3">
           <div className="font-display text-[17px] font-bold text-ink">{s.name} {k === "813" && <SimBadge />}</div>
           <div className="text-[12px] text-cyan">{s.kind}</div>
@@ -46,7 +46,7 @@ export default function SensorCard({ incident }: { incident: Incident | null }) 
           <div className="mt-1 text-[10.5px] font-bold tracking-wider text-caution">{s.status(incident)}</div>
         </div>
         {s.bands.length > 0 && (
-          <svg viewBox={`0 0 ${W} ${H}`} className="absolute bottom-3 right-1 h-[50px] w-[60%]" aria-label="band layout">
+          <svg viewBox={`0 0 ${W} ${H}`} className="absolute bottom-3 right-1 h-[50px] w-[60%]" aria-label="spectral bands">
             {s.bands.map(([c, fw], i) => <rect key={i} x={x(c - fw / 2)} y={34} width={Math.max(1.2, x(c + fw / 2) - x(c - fw / 2))} height={46} fill={bandColor(c)} opacity={0.75} />)}
             {[400, 700, 1000, 1300, 1700].map((t) => <text key={t} x={x(t)} y={98} fill="#5D7299" fontSize="10" textAnchor="middle">{t}</text>)}
           </svg>

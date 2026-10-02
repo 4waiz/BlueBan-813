@@ -256,9 +256,12 @@ def main():
         "difference is spectral configuration.",
         "The 813 arm is simulated at 30 m, not its specified 20 m, so it is "
         "pessimistic about the real sensor.",
-        "Ambiguous pixels between the background and anomaly thresholds were "
-        "excluded, so these figures describe separation of confident "
-        "populations and would be lower on borderline cases.",
+        ("Ambiguous pixels between the background and anomaly thresholds were "
+         "excluded, so these figures describe separation of confident "
+         "populations and would be lower on borderline cases.") if dropped else
+        ("Every water pixel is included at the operating threshold, borderline "
+         "cases too (none dropped), so these figures describe the operational "
+         "task, not a clean split of confident populations."),
     ]
 
     report["regime"] = regime

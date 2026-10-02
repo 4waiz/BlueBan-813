@@ -180,7 +180,7 @@
   "Reference labels come from the full-spectrum RX detector, not from in-situ measurement. This quantifies information loss at reduced spectral resolution; it does not establish that the detected anomaly is any particular substance.",
   "Both arms are convolved from the same Tanager pixels, so the only difference is spectral configuration.",
   "The 813 arm is simulated at 30 m, not its specified 20 m, so it is pessimistic about the real sensor.",
-  "Ambiguous pixels between the background and anomaly thresholds were excluded, so these figures describe separation of confident populations and would be lower on borderline cases."
+  "Every water pixel is included at the operating threshold, borderline cases too (none dropped), so these figures describe the operational task, not a clean split of confident populations."
  ],
  "regime": "hard"
 }

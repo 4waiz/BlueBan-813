@@ -26,9 +26,9 @@ function View() {
   const exit = () => { if (window.history.length > 1) router.back(); else router.push("/"); };
   return (
     <div className="fixed inset-0 z-[80] bg-[#02040b]">
-      {tle.error ? <div className="grid h-full place-items-center text-critical">Orbital elements missing (config/tle_eo.json): {String(tle.error)}</div>
+      {tle.error ? <div className="grid h-full place-items-center text-critical">Orbit data missing (config/tle_eo.json): {String(tle.error)}</div>
         : tle.data ? <OrbitViewer tle={tle.data} aois={aois} incident={hero} initialSensor={sensor} onExit={exit} />
-          : <div className="grid h-full place-items-center text-[13px] text-muted">Loading orbital elements…</div>}
+          : <div className="grid h-full place-items-center text-[13px] text-muted">Loading orbit data…</div>}
     </div>
   );
 }

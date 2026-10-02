@@ -226,8 +226,8 @@ def rules_model(val_labels: list) -> dict:
                             "* (1 - 0.6 cloud_adjacent)"},
          "artifact": {"kind": "rules", "reference": "pipeline/learning.py:rules_score"},
          "status": "PRODUCTION", "parent_model": None,
-         "notes": "Transparent detection rule used to raise incidents. The learned candidates must beat "
-                  "it on the frozen validation set before a human may promote them.",
+         "notes": "The simple rule that raises incidents today. A new model must beat it on the held-back "
+                  "test set, and a person must approve, before it goes live.",
          "gate": None, "promoted_by": "Team Kanban (initial deployment)",
          "promoted_at": "2026-09-30T00:00:00Z", "metrics": []}
     if val_labels:

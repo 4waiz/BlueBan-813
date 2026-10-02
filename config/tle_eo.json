@@ -6,7 +6,7 @@
    "key": "S2A",
    "name": "SENTINEL-2A",
    "norad": 40697,
-   "role": "Sentinel-2 MSI: primary detection sensor",
+   "role": "Sentinel-2: main satellite for spotting changes",
    "line1": "1 40697U 15028A   26272.20067609 -.00000076  00000+0 -12346-4 0  9995",
    "line2": "2 40697  98.5663 345.5375 0001072  86.9163 273.2143 14.30818010588605",
    "epoch": "2026-09-29T04:48:58Z"
@@ -15,7 +15,7 @@
    "key": "S2B",
    "name": "SENTINEL-2B",
    "norad": 42063,
-   "role": "Sentinel-2 MSI: primary detection sensor",
+   "role": "Sentinel-2: main satellite for spotting changes",
    "line1": "1 42063U 17013A   26272.19352094  .00000016  00000+0  22888-4 0  9997",
    "line2": "2 42063  98.5707 345.4733 0001157  90.1358 269.9957 14.30816838499519",
    "epoch": "2026-09-29T04:38:40Z"
@@ -24,7 +24,7 @@
    "key": "S2C",
    "name": "SENTINEL-2C",
    "norad": 60989,
-   "role": "Sentinel-2 MSI: primary detection sensor",
+   "role": "Sentinel-2: main satellite for spotting changes",
    "line1": "1 60989U 24157A   26272.15857634  .00000056  00000+0  37946-4 0  9992",
    "line2": "2 60989  98.5709 345.4440 0001225  82.5354 277.5968 14.30816207107850",
    "epoch": "2026-09-29T03:48:20Z"
@@ -33,7 +33,7 @@
    "key": "S3A",
    "name": "SENTINEL-3A",
    "norad": 41335,
-   "role": "Sentinel-3 OLCI: cross-sensor reference",
+   "role": "Sentinel-3: second-satellite check",
    "line1": "1 41335U 16011A   26272.14902222  .00000052  00000+0  39604-4 0  9998",
    "line2": "2 41335  98.6263 338.0288 0001232 105.9991 254.1325 14.26737337552889",
    "epoch": "2026-09-29T03:34:35Z"
@@ -42,7 +42,7 @@
    "key": "S3B",
    "name": "SENTINEL-3B",
    "norad": 43437,
-   "role": "Sentinel-3 OLCI: cross-sensor reference",
+   "role": "Sentinel-3: second-satellite check",
    "line1": "1 43437U 18039A   26272.19226941  .00000052  00000+0  39713-4 0  9998",
    "line2": "2 43437  98.6259 338.2207 0001186  69.1451 290.9857 14.26735286438952",
    "epoch": "2026-09-29T04:36:52Z"
@@ -51,7 +51,7 @@
    "key": "S1A",
    "name": "SENTINEL-1A",
    "norad": 39634,
-   "role": "Sentinel-1 SAR: optional surface-dark-anomaly mode",
+   "role": "Sentinel-1 radar: optional check for dark patches (possible oil)",
    "line1": "1 39634U 14016A   26272.23363804  .00000091  00000+0  28561-4 0  9990",
    "line2": "2 39634  98.1591 278.1337 0001481  85.2846 274.8524 14.59808973665191",
    "epoch": "2026-09-29T05:36:26Z"
@@ -60,7 +60,7 @@
    "key": "S1C",
    "name": "SENTINEL-1C",
    "norad": 62261,
-   "role": "Sentinel-1 SAR: optional surface-dark-anomaly mode",
+   "role": "Sentinel-1 radar: optional check for dark patches (possible oil)",
    "line1": "1 62261U 24235A   26272.22405793  .00000062  00000+0  22781-4 0  9995",
    "line2": "2 62261  98.1825 278.0563 0001359  90.1749 269.9606 14.59199436 96588",
    "epoch": "2026-09-29T05:22:38Z"
@@ -69,7 +69,7 @@
    "key": "S1D",
    "name": "SENTINEL-1D",
    "norad": 66315,
-   "role": "Sentinel-1 SAR: optional surface-dark-anomaly mode",
+   "role": "Sentinel-1 radar: optional check for dark patches (possible oil)",
    "line1": "1 66315U 25251A   26271.98420755  .00000044  00000+0  19133-4 0  9992",
    "line2": "2 66315  98.1822 277.8739 0001325  92.9326 267.2025 14.59199552 47867",
    "epoch": "2026-09-28T23:37:15Z"
@@ -78,7 +78,7 @@
    "key": "L8",
    "name": "LANDSAT 8",
    "norad": 39084,
-   "role": "Landsat 8 OLI/TIRS: thermal context",
+   "role": "Landsat 8: water temperature context",
    "line1": "1 39084U 13008A   26272.19696961  .00000171  00000+0  48053-4 0  9994",
    "line2": "2 39084  98.2202 341.0415 0001315  94.9771 265.1578 14.57105851713040",
    "epoch": "2026-09-29T04:43:38Z"
@@ -87,7 +87,7 @@
    "key": "L9",
    "name": "LANDSAT 9",
    "norad": 49260,
-   "role": "Landsat 9 OLI-2/TIRS-2: thermal context",
+   "role": "Landsat 9: water temperature context",
    "line1": "1 49260U 21088A   26272.16268845  .00000182  00000+0  50577-4 0  9997",
    "line2": "2 49260  98.2182 341.0267 0001475  91.0270 269.1097 14.57104347266141",
    "epoch": "2026-09-29T03:54:16Z"
@@ -96,7 +96,7 @@
    "key": "PACE",
    "name": "PACE",
    "norad": 58928,
-   "role": "NASA PACE OCI hyperspectral ocean colour (imaged the 2024 Gulf of Oman bloom)",
+   "role": "NASA PACE: hyperspectral ocean colour (saw the 2024 Gulf of Oman bloom)",
    "line1": "1 58928U 24025A   26271.35647542  .00000249  00000+0  54538-4 0  9992",
    "line2": "2 58928  98.0975 201.1543 0000985 330.2482  29.8665 14.65614157141048",
    "epoch": "2026-09-28T08:33:19Z"
@@ -105,7 +105,7 @@
    "key": "TAN1",
    "name": "TANAGER-1",
    "norad": 60507,
-   "role": "Planet Tanager-1 hyperspectral: source pixels of the simulated 813 product",
+   "role": "Planet Tanager-1: real hyperspectral pixels used to simulate 813",
    "line1": "1 60507U 24149AR  26272.04413294  .00010397  00000+0  23049-3 0  9994",
    "line2": "2 60507  97.2287   5.7030 0000788  34.9545 325.1755 15.43934819119065",
    "epoch": "2026-09-29T01:03:33Z"

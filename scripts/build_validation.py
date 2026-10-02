@@ -98,7 +98,7 @@ def data_quality():
 def matchups(seed_labels):
     cfg = matchup.MatchupConfig()
     ins = {"n_matchups": 0,
-           "status": "NO PUBLIC IN-SITU DATA",
+           "status": "NO PUBLIC WATER SAMPLES",
            "reason": "No public per-sample UAE chlorophyll, turbidity or TSS measurements were found "
                      "(docs/PUBLIC_UAE_DATA.md). The hackathon platform and gIQ hold none for UAE water "
                      "(docs/AUTHENTICATED_DATA_AUDIT.md). A data request to EAD is drafted, not sent.",

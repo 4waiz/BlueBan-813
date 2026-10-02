@@ -8,7 +8,7 @@ export interface Spectrum {
 }
 
 const S2_BANDS: [string, number, number][] = [["B1", 443, 21], ["B2", 492, 66], ["B3", 560, 36], ["B4", 665, 31], ["B5", 704, 15], ["B6", 740, 15], ["B7", 783, 20], ["B8", 833, 106], ["B8A", 865, 21], ["B11", 1610, 91]];
-export const DIAGNOSTIC: [number, string][] = [[443, "Chl-a Soret"], [620, "Phycocyanin"], [665, "Sediment / red"], [675, "Chl-a red absorption"], [705, "Red-edge peak"]];
+export const DIAGNOSTIC: [number, string][] = [[443, "Chlorophyll (blue)"], [620, "Blue-green algae"], [665, "Sediment"], [675, "Chlorophyll (red dip)"], [705, "Bloom peak"]];
 
 export default function SpectrumPlot(props: {
   spec: Spectrum; height?: number; fill?: boolean; showBands?: boolean; showDiff?: boolean; range?: [number, number]; highlight?: number | null;
@@ -79,15 +79,15 @@ function SpectrumPlotInner({ spec, height = 240, showBands = true, showDiff = fa
         {h != null && hw != null && <line x1={x(hw)} x2={x(hw)} y1={T} y2={H - B} stroke="#EAF1FF" strokeOpacity={0.5} />}
       </svg>
       <div className="pointer-events-none absolute right-2 top-2 flex gap-3 text-[10.5px]">
-        <span className="text-critical">● Incident pixel(s)</span><span className="text-cyan">● Background water</span>
+        <span className="text-critical">● Event pixels</span><span className="text-cyan">● Normal water</span>
       </div>
       {h != null && hw != null && (
         <div className="panel pointer-events-none absolute left-14 top-6 px-3 py-2 text-[11px]">
-          <div className="hud-value font-bold text-caution">{hw.toFixed(1)} nm {band ? `· S2 ${band[0]}` : "· no S2 band"}</div>
-          <div className="text-critical">Incident: {spec.event[h] != null ? spec.event[h]!.toFixed(4) : "n/a"}</div>
-          <div className="text-cyan">Background: {spec.background[h] != null ? spec.background[h]!.toFixed(4) : "n/a"}</div>
-          {spec.background_p05?.[h] != null && <div className="text-muted">Background 5-95 %: {spec.background_p05[h]!.toFixed(4)}–{spec.background_p95![h]!.toFixed(4)}</div>}
-          {diag && <div className="text-ink">Diagnostic: {diag[1]}</div>}
+          <div className="hud-value font-bold text-caution">{hw.toFixed(1)} nm {band ? `· Sentinel-2 ${band[0]}` : "· no Sentinel-2 band"}</div>
+          <div className="text-critical">Event: {spec.event[h] != null ? spec.event[h]!.toFixed(4) : "n/a"}</div>
+          <div className="text-cyan">Normal water: {spec.background[h] != null ? spec.background[h]!.toFixed(4) : "n/a"}</div>
+          {spec.background_p05?.[h] != null && <div className="text-muted">Usual range (5–95 %): {spec.background_p05[h]!.toFixed(4)}–{spec.background_p95![h]!.toFixed(4)}</div>}
+          {diag && <div className="text-ink">Key wavelength: {diag[1]}</div>}
         </div>
       )}
     </div>

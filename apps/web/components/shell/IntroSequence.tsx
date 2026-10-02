@@ -41,7 +41,9 @@ export default function IntroSequence() {
   }, [show, skip]);
 
   return (
-    <AnimatePresence onExitComplete={() => setLeaving(false)}>
+    // After the fade-out the sequence is over for good: `leaving` stays set and
+    // `show` drops, which also removes the key listener and the timer.
+    <AnimatePresence onExitComplete={() => setShow(false)}>
       {show && !leaving && (
         <motion.div key="intro" className="fixed inset-0 z-[100] cursor-pointer overflow-hidden bg-void" onClick={skip}
           initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: "easeInOut" }}

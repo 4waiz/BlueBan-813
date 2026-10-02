@@ -1,0 +1,79 @@
+{
+ "_schema": "Provenance, per pipeline/provenance.py",
+ "result_id": "water_mask_enmap_20240424_shawka_dam_v1",
+ "result_kind": "water_mask",
+ "sources": [
+  {
+   "satellite": "EnMAP",
+   "sensor": "HSI (VNIR + SWIR)",
+   "scene_id": "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z",
+   "acquisition_utc": "2024-04-24T07:30:16.236194Z",
+   "product": "ENMAP_HSI_L2A",
+   "processing_level": "L2A",
+   "provider": "DLR / EOC Geoservice",
+   "licence": "proprietary (see docs/DATA_ACCESS_AUDIT.md section 1)",
+   "native_resolution_m": 30.0,
+   "bands_used": "all 224 minus 5 dropped for carrying nodata everywhere in the AOI window (indices 131-135, 1-based) -- NOTE: one fewer band dropped, and shifted by one index, vs. the 2022-09-08 scene's 6-band gap (130-135, 1-based); observed, not reconciled, see docs/WATER_MASK.md",
+   "wavelengths_nm": "not available for individual bands -- see config/project.yaml enmap.spec.band_characterisation_table",
+   "units": "surface reflectance (Land_Mode correction; see docs/DATA_ACCESS_AUDIT.md section 2.1 and docs/WATER_MASK.md section 7)",
+   "local_path": "sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "notes": "This is a LOCALLY CROPPED file, not the original 421,431,498-byte scene -- the original exceeds this environment's per-file staging cap (~400 MiB) and was never brought in whole (device_bash, the tool that would normally do this crop in place, was blocked by a tracked Windows-mount issue for the whole duration of this project). The project owner ran scripts/crop_enmap_scene.py locally instead, producing this 264,247-byte, 224-band, AOI+150m-buffer window (same crop definition used for the 2022-09-08 scene, verified pixel-grid-identical -- see docs/WATER_MASK.md section 8). Full per-file provenance for the ORIGINAL uncropped scene is in data/metadata/enmap_20240424_DT0000070441_006_provenance.json; this record covers the crop and the water-mask result derived from it."
+  },
+  {
+   "satellite": "n/a (validation reference only, not a direct input to the mask)",
+   "sensor": "Sentinel-2 MSI / Landsat 8-9 OLI-TIRS",
+   "scene_id": "shawka_dam rows, data/baseline_indices_s2_landsat.csv (14 scenes, Sep 2023-Oct 2025)",
+   "acquisition_utc": "2023-09 through 2025-10 (14 monthly observations)",
+   "product": "sentinel-2-l2a / landsat-c2-l2, NDWI_water_check column",
+   "processing_level": "L2A / Collection 2 Level-2",
+   "provider": "Microsoft Planetary Computer (ESA/Copernicus, USGS)",
+   "licence": "Copernicus open licence / USGS public domain (per BluePulse-813's own audit, not re-verified here)",
+   "native_resolution_m": 10.0,
+   "units": "NDWI (dimensionless), per-pixel over 2806 pixels/scene",
+   "local_path": "data-access-log/shawka_dam_water_check.md; data/baseline_indices_s2_landsat.csv",
+   "notes": "Reused by copy from BluePulse-813, not recollected. IMPORTANT: the baseline series has NO scene between 2024-02-23 and 2024-09-04 -- there is no direct seasonal analog for an April 2024 reading. The comparison in docs/WATER_MASK.md section 9 is against the neighboring Jan-Feb 2024 (7.7-8.9% wet) and Sep 2024-Feb 2025 (1.7-12.2% wet) brackets only, stated as a weaker check than the 2022-09-08 comparison for exactly this reason."
+  }
+ ],
+ "algorithm": {
+  "name": "water_mask (inland, band-group broadband + short/long index) -- SAME parameters as the 2022-09-08 run, not re-tuned",
+  "description": "Identical function and parameters as data/water_mask/provenance.json (the 2022-09-08 record) -- run against this scene specifically to test whether the same thresholds generalize across dates. See pipeline/water_mask.py and docs/WATER_MASK.md.",
+  "reference": "docs/WATER_MASK.md section 9 -- two-date comparison",
+  "parameters": {
+   "brightness_max": 0.11,
+   "short_long_index_min": 0.0,
+   "min_component_px": 3,
+   "buffer_px": 0
+  },
+  "inputs": [
+   "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "aoi/shawka_dam.geojson"
+  ],
+  "units_out": "boolean mask, True = candidate water/wet-core pixel",
+  "assumptions": [
+   "Same three assumptions as the 2022-09-08 provenance record (band ordering, 1/10000 reflectance scale, bad-band handling)."
+  ],
+  "limitations": [
+   "Same limitations as the 2022-09-08 record, PLUS the key finding of this run: the two-criterion mask does NOT select the same physical location the 2022-09-08 mask did, even though that location (rows 7-10, cols 12-16 in the shared pixel grid) is still visibly the darkest broadband patch in this scene too (brightness as low as 0.035-0.05). Its short_long_index is strongly NEGATIVE here (-0.15 to -0.33), the opposite sign from the 2022-09-08 wet core -- so it fails the second criterion and is excluded. The 4 pixels this run DID select (rows 12-13, cols 23-24) were among the BRIGHTEST, driest pixels in the 2022-09-08 scene (0.30-0.36 reflectance then). Full detail in docs/WATER_MASK.md section 9 -- this is reported as a finding, not resolved or re-tuned here."
+  ]
+ },
+ "schema_version": "1.0",
+ "extra": {
+  "result_2024_04_24": {
+   "px_water_final": 4,
+   "px_inside_locked_polygon": 84,
+   "wet_fraction_of_polygon_pct": 4.8,
+   "px_water_outside_locked_polygon": 0
+  },
+  "comparison_to_2022_09_08": {
+   "wet_fraction_pct": {
+    "2022-09-08": 11.9,
+    "2024-04-24": 4.8
+   },
+   "spatial_overlap_of_selected_pixels": "none -- zero shared pixel locations between the two dates' final masks",
+   "recurring_dark_cluster_still_visible": true,
+   "recurring_dark_cluster_selected_in_2024": false,
+   "reason_not_selected": "short_long_index sign flip at that location between dates (see limitations above)"
+  }
+ },
+ "status_update_2026_09_19": "This record remains the accurate historical provenance for the SINGLE-DATE water_mask()/short_long_index result. For cross-date use, this criterion was found not to generalize (see algorithm.limitations above) and has been REPLACED by persistent_wet_core() -- see data/water_mask/provenance_persistent_wet_core.json and docs/WATER_MASK.md section 12. This file is not edited otherwise; the original result stands as originally recorded."
+}

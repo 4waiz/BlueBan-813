@@ -1,0 +1,477 @@
+{
+ "aoi": "shawka_dam",
+ "z_threshold": 1.5,
+ "per_sensor_n": {
+  "landsat-c2-l2": 14,
+  "sentinel-2-l2a": 14
+ },
+ "per_sensor_mean": {
+  "landsat-c2-l2": {
+   "NDCI_chl_proxy": 0.12458393860528495,
+   "NDTI_turbidity_proxy": 0.08049687218328071,
+   "RedTideIndex_proxy": 1.285469268640372,
+   "NDWI_water_check": -0.20304276421082484
+  },
+  "sentinel-2-l2a": {
+   "NDCI_chl_proxy": 0.03528432440076315,
+   "NDTI_turbidity_proxy": 0.04687154288063349,
+   "RedTideIndex_proxy": 1.0732006309895312,
+   "NDWI_water_check": -0.11393666960961897
+  }
+ },
+ "per_sensor_std": {
+  "landsat-c2-l2": {
+   "NDCI_chl_proxy": 0.016918648503584408,
+   "NDTI_turbidity_proxy": 0.00586570534142089,
+   "RedTideIndex_proxy": 0.0435435266803888,
+   "NDWI_water_check": 0.013607564085932172
+  },
+  "sentinel-2-l2a": {
+   "NDCI_chl_proxy": 0.004773478825819894,
+   "NDTI_turbidity_proxy": 0.008196623980451196,
+   "RedTideIndex_proxy": 0.010296155713113174,
+   "NDWI_water_check": 0.012796093695624336
+  }
+ },
+ "n_flagged": 7,
+ "deviations": [
+  {
+   "item_id": "LC08_L2SP_159043_20230925_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2023-09-25T06:40:29.200305+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.4674,
+    "NDTI_turbidity_proxy": -0.5158,
+    "RedTideIndex_proxy": -0.4891,
+    "NDWI_water_check": 0.7815
+   },
+   "max_abs_z": 0.7815,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20230930T064651_R020_T40RDN_20230930T124351",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2023-09-30T06:46:51.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 2.3747,
+    "NDTI_turbidity_proxy": 0.7533,
+    "RedTideIndex_proxy": 2.3891,
+    "NDWI_water_check": -1.5798
+   },
+   "max_abs_z": 2.3891,
+   "flagged_index": "RedTideIndex_proxy",
+   "flagged": true
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20231003_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2023-10-03T06:40:28.611650+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.3259,
+    "NDTI_turbidity_proxy": 0.1481,
+    "RedTideIndex_proxy": 0.3133,
+    "NDWI_water_check": -0.456
+   },
+   "max_abs_z": 0.456,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2B_MSIL2A_20231005T064729_R020_T40RDN_20231005T131535",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2023-10-05T06:47:29.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.4757,
+    "NDTI_turbidity_proxy": -0.0915,
+    "RedTideIndex_proxy": 0.4701,
+    "NDWI_water_check": -0.2356
+   },
+   "max_abs_z": 0.4757,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20231119T065151_R020_T40RCN_20231119T120022",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2023-11-19T06:51:51.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -1.589,
+    "NDTI_turbidity_proxy": -0.4737,
+    "RedTideIndex_proxy": -1.5757,
+    "NDWI_water_check": 2.6535
+   },
+   "max_abs_z": 2.6535,
+   "flagged_index": "NDWI_water_check",
+   "flagged": true
+  },
+  {
+   "item_id": "LC08_L2SP_159043_20231128_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2023-11-28T06:40:37.400188+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.0779,
+    "NDTI_turbidity_proxy": -0.6431,
+    "RedTideIndex_proxy": -0.0982,
+    "NDWI_water_check": 0.362
+   },
+   "max_abs_z": 0.6431,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20231206_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2023-12-06T06:40:37.795722+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.1245,
+    "NDTI_turbidity_proxy": 0.0441,
+    "RedTideIndex_proxy": 0.1073,
+    "NDWI_water_check": -0.1692
+   },
+   "max_abs_z": 0.1692,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20231209T065251_R020_T40RDN_20231209T111650",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2023-12-09T06:52:51.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.0546,
+    "NDTI_turbidity_proxy": -0.2675,
+    "RedTideIndex_proxy": 0.0495,
+    "NDWI_water_check": -0.5077
+   },
+   "max_abs_z": 0.5077,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20240123_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2024-01-23T06:40:36.291270+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.5613,
+    "NDTI_turbidity_proxy": -0.3802,
+    "RedTideIndex_proxy": 0.5561,
+    "NDWI_water_check": -0.5217
+   },
+   "max_abs_z": 0.5613,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2B_MSIL2A_20240123T065159_R020_T40RDN_20240123T100824",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2024-01-23T06:51:59.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.9456,
+    "NDTI_turbidity_proxy": -0.5987,
+    "RedTideIndex_proxy": -0.9426,
+    "NDWI_water_check": -0.5946
+   },
+   "max_abs_z": 0.9456,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2B_MSIL2A_20240222T064909_R020_T40RCN_20240222T113956",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2024-02-22T06:49:09.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.2767,
+    "NDTI_turbidity_proxy": -0.7517,
+    "RedTideIndex_proxy": -0.2803,
+    "NDWI_water_check": -0.3019
+   },
+   "max_abs_z": 0.7517,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC08_L2SP_160042_20240223_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2024-02-23T06:46:13.312516+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.9887,
+    "NDTI_turbidity_proxy": -0.3965,
+    "RedTideIndex_proxy": 1.0028,
+    "NDWI_water_check": -1.0319
+   },
+   "max_abs_z": 1.0319,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20240904T064621_R020_T40RCN_20240904T121950",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2024-09-04T06:46:21.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 1.5202,
+    "NDTI_turbidity_proxy": -0.189,
+    "RedTideIndex_proxy": 1.5211,
+    "NDWI_water_check": 0.5278
+   },
+   "max_abs_z": 1.5211,
+   "flagged_index": "RedTideIndex_proxy",
+   "flagged": true
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20240919_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2024-09-19T06:40:12.019977+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.084,
+    "NDTI_turbidity_proxy": -0.8803,
+    "RedTideIndex_proxy": 0.066,
+    "NDWI_water_check": 0.2644
+   },
+   "max_abs_z": 0.8803,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20241005_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2024-10-05T06:40:19.334772+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.4152,
+    "NDTI_turbidity_proxy": -1.0172,
+    "RedTideIndex_proxy": 0.4051,
+    "NDWI_water_check": -0.0804
+   },
+   "max_abs_z": 1.0172,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2B_MSIL2A_20241029T064919_R020_T40RDN_20241029T090554",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2024-10-29T06:49:19.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.5826,
+    "NDTI_turbidity_proxy": -0.9276,
+    "RedTideIndex_proxy": 0.5772,
+    "NDWI_water_check": 0.466
+   },
+   "max_abs_z": 0.9276,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20241103T065031_R020_T40RDN_20241103T100958",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2024-11-03T06:50:31.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.1668,
+    "NDTI_turbidity_proxy": -0.8733,
+    "RedTideIndex_proxy": 0.1614,
+    "NDWI_water_check": -0.4477
+   },
+   "max_abs_z": 0.8733,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC08_L2SP_160043_20241105_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2024-11-05T06:46:34.125376+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 1.3339,
+    "NDTI_turbidity_proxy": -0.2984,
+    "RedTideIndex_proxy": 1.3691,
+    "NDWI_water_check": -1.4894
+   },
+   "max_abs_z": 1.4894,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20241208_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2024-12-08T06:40:29.771083+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 1.3149,
+    "NDTI_turbidity_proxy": -1.2045,
+    "RedTideIndex_proxy": 1.3488,
+    "NDWI_water_check": -1.0928
+   },
+   "max_abs_z": 1.3488,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2B_MSIL2A_20241228T065209_R020_T40RDN_20241228T085137",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2024-12-28T06:52:09.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.241,
+    "NDTI_turbidity_proxy": -1.2042,
+    "RedTideIndex_proxy": -0.2447,
+    "NDWI_water_check": 0.379
+   },
+   "max_abs_z": 1.2042,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20250112T065241_R020_T40RDN_20250112T101851",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2025-01-12T06:52:41.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.2803,
+    "NDTI_turbidity_proxy": -0.3698,
+    "RedTideIndex_proxy": -0.2838,
+    "NDWI_water_check": -0.3844
+   },
+   "max_abs_z": 0.3844,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20250125_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2025-01-25T06:40:33.813324+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": 0.2372,
+    "NDTI_turbidity_proxy": 1.1558,
+    "RedTideIndex_proxy": 0.2223,
+    "NDWI_water_check": -0.7668
+   },
+   "max_abs_z": 1.1558,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2C_MSIL2A_20250201T065141_R020_T40RCN_20250201T104612",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2025-02-01T06:51:41.025000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.1051,
+    "NDTI_turbidity_proxy": 1.1677,
+    "RedTideIndex_proxy": -0.1096,
+    "NDWI_water_check": -1.3186
+   },
+   "max_abs_z": 1.3186,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "LC09_L2SP_159043_20250210_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2025-02-10T06:40:32.781281+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -1.2257,
+    "NDTI_turbidity_proxy": 0.1327,
+    "RedTideIndex_proxy": -1.2334,
+    "NDWI_water_check": 1.4309
+   },
+   "max_abs_z": 1.4309,
+   "flagged_index": null,
+   "flagged": false
+  },
+  {
+   "item_id": "S2A_MSIL2A_20250901T065321_R020_T40RDN_20250901T092758",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2025-09-01T06:53:21.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -0.4801,
+    "NDTI_turbidity_proxy": 2.2844,
+    "RedTideIndex_proxy": -0.4821,
+    "NDWI_water_check": 0.4776
+   },
+   "max_abs_z": 2.2844,
+   "flagged_index": "NDTI_turbidity_proxy",
+   "flagged": true
+  },
+  {
+   "item_id": "LC08_L2SP_160043_20250905_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2025-09-05T06:46:41.471522+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -2.3466,
+    "NDTI_turbidity_proxy": 1.2724,
+    "RedTideIndex_proxy": -2.2956,
+    "NDWI_water_check": 2.3135
+   },
+   "max_abs_z": 2.3466,
+   "flagged_index": "NDCI_chl_proxy",
+   "flagged": true
+  },
+  {
+   "item_id": "S2B_MSIL2A_20251004T064629_R020_T40RDN_20251004T101955",
+   "collection": "sentinel-2-l2a",
+   "datetime": "2025-10-04T06:46:29.024000+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -1.2568,
+    "NDTI_turbidity_proxy": 1.5417,
+    "RedTideIndex_proxy": -1.2494,
+    "NDWI_water_check": 0.8665
+   },
+   "max_abs_z": 1.5417,
+   "flagged_index": "NDTI_turbidity_proxy",
+   "flagged": true
+  },
+  {
+   "item_id": "LC09_L2SP_160043_20251031_02_T1",
+   "collection": "landsat-c2-l2",
+   "datetime": "2025-10-31T06:46:50.905726+00:00",
+   "z_scores": {
+    "NDCI_chl_proxy": -1.2681,
+    "NDTI_turbidity_proxy": 2.5832,
+    "RedTideIndex_proxy": -1.2744,
+    "NDWI_water_check": 0.4561
+   },
+   "max_abs_z": 2.5832,
+   "flagged_index": "NDTI_turbidity_proxy",
+   "flagged": true
+  }
+ ],
+ "enmap_date_context": {
+  "2022-09-08": {
+   "landsat-c2-l2": {
+    "before": null,
+    "after": {
+     "item_id": "LC08_L2SP_159043_20230925_02_T1",
+     "datetime": "2023-09-25T06:40:29.200305+00:00",
+     "days_after_enmap": 382
+    }
+   },
+   "sentinel-2-l2a": {
+    "before": null,
+    "after": {
+     "item_id": "S2A_MSIL2A_20230930T064651_R020_T40RDN_20230930T124351",
+     "datetime": "2023-09-30T06:46:51.024000+00:00",
+     "days_after_enmap": 387
+    }
+   }
+  },
+  "2024-04-24": {
+   "landsat-c2-l2": {
+    "before": {
+     "item_id": "LC08_L2SP_160042_20240223_02_T1",
+     "datetime": "2024-02-23T06:46:13.312516+00:00",
+     "days_before_enmap": 60
+    },
+    "after": {
+     "item_id": "LC09_L2SP_159043_20240919_02_T1",
+     "datetime": "2024-09-19T06:40:12.019977+00:00",
+     "days_after_enmap": 148
+    }
+   },
+   "sentinel-2-l2a": {
+    "before": {
+     "item_id": "S2B_MSIL2A_20240222T064909_R020_T40RCN_20240222T113956",
+     "datetime": "2024-02-22T06:49:09.024000+00:00",
+     "days_before_enmap": 61
+    },
+    "after": {
+     "item_id": "S2A_MSIL2A_20240904T064621_R020_T40RCN_20240904T121950",
+     "datetime": "2024-09-04T06:46:21.024000+00:00",
+     "days_after_enmap": 133
+    }
+   }
+  }
+ }
+}

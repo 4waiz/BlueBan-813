@@ -46,6 +46,15 @@ DOC_KEYS = {
     "archive-data-access-audit-2026-09-15": "archive/DATA_ACCESS_AUDIT_2026-09-15.md",
     "archive-official-resource-audit-2026-09-17": "archive/OFFICIAL_RESOURCE_AUDIT_2026-09-17.md",
     "archive-aoi-selection-tanager": "archive/AOI_SELECTION_TANAGER_2026-09-15.md",
+    # Inland complement (Shawka Dam), appended
+    "inland-review-flags": "inland/REVIEW_FLAGS.md",
+    "inland-aoi-selection": "inland/AOI_SELECTION.md",
+    "inland-data-access-audit": "inland/DATA_ACCESS_AUDIT.md",
+    "inland-water-mask": "inland/WATER_MASK.md",
+    "inland-anomaly-and-fingerprint": "inland/ANOMALY_AND_FINGERPRINT.md",
+    "inland-temporal-baseline-detector": "inland/TEMPORAL_BASELINE_DETECTOR.md",
+    "inland-satellite-813-decision": "inland/SATELLITE_813_DECISION.md",
+    "inland-water-check-log": "inland/data-access-log/shawka_dam_water_check.md",
 }
 
 
@@ -79,6 +88,15 @@ DATA_SOURCES = [
     {"name": "Hackathon platform datasets and gIQ", "provider": "Arab Youth Space Hackathon Cockpit; gIQ",
      "licence": "restricted", "role": "Audited for UAE water data", "status": "NOTHING USABLE FOR UAE WATER (see audit)",
      "url": None},
+    # Inland complement (Shawka Dam), appended
+    {"name": "EnMAP HSI L2A (Shawka Dam, 2022-09-08 and 2024-04-24)", "provider": "DLR / EOC Geoservice",
+     "licence": "proprietary: redistribution terms not yet confirmed for public submission",
+     "role": "Inland complement: wet-core mask, RX anomaly and fingerprint, 813 simulation on EnMAP (derived results only; per-pixel layers withheld)",
+     "status": "USED (2 fixed dates, precomputed)", "url": "https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A"},
+    {"name": "Sentinel-2 / Landsat baseline (Shawka Dam)", "provider": "ESA Copernicus; USGS (via Planetary Computer)",
+     "licence": "Copernicus: free, full and open; USGS: public domain",
+     "role": "Inland complement: 28-observation temporal baseline (AOI-mean NDCI, NDTI, red-edge ratio, NDWI)",
+     "status": "USED (precomputed)", "url": None},
 ]
 
 
@@ -194,6 +212,10 @@ def main():
             idx.append({"key": key, "file": fn, "bytes": os.path.getsize(sp)})
     write(os.path.join(OUT, "docs", "index.json"), {"docs": idx})
     log(f"docs: {len(idx)}")
+
+    # Inland complement (Shawka Dam): the public summary only; data/inland/restricted/ is never bundled
+    if copy(os.path.join(ROOT, "outputs", "inland", "summary.json"), os.path.join(OUT, "inland", "summary.json")):
+        log("inland summary")
 
     status = {"generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
               "sources": DATA_SOURCES, "lineage": lineage(),

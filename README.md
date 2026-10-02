@@ -145,3 +145,34 @@ tests/           pytest suite + TS/Python learning parity
 * **Humans promote models.** The previous production model stays untouched until a candidate passes the gate and a named person approves.
 
 Restricted or authenticated downloads never leave `data/raw/private/` (gitignored). Everything in this repository is derived from open data.
+
+## Inland complement: Shawka Dam (appended 2026-10-02)
+
+The challenge covers inland water as well as coasts. A second module, built
+separately, covers **Shawka Dam (Ras Al Khaimah)**, a small wadi reservoir, from
+two fixed **EnMAP L2A hyperspectral** dates (2022-09-08, 2024-04-24) and a
+28-observation Sentinel-2/Landsat baseline (September 2023 to October 2025). It is
+integrated as a pure add-on: the coastal pipeline, outputs and numbers are unchanged.
+
+* **What it shows.** A 10-pixel (30 m) persistent wet core inside the locked polygon
+  (84 px), dark on both dates; a two-year deviation detector whose clearest signal
+  is a Sep–Oct 2025 cluster on both sensors as the pool nearly dried; an RX anomaly
+  and fingerprint layer on the core; and Satellite 813 simulated on a second
+  hyperspectral sensor (196 of 205 simulated 813 bands have real EnMAP support).
+* **Where.** `/inland` in the app (3D wet-core map, EnMAP→813 band ladder,
+  deviation ribbon), `GET /api/inland/summary`, [`docs/inland/`](docs/inland/README.md),
+  `pipeline/inland/`, `data/inland/`, `config/project.yaml` → `sites.shawka_dam`.
+* **Static results, not a live feed.** The inland pipeline code is kept for
+  methodology transparency and future scenes; BLUEBAN serves its precomputed outputs.
+* **Reviewed on integration.** [`docs/inland/REVIEW_FLAGS.md`](docs/inland/REVIEW_FLAGS.md) lists what looks
+  off, with evidence (flagged, not fixed). The two high-severity flags are the
+  licence and a band table that matches the 2024 scene only.
+
+Two caveats, carried over exactly:
+
+* EnMAP's license is "proprietary" with redistribution terms not yet confirmed for public submission.
+* Detector caveat: the anomaly/fingerprint results are based on a ~10-17 pixel background population, not a calibrated detector.
+
+Per-pixel EnMAP reflectance layers and spectra therefore stay in
+`data/inland/restricted/` (gitignored) until the licence is confirmed; the
+public summary carries derived masks, scores and counts only.

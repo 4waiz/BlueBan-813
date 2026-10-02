@@ -1,0 +1,88 @@
+{
+ "result_id": "anomaly_fingerprint_enmap_20220908_20240424_shawka_dam_v1",
+ "result_kind": "anomaly_and_fingerprint",
+ "sources": [
+  {
+   "satellite": "EnMAP",
+   "sensor": "HSI (VNIR + SWIR)",
+   "scene_id": "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "acquisition_utc": "2022-09-08T07:30:13.226624Z",
+   "product": "ENMAP_HSI_L2A",
+   "processing_level": "L2A",
+   "provider": "DLR / EOC Geoservice",
+   "licence": "proprietary",
+   "native_resolution_m": 30.0,
+   "bands_used": [],
+   "wavelengths_nm": [],
+   "units": "",
+   "quality_mask": "",
+   "access_url": "",
+   "local_path": "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "sha256": "",
+   "notes": ""
+  },
+  {
+   "satellite": "EnMAP",
+   "sensor": "HSI (VNIR + SWIR)",
+   "scene_id": "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "acquisition_utc": "2024-04-24T07:30:16.236194Z",
+   "product": "ENMAP_HSI_L2A",
+   "processing_level": "L2A",
+   "provider": "DLR / EOC Geoservice",
+   "licence": "proprietary",
+   "native_resolution_m": 30.0,
+   "bands_used": [],
+   "wavelengths_nm": [],
+   "units": "",
+   "quality_mask": "",
+   "access_url": "",
+   "local_path": "/mnt/user-data/uploads/813-inland-standalone-complement/sourced data/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "sha256": "",
+   "notes": ""
+  }
+ ],
+ "algorithm": {
+  "name": "rx_anomaly + fingerprint_pixel (inland adaptation)",
+  "description": "RX/Mahalanobis anomaly score in PCA-of-band-group space, pooled background across both dates, applied within the validated persistent wet core; band-group-based fingerprint hypothesis over the same population. See pipeline/anomaly.py and pipeline/fingerprint.py module docstrings for the full derivation and stated small-sample / no-wavelength-table limitations.",
+  "reference": "Reed & Yu (1990); interface shape mirrors DesalGuard-main, values/features do not.",
+  "parameters": {
+   "test_darkness_max": 0.1,
+   "background_darkness_max": 0.13,
+   "n_groups": 6
+  },
+  "inputs": [
+   "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z-AOI_CROP.tiff",
+   "aoi/shawka_dam.geojson"
+  ],
+  "units_out": "per-pixel RX score, SAM, and weighted class-hypothesis scores",
+  "assumptions": [
+   "Background (darkness_max=0.13 persistent-wet-core mask) is a valid 'normal water' population for this AOI -- itself only validated by the zero-leakage/single-component checks in docs/WATER_MASK.md section 12, not by independent ground truth."
+  ],
+  "limitations": [
+   "Background pooled across 2 dates is still only tens of pixel-spectra -- see pipeline/anomaly.py module docstring; scores are a relative ranking, not a calibrated detection.",
+   "Most fingerprint evidence is still band-GROUP-based; CYANO_LIKE now uses real named bands (600/620/650 nm phycocyanin shoulders, see data/metadata/enmap_band_characterisation.json), the one class that structurally needed them. BOTTOM_INFLUENCED remains not computed -- see pipeline/fingerprint.py module docstring and CLASSES registry.",
+   "Fingerprint evidence WEIGHTS (including CYANO_LIKE's z-score gate) are structurally-reasoned placeholders, not empirically fit -- no labeled anomaly example exists for this AOI.",
+   "Background d620 distribution (phycocyanin band-depth) has n=34 -- same small-sample caveat as the rest of this module's background statistics."
+  ]
+ },
+ "code_version": "uncommitted",
+ "schema_version": "1.0",
+ "processed_utc": "2026-09-19T11:33:02Z",
+ "environment": {
+  "python": "3.11.15",
+  "platform": "Linux"
+ },
+ "extra": {
+  "summary": {
+   "2022-09-08": {
+    "BACKGROUND_WATER": 10
+   },
+   "2024-04-24": {
+    "BLOOM_LIKE": 1,
+    "CDOM_LIKE": 7,
+    "BACKGROUND_WATER": 2
+   }
+  }
+ }
+}

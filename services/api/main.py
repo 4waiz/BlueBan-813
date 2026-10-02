@@ -45,6 +45,10 @@ from .loop import router as loop_router  # noqa: E402
 
 app.include_router(loop_router)
 
+from .inland import router as inland_router  # noqa: E402
+
+app.include_router(inland_router)
+
 
 def _read(path: str) -> Any:
     if not os.path.exists(path):

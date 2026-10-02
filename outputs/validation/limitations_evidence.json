@@ -1,0 +1,502 @@
+{
+ "generated_utc": "2026-10-02T10:33:00Z",
+ "drift": [
+  {
+   "label": "Gulf of Annaba (BB-2026-001 sample point)",
+   "sample_point_lonlat": [
+    7.67354,
+    37.00267
+   ],
+   "era5_cell_lonlat": [
+    7.70751,
+    36.942
+   ],
+   "record": [
+    "2019-01-01T00:00",
+    "2025-12-31T23:00"
+   ],
+   "n_hours": 61368,
+   "n_starts": 10220,
+   "wind_speed_ms": {
+    "median": 2.24,
+    "p95": 6.14,
+    "max": 12.75
+   },
+   "drift_physics": {
+    "wind_drift_factor": 0.03,
+    "deflection_deg": 15.0
+   },
+   "displacement_all_year": {
+    "6": {
+     "n": 10220,
+     "median_km": 1.3436393854100936,
+     "p90_km": 3.1928825219000014,
+     "p95_km": 3.816788364198006,
+     "max_km": 7.4783854956516445
+    },
+    "12": {
+     "n": 10220,
+     "median_km": 2.5004087211297437,
+     "p90_km": 6.010257526737973,
+     "p95_km": 7.306786124826241,
+     "max_km": 14.022622216155579
+    },
+    "24": {
+     "n": 10220,
+     "median_km": 4.425921190837427,
+     "p90_km": 11.267582008397339,
+     "p95_km": 13.735808445917364,
+     "max_km": 26.096182472720738
+    },
+    "48": {
+     "n": 10220,
+     "median_km": 8.165930937864733,
+     "p90_km": 20.692777436874216,
+     "p95_km": 25.02544048889491,
+     "max_km": 44.75249598762429
+    }
+   },
+   "persistence_error_all_year": {
+    "6": {
+     "n": 10220,
+     "median_km": 0.5783371550813381,
+     "p90_km": 1.231971647374193,
+     "p95_km": 1.4707772312438476,
+     "max_km": 4.417940022066626
+    },
+    "12": {
+     "n": 10220,
+     "median_km": 1.890414090241073,
+     "p90_km": 3.5463255128593705,
+     "p95_km": 4.175740906463241,
+     "max_km": 8.94891638826913
+    },
+    "24": {
+     "n": 10220,
+     "median_km": 4.345170419410315,
+     "p90_km": 8.440769308423574,
+     "p95_km": 9.910637812260495,
+     "max_km": 22.77973771939214
+    },
+    "48": {
+     "n": 10220,
+     "median_km": 10.0138421192659,
+     "p90_km": 19.55326806562122,
+     "p95_km": 23.319467355322512,
+     "max_km": 48.304890113960305
+    }
+   },
+   "season_center": "2025-06-01",
+   "displacement_season": {
+    "6": {
+     "n": 2548,
+     "median_km": 1.1746445675312185,
+     "p90_km": 2.7697133683718906,
+     "p95_km": 3.3776092217303852,
+     "max_km": 5.93788175902859
+    },
+    "12": {
+     "n": 2548,
+     "median_km": 2.2521016086144456,
+     "p90_km": 4.975245092433926,
+     "p95_km": 6.276280122028056,
+     "max_km": 11.654412650735795
+    },
+    "24": {
+     "n": 2548,
+     "median_km": 3.901506970222814,
+     "p90_km": 8.781279498615785,
+     "p95_km": 11.22546214322839,
+     "max_km": 20.168316874025447
+    },
+    "48": {
+     "n": 2548,
+     "median_km": 6.894665567813474,
+     "p90_km": 15.928919328428671,
+     "p95_km": 20.28956533349856,
+     "max_km": 37.11825809574417
+    }
+   },
+   "persistence_error_season": {
+    "6": {
+     "n": 2548,
+     "median_km": 0.6237225418699627,
+     "p90_km": 1.2784359763833708,
+     "p95_km": 1.5041678338776607,
+     "max_km": 3.1849962876002254
+    },
+    "12": {
+     "n": 2548,
+     "median_km": 2.0298922900704595,
+     "p90_km": 3.5831530769930673,
+     "p95_km": 4.094588515416144,
+     "max_km": 7.740569402755471
+    },
+    "24": {
+     "n": 2548,
+     "median_km": 4.479890877284552,
+     "p90_km": 8.17223172166142,
+     "p95_km": 9.391075349390649,
+     "max_km": 20.18211900914482
+    },
+    "48": {
+     "n": 2548,
+     "median_km": 10.1780134835309,
+     "p90_km": 18.65889631298829,
+     "p95_km": 21.98875067557084,
+     "max_km": 48.304890113960305
+    }
+   },
+   "diffusion_sigma_km": {
+    "6": 0.46475800154489,
+    "12": 0.6572670690061994,
+    "24": 0.92951600308978,
+    "48": 1.3145341380123987
+   },
+   "source": "ERA5 reanalysis via Open-Meteo historical archive API"
+  },
+  {
+   "label": "Fujairah (BB-AE-2024-001 sample point)",
+   "sample_point_lonlat": [
+    56.5302,
+    25.1157
+   ],
+   "era5_cell_lonlat": [
+    56.504852,
+    25.13181
+   ],
+   "record": [
+    "2019-01-01T00:00",
+    "2025-12-31T23:00"
+   ],
+   "n_hours": 61368,
+   "n_starts": 10220,
+   "wind_speed_ms": {
+    "median": 2.9,
+    "p95": 7.41,
+    "max": 17.61
+   },
+   "drift_physics": {
+    "wind_drift_factor": 0.03,
+    "deflection_deg": 15.0
+   },
+   "displacement_all_year": {
+    "6": {
+     "n": 10220,
+     "median_km": 1.5993685622209035,
+     "p90_km": 3.4414161930405016,
+     "p95_km": 4.487994216665328,
+     "max_km": 9.939855472413283
+    },
+    "12": {
+     "n": 10220,
+     "median_km": 2.693427098851911,
+     "p90_km": 6.288917803310098,
+     "p95_km": 8.232319382646098,
+     "max_km": 19.123150083726678
+    },
+    "24": {
+     "n": 10220,
+     "median_km": 4.422691578269874,
+     "p90_km": 11.236573291220623,
+     "p95_km": 14.840852795190038,
+     "max_km": 34.06793050651927
+    },
+    "48": {
+     "n": 10220,
+     "median_km": 8.192822614385904,
+     "p90_km": 20.26288958164904,
+     "p95_km": 26.078603237407496,
+     "max_km": 53.39331588426966
+    }
+   },
+   "persistence_error_all_year": {
+    "6": {
+     "n": 10220,
+     "median_km": 1.0114166533070912,
+     "p90_km": 2.1824089146097005,
+     "p95_km": 2.7071156499323847,
+     "max_km": 6.91079171737522
+    },
+    "12": {
+     "n": 10220,
+     "median_km": 2.705251943652641,
+     "p90_km": 5.5882426458545895,
+     "p95_km": 6.9547988215209955,
+     "max_km": 15.13640659082535
+    },
+    "24": {
+     "n": 10220,
+     "median_km": 5.659680428609657,
+     "p90_km": 12.120186033040214,
+     "p95_km": 14.763372168848862,
+     "max_km": 34.887464635870614
+    },
+    "48": {
+     "n": 10220,
+     "median_km": 12.308126425411768,
+     "p90_km": 26.578983612511646,
+     "p95_km": 32.5711905388001,
+     "max_km": 72.95427967669485
+    }
+   },
+   "season_center": "2024-02-17",
+   "displacement_season": {
+    "6": {
+     "n": 2548,
+     "median_km": 1.68999448281862,
+     "p90_km": 4.7053437603539106,
+     "p95_km": 5.469274168340483,
+     "max_km": 9.939855472413283
+    },
+    "12": {
+     "n": 2548,
+     "median_km": 2.873427450706038,
+     "p90_km": 8.777307177711057,
+     "p95_km": 10.408571169388392,
+     "max_km": 19.123150083726678
+    },
+    "24": {
+     "n": 2548,
+     "median_km": 4.707163292065418,
+     "p90_km": 16.01949032871394,
+     "p95_km": 19.04414616883247,
+     "max_km": 34.06793050651927
+    },
+    "48": {
+     "n": 2548,
+     "median_km": 8.489177608061505,
+     "p90_km": 28.338910919953342,
+     "p95_km": 34.469803802733395,
+     "max_km": 53.39331588426966
+    }
+   },
+   "persistence_error_season": {
+    "6": {
+     "n": 2548,
+     "median_km": 1.0156003844044998,
+     "p90_km": 2.223947917785509,
+     "p95_km": 2.796745065001501,
+     "max_km": 6.582655856615954
+    },
+    "12": {
+     "n": 2548,
+     "median_km": 2.875015203752254,
+     "p90_km": 5.9851049716395215,
+     "p95_km": 7.402691076587746,
+     "max_km": 14.584138571532694
+    },
+    "24": {
+     "n": 2548,
+     "median_km": 6.223807574787193,
+     "p90_km": 13.795922337814426,
+     "p95_km": 16.444942783831404,
+     "max_km": 34.887464635870614
+    },
+    "48": {
+     "n": 2548,
+     "median_km": 14.344570129509467,
+     "p90_km": 31.591908933493198,
+     "p95_km": 37.985903488136465,
+     "max_km": 72.95427967669485
+    }
+   },
+   "diffusion_sigma_km": {
+    "6": 0.46475800154489,
+    "12": 0.6572670690061994,
+    "24": 0.92951600308978,
+    "48": 1.3145341380123987
+   },
+   "source": "ERA5 reanalysis via Open-Meteo historical archive API"
+  }
+ ],
+ "s2_variability": {
+  "zone": "hotspot_inner_gulf",
+  "variable": "TURBIDITY_PROXY_p95",
+  "max_gap_days": 5.0,
+  "n_observations": 352,
+  "n_pairs": 221,
+  "median_abs_change": 0.07753100000000002,
+  "p90_abs_change": 0.297204,
+  "p95_abs_change": 0.353526,
+  "record_p5": -0.50819435,
+  "record_p95": -0.007183650000000013,
+  "record_p5_p95_range": 0.5010107,
+  "min_water_fraction_of_max": 0.5
+ },
+ "portability": {
+  "by_coast": {
+   "Arabian Gulf": {
+    "aois": 6,
+    "confirmed": 284,
+    "referenced": 357,
+    "pooled_rate": 0.7955182072829131
+   },
+   "Gulf of Oman": {
+    "aois": 4,
+    "confirmed": 39,
+    "referenced": 79,
+    "pooled_rate": 0.4936708860759494
+   }
+  },
+  "loao_candidate_beats_rule": [
+   9,
+   9
+  ],
+  "thresholds_unchanged_across_aois": {
+   "z_min": 3.0,
+   "pct_min": 95.0,
+   "min_area_km2": 0.5,
+   "floors": {
+    "NDCI": 0.02,
+    "MCI": 0.002,
+    "FAI": 0.002,
+    "TUR_NECHAD2016": 1.0,
+    "HUE_ANGLE": 5.0,
+    "CDOM_RATIO": 0.1
+   }
+  },
+  "per_aoi": [
+   {
+    "aoi": "AE-AUH-LAGOON",
+    "coast": "Arabian Gulf",
+    "acquisitions": 755,
+    "candidates": 282,
+    "olci_confirmed": 10,
+    "olci_not_confirmed": 0,
+    "confirmation_rate": 1.0,
+    "loao_candidate_auprc": null,
+    "loao_rule_auprc": null
+   },
+   {
+    "aoi": "AE-AUH-NORTH",
+    "coast": "Arabian Gulf",
+    "acquisitions": 660,
+    "candidates": 681,
+    "olci_confirmed": 41,
+    "olci_not_confirmed": 19,
+    "confirmation_rate": 0.6833333333333333,
+    "loao_candidate_auprc": 0.982407,
+    "loao_rule_auprc": 0.497464
+   },
+   {
+    "aoi": "AE-AUH-TAWEELAH",
+    "coast": "Arabian Gulf",
+    "acquisitions": 656,
+    "candidates": 676,
+    "olci_confirmed": 74,
+    "olci_not_confirmed": 16,
+    "confirmation_rate": 0.8222222222222222,
+    "loao_candidate_auprc": 0.997556,
+    "loao_rule_auprc": 0.669151
+   },
+   {
+    "aoi": "AE-DXB-JEBELALI",
+    "coast": "Arabian Gulf",
+    "acquisitions": 739,
+    "candidates": 391,
+    "olci_confirmed": 46,
+    "olci_not_confirmed": 12,
+    "confirmation_rate": 0.7931034482758621,
+    "loao_candidate_auprc": 0.991741,
+    "loao_rule_auprc": 0.618083
+   },
+   {
+    "aoi": "AE-FUJ",
+    "coast": "Gulf of Oman",
+    "acquisitions": 563,
+    "candidates": 257,
+    "olci_confirmed": 11,
+    "olci_not_confirmed": 20,
+    "confirmation_rate": 0.3548387096774194,
+    "loao_candidate_auprc": 0.56307,
+    "loao_rule_auprc": 0.339681
+   },
+   {
+    "aoi": "AE-FUJ-DIBBA",
+    "coast": "Gulf of Oman",
+    "acquisitions": 333,
+    "candidates": 57,
+    "olci_confirmed": 12,
+    "olci_not_confirmed": 7,
+    "confirmation_rate": 0.631578947368421,
+    "loao_candidate_auprc": 0.936891,
+    "loao_rule_auprc": 0.859985
+   },
+   {
+    "aoi": "AE-SHJ-AJM",
+    "coast": "Arabian Gulf",
+    "acquisitions": 380,
+    "candidates": 215,
+    "olci_confirmed": 52,
+    "olci_not_confirmed": 11,
+    "confirmation_rate": 0.8253968253968254,
+    "loao_candidate_auprc": 0.935493,
+    "loao_rule_auprc": 0.728802
+   },
+   {
+    "aoi": "AE-SHJ-KALBA",
+    "coast": "Gulf of Oman",
+    "acquisitions": 318,
+    "candidates": 57,
+    "olci_confirmed": 11,
+    "olci_not_confirmed": 3,
+    "confirmation_rate": 0.7857142857142857,
+    "loao_candidate_auprc": 0.925466,
+    "loao_rule_auprc": 0.755127
+   },
+   {
+    "aoi": "AE-SHJ-KHORFAKKAN",
+    "coast": "Gulf of Oman",
+    "acquisitions": 355,
+    "candidates": 75,
+    "olci_confirmed": 5,
+    "olci_not_confirmed": 10,
+    "confirmation_rate": 0.3333333333333333,
+    "loao_candidate_auprc": 1.0,
+    "loao_rule_auprc": 0.221479
+   },
+   {
+    "aoi": "AE-UAQ-RAK",
+    "coast": "Arabian Gulf",
+    "acquisitions": 346,
+    "candidates": 370,
+    "olci_confirmed": 61,
+    "olci_not_confirmed": 15,
+    "confirmation_rate": 0.8026315789473685,
+    "loao_candidate_auprc": 0.896632,
+    "loao_rule_auprc": 0.834868
+   }
+  ],
+  "confirmation_rate_range": [
+   0.3333333333333333,
+   1.0
+  ],
+  "by_hypothesis": {
+   "SEDIMENT_LIKE": {
+    "n": 353,
+    "positive": 300,
+    "negative": 53,
+    "variable": "TSM_NN"
+   },
+   "BLOOM_LIKE": {
+    "n": 83,
+    "positive": 23,
+    "negative": 60,
+    "variable": "CHL_NN"
+   }
+  },
+  "agreement": {
+   "SEDIMENT_LIKE": {
+    "spearman_rho": 0.458927,
+    "p_value": 0.0,
+    "n": 353
+   },
+   "BLOOM_LIKE": {
+    "spearman_rho": -0.1918,
+    "p_value": 0.082379,
+    "n": 83
+   }
+  }
+ }
+}

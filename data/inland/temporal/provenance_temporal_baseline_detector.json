@@ -1,0 +1,40 @@
+{
+ "result_id": "temporal_baseline_detector_shawka_dam_v1",
+ "result_kind": "temporal_deviation_detection",
+ "sources": [],
+ "algorithm": {
+  "name": "detect_temporal_deviations",
+  "description": "Per-sensor z-score deviation detector over the reused 14-month Sentinel-2/Landsat baseline (28 shawka_dam observations, 14 per sensor). Flags any observation where NDCI/NDTI/RedTideIndex/NDWI deviates more than 1.5 standard deviations from THIS AOI's own per-sensor mean -- replaces the prior single-scene plausibility check (comparing one EnMAP-date wet fraction against the baseline's min/max range) with an actual multi-scene detector using the full time series.",
+  "reference": "pipeline/temporal.py",
+  "parameters": {
+   "z_threshold": 1.5,
+   "scoring": "per-sensor (S2, Landsat scored separately against their own population)"
+  },
+  "inputs": [
+   "/mnt/attach/outputs/813-inland-standalone-complement/data/baseline_indices_s2_landsat.csv"
+  ],
+  "units_out": "z-scores (dimensionless, per-sensor-population-relative)",
+  "assumptions": [
+   "Deviation is scored per-sensor against that sensor's OWN 14-observation population at this AOI, not pooled across sensors -- S2 and Landsat read systematically different absolute index values here (a sensor band-definition offset, not a real difference), so pooling would conflate that offset with genuine temporal deviation.",
+   "z_threshold=1.5 is a structurally-reasonable placeholder, not fit against labeled anomalous-month examples (none exist for this AOI) -- same category as pipeline/fingerprint.py's evidence weights."
+  ],
+  "limitations": [
+   "14 observations per sensor across ~2 unevenly-sampled years is too small to fit a true month-of-year seasonal climatology (most calendar months have 0-1 samples per sensor) -- this is a deviation-from-this-AOI's-own-2-year-mean detector, not a seasonal-climatology detector, and is described as such, not overclaimed.",
+   "Neither EnMAP acquisition date has a same-day or same-week baseline observation; 2022-09-08 predates the entire baseline series (first observation 2023-09-25); 2024-04-24 falls inside the baseline's own known coverage gap (no scene 2024-02-23 to 2024-09-04, already documented in config/project.yaml water_mask.result_2024_04_24). The EnMAP-date cross-reference below reports the REAL nearest bracketing observations and their actual date offsets, never an interpolated or fabricated same-date value."
+  ]
+ },
+ "code_version": "uncommitted",
+ "schema_version": "1.0",
+ "processed_utc": "2026-09-19T16:25:38Z",
+ "environment": {
+  "python": "3.11.15",
+  "platform": "Linux"
+ },
+ "extra": {
+  "n_flagged": 7,
+  "enmap_date_context": {
+   "2022-09-08": "{'landsat-c2-l2': {'before': None, 'after': {'item_id': 'LC08_L2SP_159043_20230925_02_T1', 'datetime': '2023-09-25T06:40:29.200305+00:00', 'days_after_enmap': 382}}, 'sentinel-2-l2a': {'before': None, 'after': {'item_id': 'S2A_MSIL2A_20230930T064651_R020_T40RDN_20230930T124351', 'datetime': '2023-09-30T06:46:51.024000+00:00', 'days_after_enmap': 387}}}",
+   "2024-04-24": "{'landsat-c2-l2': {'before': {'item_id': 'LC08_L2SP_160042_20240223_02_T1', 'datetime': '2024-02-23T06:46:13.312516+00:00', 'days_before_enmap': 60}, 'after': {'item_id': 'LC09_L2SP_159043_20240919_02_T1', 'datetime': '2024-09-19T06:40:12.019977+00:00', 'days_after_enmap': 148}}, 'sentinel-2-l2a': {'before': {'item_id': 'S2B_MSIL2A_20240222T064909_R020_T40RCN_20240222T113956', 'datetime': '2024-02-22T06:49:09.024000+00:00', 'days_before_enmap': 61}, 'after': {'item_id': 'S2A_MSIL2A_20240904T064621_R020_T40RCN_20240904T121950', 'datetime': '2024-09-04T06:46:21.024000+00:00', 'days_after_enmap': 133}}}"
+  }
+ }
+}

@@ -48,3 +48,7 @@ data/blueban.sqlite*
 # Authenticated / restricted downloads never leave this folder
 data/raw/private/
 apps/web/.next-static/
+
+# Inland (Shawka Dam): per-pixel EnMAP reflectance layers and spectra stay local
+# until the EnMAP licence terms are confirmed for public redistribution
+data/inland/restricted/

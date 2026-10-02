@@ -1,0 +1,74 @@
+{
+ "_schema": "Provenance, per pipeline/provenance.py",
+ "result_id": "water_mask_enmap_20220908_shawka_dam_v1",
+ "result_kind": "water_mask",
+ "sources": [
+  {
+   "satellite": "EnMAP",
+   "sensor": "HSI (VNIR + SWIR)",
+   "scene_id": "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z",
+   "acquisition_utc": "2022-09-08T07:30:13.226624Z",
+   "product": "ENMAP_HSI_L2A",
+   "processing_level": "L2A",
+   "provider": "DLR / EOC Geoservice",
+   "licence": "proprietary (see docs/DATA_ACCESS_AUDIT.md section 1)",
+   "native_resolution_m": 30.0,
+   "bands_used": "all 224 minus 6 dropped for carrying nodata everywhere in the AOI window (indices 130-135, 1-based)",
+   "wavelengths_nm": "not available for individual bands -- see config/project.yaml enmap.spec.band_characterisation_table; broad index-ordered band GROUPS used instead, see docs/WATER_MASK.md section 2",
+   "units": "surface reflectance (Land_Mode correction; see docs/DATA_ACCESS_AUDIT.md section 2.1 and docs/WATER_MASK.md section 7 for the direct Land_Mode/water-vapor-retrieval limitation finding)",
+   "local_path": "sourced data/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "notes": "Full per-file provenance in data/metadata/enmap_20220908_DT0000003309_006_provenance.json"
+  },
+  {
+   "satellite": "n/a (validation reference only, not a direct input to the mask)",
+   "sensor": "Sentinel-2 MSI / Landsat 8-9 OLI-TIRS",
+   "scene_id": "shawka_dam rows, data/baseline_indices_s2_landsat.csv (14 scenes, Sep 2023-Oct 2025)",
+   "acquisition_utc": "2023-09 through 2025-10 (14 monthly observations)",
+   "product": "sentinel-2-l2a / landsat-c2-l2, NDWI_water_check column",
+   "processing_level": "L2A / Collection 2 Level-2",
+   "provider": "Microsoft Planetary Computer (ESA/Copernicus, USGS)",
+   "licence": "Copernicus open licence / USGS public domain (per BluePulse-813's own audit, not re-verified here)",
+   "native_resolution_m": 10.0,
+   "units": "NDWI (dimensionless), per-pixel over 2806 pixels/scene",
+   "local_path": "data-access-log/shawka_dam_water_check.md; data/baseline_indices_s2_landsat.csv",
+   "notes": "Reused by copy from BluePulse-813 (earlier, separate, paused project), per project owner instruction -- not recollected. Used here only to sanity-check the EnMAP-derived wet fraction's order of magnitude (docs/WATER_MASK.md section 6), not as a direct algorithmic input."
+  }
+ ],
+ "algorithm": {
+  "name": "water_mask (inland, band-group broadband + short/long index)",
+  "description": "Two-criterion threshold mask (broadband darkness + visible-vs-SWIR-group index) over an EnMAP reflectance cube windowed to the locked AOI polygon, followed by connected-component speckle filtering. See pipeline/water_mask.py and docs/WATER_MASK.md for full derivation.",
+  "reference": "Not DesalGuard-main's pipeline/water_mask.py values (MNDWI/NIR coastal thresholds explicitly not reused) -- interface shape only carried over; docs/WATER_MASK.md section 1 explains why.",
+  "parameters": {
+   "brightness_max": 0.11,
+   "short_long_index_min": 0.0,
+   "min_component_px": 3,
+   "buffer_px": 0
+  },
+  "inputs": [
+   "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z-SPECTRAL_IMAGE_COG.tiff",
+   "aoi/shawka_dam.geojson"
+  ],
+  "units_out": "boolean mask, True = candidate water/wet-core pixel",
+  "assumptions": [
+   "EnMAP bands are stored in increasing-wavelength order (standard imaging-spectrometer convention; not independently verified against a wavelength table for this file, but indirectly supported by the AOI's own mean-spectrum shape -- see docs/WATER_MASK.md section 2).",
+   "Reflectance scale factor is 1/10000 (sourced from EnMAP-Box's own import documentation; neither GeoTIFF carries an embedded scale/offset tag).",
+   "The 6 nodata-carrying bands (130-135, 1-based) can be dropped without materially affecting the broad band-group means (each group spans ~72 bands; losing 6 from one group is a small perturbation)."
+  ],
+  "limitations": [
+   "Single date (2022-09-08 only); the 2024-04-24 scene could not be staged for pixel-level work (file size exceeds this environment's per-file cap) -- see docs/WATER_MASK.md section 8.",
+   "Single small AOI sample (84 pixels inside the locked polygon in this window).",
+   "Broad band GROUPS, not exact narrow MNDWI/NDWI bands, because the per-band wavelength table is not yet available (docs/WATER_MASK.md section 2).",
+   "Reflectance over wet-core pixels carries the Land_Mode water-vapor-retrieval limitation described in docs/WATER_MASK.md section 7 -- not corrected for here, only checked and found non-blocking for a threshold classification."
+  ]
+ },
+ "schema_version": "1.0",
+ "extra": {
+  "result_2022_09_08": {
+   "px_water_final": 10,
+   "px_inside_locked_polygon": 84,
+   "wet_fraction_of_polygon_pct": 11.9,
+   "px_water_outside_locked_polygon": 0
+  }
+ },
+ "status_update_2026_09_19": "This record remains the accurate historical provenance for the SINGLE-DATE water_mask()/short_long_index result. For cross-date use, this criterion was found not to generalize (see algorithm.limitations above) and has been REPLACED by persistent_wet_core() -- see data/water_mask/provenance_persistent_wet_core.json and docs/WATER_MASK.md section 12. This file is not edited otherwise; the original result stands as originally recorded."
+}

@@ -16,6 +16,8 @@ import { BASE_PATH, getOperator, setOperator, useEngineQuery } from "@/lib/engin
 import type { Aoi, IncidentSummary, LabelRow, ModelRecord } from "@/lib/engine/types";
 import { Dot, fmt, Modal, SimBadge, toast, Toaster } from "@/components/ui";
 import { nextPass } from "@/lib/passes";
+import { Droplets } from "lucide-react";
+import IntroSequence from "@/components/shell/IntroSequence";
 
 const TEAM_URL = "https://kanbanstudios.ae/team-kanban";
 
@@ -131,6 +133,7 @@ function MissionRail({ incidents, aois, models, labels }: { incidents: IncidentS
     { href: "/incidents", label: "INCIDENTS", icon: <ClipboardCheck size={16} />, badge: open.length },
     { href: "/field", label: "SAMPLES", icon: <FlaskConical size={16} /> },
     { href: "/validation", label: "VALIDATION", icon: <Gauge size={16} /> },
+    { href: "/inland", label: "INLAND · SHAWKA", icon: <Droplets size={16} /> },
     { href: "/data", label: "DATA", icon: <Database size={16} /> },
     { href: "/assets", label: "ASSETS", icon: <Activity size={16} /> },
     { href: "/settings", label: "SETTINGS", icon: <Settings size={16} /> },
@@ -203,6 +206,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <Footer {...d} />
       <Toaster />
+      <IntroSequence />
     </div>
   );
 }

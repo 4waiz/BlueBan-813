@@ -1,0 +1,2293 @@
+{
+ "_schema": "BLUEBAN live check of the two Shawka Dam EnMAP L2A items against DLR's open STAC (no authentication; metadata only, no imagery)",
+ "retrieved_utc": "2026-10-02",
+ "method": "GET https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/{id} (the items endpoint; the /search endpoint ignores the ids parameter and returns other items)",
+ "collection_license": "proprietary",
+ "collection_url": "https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A",
+ "items": {
+  "2022-09-08": {
+   "id": "ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z",
+   "self": "https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/ENMAP01-____L2A-DT0000003309_20220908T073013Z_006_V010502_20251029T084333Z",
+   "datetime": "2022-09-08T07:30:15.493982Z",
+   "eo:cloud_cover": 0,
+   "view:sun_elevation": 67.860731,
+   "proj:epsg": 32640,
+   "proj:shape": [
+    1177,
+    1200
+   ],
+   "proj:transform": [
+    30.0,
+    0.0,
+    389025.0,
+    0.0,
+    -30.0,
+    2808945.0
+   ],
+   "bands": [
+    {
+     "name": "B001",
+     "center_wavelength_nm": 418.127,
+     "fwhm_nm": 6.9956
+    },
+    {
+     "name": "B002",
+     "center_wavelength_nm": 423.764,
+     "fwhm_nm": 6.6675
+    },
+    {
+     "name": "B003",
+     "center_wavelength_nm": 429.188,
+     "fwhm_nm": 6.4241
+    },
+    {
+     "name": "B004",
+     "center_wavelength_nm": 434.425,
+     "fwhm_nm": 6.2512
+    },
+    {
+     "name": "B005",
+     "center_wavelength_nm": 439.504,
+     "fwhm_nm": 6.1349
+    },
+    {
+     "name": "B006",
+     "center_wavelength_nm": 444.451,
+     "fwhm_nm": 6.0608
+    },
+    {
+     "name": "B007",
+     "center_wavelength_nm": 449.295,
+     "fwhm_nm": 6.0149
+    },
+    {
+     "name": "B008",
+     "center_wavelength_nm": 454.063,
+     "fwhm_nm": 5.983
+    },
+    {
+     "name": "B009",
+     "center_wavelength_nm": 458.789,
+     "fwhm_nm": 5.9523
+    },
+    {
+     "name": "B010",
+     "center_wavelength_nm": 463.49,
+     "fwhm_nm": 5.9199
+    },
+    {
+     "name": "B011",
+     "center_wavelength_nm": 468.171,
+     "fwhm_nm": 5.8877
+    },
+    {
+     "name": "B012",
+     "center_wavelength_nm": 472.84,
+     "fwhm_nm": 5.8579
+    },
+    {
+     "name": "B013",
+     "center_wavelength_nm": 477.505,
+     "fwhm_nm": 5.8324
+    },
+    {
+     "name": "B014",
+     "center_wavelength_nm": 482.171,
+     "fwhm_nm": 5.8133
+    },
+    {
+     "name": "B015",
+     "center_wavelength_nm": 486.846,
+     "fwhm_nm": 5.8025
+    },
+    {
+     "name": "B016",
+     "center_wavelength_nm": 491.538,
+     "fwhm_nm": 5.8022
+    },
+    {
+     "name": "B017",
+     "center_wavelength_nm": 496.253,
+     "fwhm_nm": 5.8141
+    },
+    {
+     "name": "B018",
+     "center_wavelength_nm": 500.998,
+     "fwhm_nm": 5.8375
+    },
+    {
+     "name": "B019",
+     "center_wavelength_nm": 505.773,
+     "fwhm_nm": 5.8708
+    },
+    {
+     "name": "B020",
+     "center_wavelength_nm": 510.58,
+     "fwhm_nm": 5.9121
+    },
+    {
+     "name": "B021",
+     "center_wavelength_nm": 515.421,
+     "fwhm_nm": 5.9597
+    },
+    {
+     "name": "B022",
+     "center_wavelength_nm": 520.298,
+     "fwhm_nm": 6.0118
+    },
+    {
+     "name": "B023",
+     "center_wavelength_nm": 525.213,
+     "fwhm_nm": 6.0667
+    },
+    {
+     "name": "B024",
+     "center_wavelength_nm": 530.167,
+     "fwhm_nm": 6.1228
+    },
+    {
+     "name": "B025",
+     "center_wavelength_nm": 535.163,
+     "fwhm_nm": 6.1794
+    },
+    {
+     "name": "B026",
+     "center_wavelength_nm": 540.202,
+     "fwhm_nm": 6.2365
+    },
+    {
+     "name": "B027",
+     "center_wavelength_nm": 545.287,
+     "fwhm_nm": 6.294
+    },
+    {
+     "name": "B028",
+     "center_wavelength_nm": 550.42,
+     "fwhm_nm": 6.3518
+    },
+    {
+     "name": "B029",
+     "center_wavelength_nm": 555.604,
+     "fwhm_nm": 6.4099
+    },
+    {
+     "name": "B030",
+     "center_wavelength_nm": 560.84,
+     "fwhm_nm": 6.4681
+    },
+    {
+     "name": "B031",
+     "center_wavelength_nm": 566.131,
+     "fwhm_nm": 6.5265
+    },
+    {
+     "name": "B032",
+     "center_wavelength_nm": 571.478,
+     "fwhm_nm": 6.585
+    },
+    {
+     "name": "B033",
+     "center_wavelength_nm": 576.885,
+     "fwhm_nm": 6.6434
+    },
+    {
+     "name": "B034",
+     "center_wavelength_nm": 582.352,
+     "fwhm_nm": 6.7018
+    },
+    {
+     "name": "B035",
+     "center_wavelength_nm": 587.883,
+     "fwhm_nm": 6.7607
+    },
+    {
+     "name": "B036",
+     "center_wavelength_nm": 593.482,
+     "fwhm_nm": 6.8211
+    },
+    {
+     "name": "B037",
+     "center_wavelength_nm": 599.151,
+     "fwhm_nm": 6.8839
+    },
+    {
+     "name": "B038",
+     "center_wavelength_nm": 604.894,
+     "fwhm_nm": 6.9499
+    },
+    {
+     "name": "B039",
+     "center_wavelength_nm": 610.714,
+     "fwhm_nm": 7.02
+    },
+    {
+     "name": "B040",
+     "center_wavelength_nm": 616.615,
+     "fwhm_nm": 7.0951
+    },
+    {
+     "name": "B041",
+     "center_wavelength_nm": 622.609,
+     "fwhm_nm": 7.1753
+    },
+    {
+     "name": "B042",
+     "center_wavelength_nm": 628.673,
+     "fwhm_nm": 7.255
+    },
+    {
+     "name": "B043",
+     "center_wavelength_nm": 634.794,
+     "fwhm_nm": 7.3314
+    },
+    {
+     "name": "B044",
+     "center_wavelength_nm": 640.974,
+     "fwhm_nm": 7.4054
+    },
+    {
+     "name": "B045",
+     "center_wavelength_nm": 647.214,
+     "fwhm_nm": 7.4773
+    },
+    {
+     "name": "B046",
+     "center_wavelength_nm": 653.514,
+     "fwhm_nm": 7.5478
+    },
+    {
+     "name": "B047",
+     "center_wavelength_nm": 659.877,
+     "fwhm_nm": 7.6174
+    },
+    {
+     "name": "B048",
+     "center_wavelength_nm": 666.303,
+     "fwhm_nm": 7.6867
+    },
+    {
+     "name": "B049",
+     "center_wavelength_nm": 672.794,
+     "fwhm_nm": 7.7563
+    },
+    {
+     "name": "B050",
+     "center_wavelength_nm": 679.351,
+     "fwhm_nm": 7.8267
+    },
+    {
+     "name": "B051",
+     "center_wavelength_nm": 685.975,
+     "fwhm_nm": 7.8985
+    },
+    {
+     "name": "B052",
+     "center_wavelength_nm": 692.667,
+     "fwhm_nm": 7.9723
+    },
+    {
+     "name": "B053",
+     "center_wavelength_nm": 699.429,
+     "fwhm_nm": 8.0487
+    },
+    {
+     "name": "B054",
+     "center_wavelength_nm": 706.262,
+     "fwhm_nm": 8.1281
+    },
+    {
+     "name": "B055",
+     "center_wavelength_nm": 713.166,
+     "fwhm_nm": 8.2102
+    },
+    {
+     "name": "B056",
+     "center_wavelength_nm": 720.14,
+     "fwhm_nm": 8.2943
+    },
+    {
+     "name": "B057",
+     "center_wavelength_nm": 727.18,
+     "fwhm_nm": 8.3798
+    },
+    {
+     "name": "B058",
+     "center_wavelength_nm": 734.286,
+     "fwhm_nm": 8.4659
+    },
+    {
+     "name": "B059",
+     "center_wavelength_nm": 741.455,
+     "fwhm_nm": 8.552
+    },
+    {
+     "name": "B060",
+     "center_wavelength_nm": 748.685,
+     "fwhm_nm": 8.6373
+    },
+    {
+     "name": "B061",
+     "center_wavelength_nm": 755.975,
+     "fwhm_nm": 8.7213
+    },
+    {
+     "name": "B062",
+     "center_wavelength_nm": 763.323,
+     "fwhm_nm": 8.8031
+    },
+    {
+     "name": "B063",
+     "center_wavelength_nm": 770.725,
+     "fwhm_nm": 8.8821
+    },
+    {
+     "name": "B064",
+     "center_wavelength_nm": 778.182,
+     "fwhm_nm": 8.9578
+    },
+    {
+     "name": "B065",
+     "center_wavelength_nm": 785.69,
+     "fwhm_nm": 9.0303
+    },
+    {
+     "name": "B066",
+     "center_wavelength_nm": 793.248,
+     "fwhm_nm": 9.1005
+    },
+    {
+     "name": "B067",
+     "center_wavelength_nm": 800.855,
+     "fwhm_nm": 9.169
+    },
+    {
+     "name": "B068",
+     "center_wavelength_nm": 808.51,
+     "fwhm_nm": 9.2365
+    },
+    {
+     "name": "B069",
+     "center_wavelength_nm": 816.21,
+     "fwhm_nm": 9.3037
+    },
+    {
+     "name": "B070",
+     "center_wavelength_nm": 823.955,
+     "fwhm_nm": 9.3713
+    },
+    {
+     "name": "B071",
+     "center_wavelength_nm": 831.743,
+     "fwhm_nm": 9.4401
+    },
+    {
+     "name": "B072",
+     "center_wavelength_nm": 839.572,
+     "fwhm_nm": 9.5108
+    },
+    {
+     "name": "B073",
+     "center_wavelength_nm": 847.441,
+     "fwhm_nm": 9.584
+    },
+    {
+     "name": "B074",
+     "center_wavelength_nm": 855.349,
+     "fwhm_nm": 9.6603
+    },
+    {
+     "name": "B075",
+     "center_wavelength_nm": 863.294,
+     "fwhm_nm": 9.7397
+    },
+    {
+     "name": "B076",
+     "center_wavelength_nm": 871.272,
+     "fwhm_nm": 9.8216
+    },
+    {
+     "name": "B077",
+     "center_wavelength_nm": 879.28,
+     "fwhm_nm": 9.9055
+    },
+    {
+     "name": "B078",
+     "center_wavelength_nm": 887.315,
+     "fwhm_nm": 9.9909
+    },
+    {
+     "name": "B079",
+     "center_wavelength_nm": 895.374,
+     "fwhm_nm": 10.0772
+    },
+    {
+     "name": "B080",
+     "center_wavelength_nm": 902.258,
+     "fwhm_nm": 9.1772
+    },
+    {
+     "name": "B081",
+     "center_wavelength_nm": 903.454,
+     "fwhm_nm": 10.164
+    },
+    {
+     "name": "B082",
+     "center_wavelength_nm": 911.552,
+     "fwhm_nm": 10.2508
+    },
+    {
+     "name": "B083",
+     "center_wavelength_nm": 911.872,
+     "fwhm_nm": 9.319
+    },
+    {
+     "name": "B084",
+     "center_wavelength_nm": 919.663,
+     "fwhm_nm": 10.3369
+    },
+    {
+     "name": "B085",
+     "center_wavelength_nm": 921.625,
+     "fwhm_nm": 9.4544
+    },
+    {
+     "name": "B086",
+     "center_wavelength_nm": 927.786,
+     "fwhm_nm": 10.422
+    },
+    {
+     "name": "B087",
+     "center_wavelength_nm": 931.512,
+     "fwhm_nm": 9.584
+    },
+    {
+     "name": "B088",
+     "center_wavelength_nm": 935.917,
+     "fwhm_nm": 10.5054
+    },
+    {
+     "name": "B089",
+     "center_wavelength_nm": 941.531,
+     "fwhm_nm": 9.7083
+    },
+    {
+     "name": "B090",
+     "center_wavelength_nm": 944.052,
+     "fwhm_nm": 10.5862
+    },
+    {
+     "name": "B091",
+     "center_wavelength_nm": 951.677,
+     "fwhm_nm": 9.8279
+    },
+    {
+     "name": "B092",
+     "center_wavelength_nm": 952.19,
+     "fwhm_nm": 10.6589
+    },
+    {
+     "name": "B093",
+     "center_wavelength_nm": 960.33,
+     "fwhm_nm": 10.716
+    },
+    {
+     "name": "B094",
+     "center_wavelength_nm": 961.948,
+     "fwhm_nm": 9.9433
+    },
+    {
+     "name": "B095",
+     "center_wavelength_nm": 968.473,
+     "fwhm_nm": 10.75
+    },
+    {
+     "name": "B096",
+     "center_wavelength_nm": 972.341,
+     "fwhm_nm": 10.0551
+    },
+    {
+     "name": "B097",
+     "center_wavelength_nm": 976.619,
+     "fwhm_nm": 10.7533
+    },
+    {
+     "name": "B098",
+     "center_wavelength_nm": 982.851,
+     "fwhm_nm": 10.1638
+    },
+    {
+     "name": "B099",
+     "center_wavelength_nm": 984.768,
+     "fwhm_nm": 10.7183
+    },
+    {
+     "name": "B100",
+     "center_wavelength_nm": 992.919,
+     "fwhm_nm": 10.6375
+    },
+    {
+     "name": "B101",
+     "center_wavelength_nm": 993.475,
+     "fwhm_nm": 10.27
+    },
+    {
+     "name": "B102",
+     "center_wavelength_nm": 1004.21,
+     "fwhm_nm": 10.3742
+    },
+    {
+     "name": "B103",
+     "center_wavelength_nm": 1015.05,
+     "fwhm_nm": 10.4768
+    },
+    {
+     "name": "B104",
+     "center_wavelength_nm": 1026.0,
+     "fwhm_nm": 10.5775
+    },
+    {
+     "name": "B105",
+     "center_wavelength_nm": 1037.05,
+     "fwhm_nm": 10.6753
+    },
+    {
+     "name": "B106",
+     "center_wavelength_nm": 1048.19,
+     "fwhm_nm": 10.769
+    },
+    {
+     "name": "B107",
+     "center_wavelength_nm": 1059.42,
+     "fwhm_nm": 10.8578
+    },
+    {
+     "name": "B108",
+     "center_wavelength_nm": 1070.74,
+     "fwhm_nm": 10.9405
+    },
+    {
+     "name": "B109",
+     "center_wavelength_nm": 1082.14,
+     "fwhm_nm": 11.0162
+    },
+    {
+     "name": "B110",
+     "center_wavelength_nm": 1093.62,
+     "fwhm_nm": 11.0839
+    },
+    {
+     "name": "B111",
+     "center_wavelength_nm": 1105.17,
+     "fwhm_nm": 11.1437
+    },
+    {
+     "name": "B112",
+     "center_wavelength_nm": 1116.79,
+     "fwhm_nm": 11.196
+    },
+    {
+     "name": "B113",
+     "center_wavelength_nm": 1128.47,
+     "fwhm_nm": 11.2414
+    },
+    {
+     "name": "B114",
+     "center_wavelength_nm": 1140.2,
+     "fwhm_nm": 11.2806
+    },
+    {
+     "name": "B115",
+     "center_wavelength_nm": 1151.98,
+     "fwhm_nm": 11.3139
+    },
+    {
+     "name": "B116",
+     "center_wavelength_nm": 1163.81,
+     "fwhm_nm": 11.3421
+    },
+    {
+     "name": "B117",
+     "center_wavelength_nm": 1175.67,
+     "fwhm_nm": 11.3656
+    },
+    {
+     "name": "B118",
+     "center_wavelength_nm": 1187.56,
+     "fwhm_nm": 11.385
+    },
+    {
+     "name": "B119",
+     "center_wavelength_nm": 1199.48,
+     "fwhm_nm": 11.4009
+    },
+    {
+     "name": "B120",
+     "center_wavelength_nm": 1211.42,
+     "fwhm_nm": 11.4135
+    },
+    {
+     "name": "B121",
+     "center_wavelength_nm": 1223.37,
+     "fwhm_nm": 11.4229
+    },
+    {
+     "name": "B122",
+     "center_wavelength_nm": 1235.34,
+     "fwhm_nm": 11.4292
+    },
+    {
+     "name": "B123",
+     "center_wavelength_nm": 1247.31,
+     "fwhm_nm": 11.4325
+    },
+    {
+     "name": "B124",
+     "center_wavelength_nm": 1259.3,
+     "fwhm_nm": 11.4329
+    },
+    {
+     "name": "B125",
+     "center_wavelength_nm": 1271.29,
+     "fwhm_nm": 11.4305
+    },
+    {
+     "name": "B126",
+     "center_wavelength_nm": 1283.29,
+     "fwhm_nm": 11.4253
+    },
+    {
+     "name": "B127",
+     "center_wavelength_nm": 1295.28,
+     "fwhm_nm": 11.4176
+    },
+    {
+     "name": "B128",
+     "center_wavelength_nm": 1307.27,
+     "fwhm_nm": 11.4073
+    },
+    {
+     "name": "B129",
+     "center_wavelength_nm": 1319.25,
+     "fwhm_nm": 11.3946
+    },
+    {
+     "name": "B130",
+     "center_wavelength_nm": 1331.22,
+     "fwhm_nm": 11.3796
+    },
+    {
+     "name": "B131",
+     "center_wavelength_nm": 1343.18,
+     "fwhm_nm": 11.3624
+    },
+    {
+     "name": "B132",
+     "center_wavelength_nm": 1355.13,
+     "fwhm_nm": 11.343
+    },
+    {
+     "name": "B133",
+     "center_wavelength_nm": 1367.06,
+     "fwhm_nm": 11.3215
+    },
+    {
+     "name": "B134",
+     "center_wavelength_nm": 1378.96,
+     "fwhm_nm": 11.2981
+    },
+    {
+     "name": "B135",
+     "center_wavelength_nm": 1390.84,
+     "fwhm_nm": 11.2728
+    },
+    {
+     "name": "B136",
+     "center_wavelength_nm": 1461.46,
+     "fwhm_nm": 11.0876
+    },
+    {
+     "name": "B137",
+     "center_wavelength_nm": 1473.1,
+     "fwhm_nm": 11.052
+    },
+    {
+     "name": "B138",
+     "center_wavelength_nm": 1484.69,
+     "fwhm_nm": 11.0151
+    },
+    {
+     "name": "B139",
+     "center_wavelength_nm": 1496.24,
+     "fwhm_nm": 10.9772
+    },
+    {
+     "name": "B140",
+     "center_wavelength_nm": 1507.75,
+     "fwhm_nm": 10.9383
+    },
+    {
+     "name": "B141",
+     "center_wavelength_nm": 1519.22,
+     "fwhm_nm": 10.8984
+    },
+    {
+     "name": "B142",
+     "center_wavelength_nm": 1530.64,
+     "fwhm_nm": 10.8577
+    },
+    {
+     "name": "B143",
+     "center_wavelength_nm": 1542.02,
+     "fwhm_nm": 10.8161
+    },
+    {
+     "name": "B144",
+     "center_wavelength_nm": 1553.36,
+     "fwhm_nm": 10.7738
+    },
+    {
+     "name": "B145",
+     "center_wavelength_nm": 1564.65,
+     "fwhm_nm": 10.7308
+    },
+    {
+     "name": "B146",
+     "center_wavelength_nm": 1575.9,
+     "fwhm_nm": 10.6872
+    },
+    {
+     "name": "B147",
+     "center_wavelength_nm": 1587.1,
+     "fwhm_nm": 10.643
+    },
+    {
+     "name": "B148",
+     "center_wavelength_nm": 1598.26,
+     "fwhm_nm": 10.5985
+    },
+    {
+     "name": "B149",
+     "center_wavelength_nm": 1609.36,
+     "fwhm_nm": 10.5535
+    },
+    {
+     "name": "B150",
+     "center_wavelength_nm": 1620.43,
+     "fwhm_nm": 10.5082
+    },
+    {
+     "name": "B151",
+     "center_wavelength_nm": 1631.44,
+     "fwhm_nm": 10.4626
+    },
+    {
+     "name": "B152",
+     "center_wavelength_nm": 1642.41,
+     "fwhm_nm": 10.4169
+    },
+    {
+     "name": "B153",
+     "center_wavelength_nm": 1653.33,
+     "fwhm_nm": 10.371
+    },
+    {
+     "name": "B154",
+     "center_wavelength_nm": 1664.2,
+     "fwhm_nm": 10.3251
+    },
+    {
+     "name": "B155",
+     "center_wavelength_nm": 1675.03,
+     "fwhm_nm": 10.2793
+    },
+    {
+     "name": "B156",
+     "center_wavelength_nm": 1685.8,
+     "fwhm_nm": 10.2335
+    },
+    {
+     "name": "B157",
+     "center_wavelength_nm": 1696.53,
+     "fwhm_nm": 10.1879
+    },
+    {
+     "name": "B158",
+     "center_wavelength_nm": 1707.2,
+     "fwhm_nm": 10.1425
+    },
+    {
+     "name": "B159",
+     "center_wavelength_nm": 1717.83,
+     "fwhm_nm": 10.0974
+    },
+    {
+     "name": "B160",
+     "center_wavelength_nm": 1728.4,
+     "fwhm_nm": 10.0525
+    },
+    {
+     "name": "B161",
+     "center_wavelength_nm": 1738.93,
+     "fwhm_nm": 10.0079
+    },
+    {
+     "name": "B162",
+     "center_wavelength_nm": 1749.4,
+     "fwhm_nm": 9.9636
+    },
+    {
+     "name": "B163",
+     "center_wavelength_nm": 1759.83,
+     "fwhm_nm": 9.9195
+    },
+    {
+     "name": "B164",
+     "center_wavelength_nm": 1939.44,
+     "fwhm_nm": 9.1657
+    },
+    {
+     "name": "B165",
+     "center_wavelength_nm": 1948.98,
+     "fwhm_nm": 9.1259
+    },
+    {
+     "name": "B166",
+     "center_wavelength_nm": 1958.49,
+     "fwhm_nm": 9.0863
+    },
+    {
+     "name": "B167",
+     "center_wavelength_nm": 1967.95,
+     "fwhm_nm": 9.0469
+    },
+    {
+     "name": "B168",
+     "center_wavelength_nm": 1977.37,
+     "fwhm_nm": 9.0077
+    },
+    {
+     "name": "B169",
+     "center_wavelength_nm": 1986.74,
+     "fwhm_nm": 8.9688
+    },
+    {
+     "name": "B170",
+     "center_wavelength_nm": 1996.07,
+     "fwhm_nm": 8.93
+    },
+    {
+     "name": "B171",
+     "center_wavelength_nm": 2005.36,
+     "fwhm_nm": 8.8913
+    },
+    {
+     "name": "B172",
+     "center_wavelength_nm": 2014.61,
+     "fwhm_nm": 8.8529
+    },
+    {
+     "name": "B173",
+     "center_wavelength_nm": 2023.82,
+     "fwhm_nm": 8.8147
+    },
+    {
+     "name": "B174",
+     "center_wavelength_nm": 2032.99,
+     "fwhm_nm": 8.7767
+    },
+    {
+     "name": "B175",
+     "center_wavelength_nm": 2042.11,
+     "fwhm_nm": 8.7388
+    },
+    {
+     "name": "B176",
+     "center_wavelength_nm": 2051.19,
+     "fwhm_nm": 8.7011
+    },
+    {
+     "name": "B177",
+     "center_wavelength_nm": 2060.24,
+     "fwhm_nm": 8.6636
+    },
+    {
+     "name": "B178",
+     "center_wavelength_nm": 2069.24,
+     "fwhm_nm": 8.6263
+    },
+    {
+     "name": "B179",
+     "center_wavelength_nm": 2078.21,
+     "fwhm_nm": 8.5892
+    },
+    {
+     "name": "B180",
+     "center_wavelength_nm": 2087.13,
+     "fwhm_nm": 8.5524
+    },
+    {
+     "name": "B181",
+     "center_wavelength_nm": 2096.01,
+     "fwhm_nm": 8.5157
+    },
+    {
+     "name": "B182",
+     "center_wavelength_nm": 2104.86,
+     "fwhm_nm": 8.4793
+    },
+    {
+     "name": "B183",
+     "center_wavelength_nm": 2113.67,
+     "fwhm_nm": 8.4432
+    },
+    {
+     "name": "B184",
+     "center_wavelength_nm": 2122.44,
+     "fwhm_nm": 8.4073
+    },
+    {
+     "name": "B185",
+     "center_wavelength_nm": 2131.17,
+     "fwhm_nm": 8.3717
+    },
+    {
+     "name": "B186",
+     "center_wavelength_nm": 2139.87,
+     "fwhm_nm": 8.3363
+    },
+    {
+     "name": "B187",
+     "center_wavelength_nm": 2148.52,
+     "fwhm_nm": 8.3013
+    },
+    {
+     "name": "B188",
+     "center_wavelength_nm": 2157.15,
+     "fwhm_nm": 8.2665
+    },
+    {
+     "name": "B189",
+     "center_wavelength_nm": 2165.73,
+     "fwhm_nm": 8.2321
+    },
+    {
+     "name": "B190",
+     "center_wavelength_nm": 2174.28,
+     "fwhm_nm": 8.198
+    },
+    {
+     "name": "B191",
+     "center_wavelength_nm": 2182.79,
+     "fwhm_nm": 8.1642
+    },
+    {
+     "name": "B192",
+     "center_wavelength_nm": 2191.27,
+     "fwhm_nm": 8.1308
+    },
+    {
+     "name": "B193",
+     "center_wavelength_nm": 2199.71,
+     "fwhm_nm": 8.0977
+    },
+    {
+     "name": "B194",
+     "center_wavelength_nm": 2208.12,
+     "fwhm_nm": 8.065
+    },
+    {
+     "name": "B195",
+     "center_wavelength_nm": 2216.5,
+     "fwhm_nm": 8.0327
+    },
+    {
+     "name": "B196",
+     "center_wavelength_nm": 2224.84,
+     "fwhm_nm": 8.0007
+    },
+    {
+     "name": "B197",
+     "center_wavelength_nm": 2233.14,
+     "fwhm_nm": 7.9692
+    },
+    {
+     "name": "B198",
+     "center_wavelength_nm": 2241.42,
+     "fwhm_nm": 7.938
+    },
+    {
+     "name": "B199",
+     "center_wavelength_nm": 2249.66,
+     "fwhm_nm": 7.9073
+    },
+    {
+     "name": "B200",
+     "center_wavelength_nm": 2257.86,
+     "fwhm_nm": 7.8769
+    },
+    {
+     "name": "B201",
+     "center_wavelength_nm": 2266.04,
+     "fwhm_nm": 7.847
+    },
+    {
+     "name": "B202",
+     "center_wavelength_nm": 2274.18,
+     "fwhm_nm": 7.8173
+    },
+    {
+     "name": "B203",
+     "center_wavelength_nm": 2282.29,
+     "fwhm_nm": 7.7878
+    },
+    {
+     "name": "B204",
+     "center_wavelength_nm": 2290.37,
+     "fwhm_nm": 7.7587
+    },
+    {
+     "name": "B205",
+     "center_wavelength_nm": 2298.42,
+     "fwhm_nm": 7.7297
+    },
+    {
+     "name": "B206",
+     "center_wavelength_nm": 2306.44,
+     "fwhm_nm": 7.7008
+    },
+    {
+     "name": "B207",
+     "center_wavelength_nm": 2314.42,
+     "fwhm_nm": 7.672
+    },
+    {
+     "name": "B208",
+     "center_wavelength_nm": 2322.37,
+     "fwhm_nm": 7.6433
+    },
+    {
+     "name": "B209",
+     "center_wavelength_nm": 2330.29,
+     "fwhm_nm": 7.6146
+    },
+    {
+     "name": "B210",
+     "center_wavelength_nm": 2338.19,
+     "fwhm_nm": 7.5859
+    },
+    {
+     "name": "B211",
+     "center_wavelength_nm": 2346.05,
+     "fwhm_nm": 7.5572
+    },
+    {
+     "name": "B212",
+     "center_wavelength_nm": 2353.88,
+     "fwhm_nm": 7.5283
+    },
+    {
+     "name": "B213",
+     "center_wavelength_nm": 2361.68,
+     "fwhm_nm": 7.4992
+    },
+    {
+     "name": "B214",
+     "center_wavelength_nm": 2369.45,
+     "fwhm_nm": 7.47
+    },
+    {
+     "name": "B215",
+     "center_wavelength_nm": 2377.19,
+     "fwhm_nm": 7.4405
+    },
+    {
+     "name": "B216",
+     "center_wavelength_nm": 2384.9,
+     "fwhm_nm": 7.4108
+    },
+    {
+     "name": "B217",
+     "center_wavelength_nm": 2392.58,
+     "fwhm_nm": 7.3808
+    },
+    {
+     "name": "B218",
+     "center_wavelength_nm": 2400.23,
+     "fwhm_nm": 7.3504
+    },
+    {
+     "name": "B219",
+     "center_wavelength_nm": 2407.85,
+     "fwhm_nm": 7.3196
+    },
+    {
+     "name": "B220",
+     "center_wavelength_nm": 2415.45,
+     "fwhm_nm": 7.2883
+    },
+    {
+     "name": "B221",
+     "center_wavelength_nm": 2423.01,
+     "fwhm_nm": 7.2566
+    },
+    {
+     "name": "B222",
+     "center_wavelength_nm": 2430.55,
+     "fwhm_nm": 7.2243
+    },
+    {
+     "name": "B223",
+     "center_wavelength_nm": 2438.05,
+     "fwhm_nm": 7.1915
+    },
+    {
+     "name": "B224",
+     "center_wavelength_nm": 2445.53,
+     "fwhm_nm": 7.1581
+    }
+   ]
+  },
+  "2024-04-24": {
+   "id": "ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z",
+   "self": "https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/ENMAP01-____L2A-DT0000070441_20240424T073016Z_006_V010502_20260318T012317Z",
+   "datetime": "2024-04-24T07:30:18.503544Z",
+   "eo:cloud_cover": 0,
+   "view:sun_elevation": 74.131193,
+   "proj:epsg": 32640,
+   "proj:shape": [
+    1176,
+    1208
+   ],
+   "proj:transform": [
+    30.0,
+    0.0,
+    381465.0,
+    0.0,
+    -30.0,
+    2796135.0
+   ],
+   "bands": [
+    {
+     "name": "B001",
+     "center_wavelength_nm": 418.416,
+     "fwhm_nm": 6.9956
+    },
+    {
+     "name": "B002",
+     "center_wavelength_nm": 424.043,
+     "fwhm_nm": 6.6675
+    },
+    {
+     "name": "B003",
+     "center_wavelength_nm": 429.457,
+     "fwhm_nm": 6.4241
+    },
+    {
+     "name": "B004",
+     "center_wavelength_nm": 434.686,
+     "fwhm_nm": 6.2512
+    },
+    {
+     "name": "B005",
+     "center_wavelength_nm": 439.757,
+     "fwhm_nm": 6.1349
+    },
+    {
+     "name": "B006",
+     "center_wavelength_nm": 444.699,
+     "fwhm_nm": 6.0608
+    },
+    {
+     "name": "B007",
+     "center_wavelength_nm": 449.539,
+     "fwhm_nm": 6.0149
+    },
+    {
+     "name": "B008",
+     "center_wavelength_nm": 454.306,
+     "fwhm_nm": 5.983
+    },
+    {
+     "name": "B009",
+     "center_wavelength_nm": 459.031,
+     "fwhm_nm": 5.9523
+    },
+    {
+     "name": "B010",
+     "center_wavelength_nm": 463.73,
+     "fwhm_nm": 5.9199
+    },
+    {
+     "name": "B011",
+     "center_wavelength_nm": 468.411,
+     "fwhm_nm": 5.8877
+    },
+    {
+     "name": "B012",
+     "center_wavelength_nm": 473.08,
+     "fwhm_nm": 5.8579
+    },
+    {
+     "name": "B013",
+     "center_wavelength_nm": 477.744,
+     "fwhm_nm": 5.8324
+    },
+    {
+     "name": "B014",
+     "center_wavelength_nm": 482.411,
+     "fwhm_nm": 5.8133
+    },
+    {
+     "name": "B015",
+     "center_wavelength_nm": 487.087,
+     "fwhm_nm": 5.8025
+    },
+    {
+     "name": "B016",
+     "center_wavelength_nm": 491.78,
+     "fwhm_nm": 5.8022
+    },
+    {
+     "name": "B017",
+     "center_wavelength_nm": 496.497,
+     "fwhm_nm": 5.8141
+    },
+    {
+     "name": "B018",
+     "center_wavelength_nm": 501.243,
+     "fwhm_nm": 5.8375
+    },
+    {
+     "name": "B019",
+     "center_wavelength_nm": 506.02,
+     "fwhm_nm": 5.8708
+    },
+    {
+     "name": "B020",
+     "center_wavelength_nm": 510.828,
+     "fwhm_nm": 5.9121
+    },
+    {
+     "name": "B021",
+     "center_wavelength_nm": 515.672,
+     "fwhm_nm": 5.9597
+    },
+    {
+     "name": "B022",
+     "center_wavelength_nm": 520.55,
+     "fwhm_nm": 6.0118
+    },
+    {
+     "name": "B023",
+     "center_wavelength_nm": 525.467,
+     "fwhm_nm": 6.0667
+    },
+    {
+     "name": "B024",
+     "center_wavelength_nm": 530.424,
+     "fwhm_nm": 6.1228
+    },
+    {
+     "name": "B025",
+     "center_wavelength_nm": 535.422,
+     "fwhm_nm": 6.1794
+    },
+    {
+     "name": "B026",
+     "center_wavelength_nm": 540.463,
+     "fwhm_nm": 6.2365
+    },
+    {
+     "name": "B027",
+     "center_wavelength_nm": 545.551,
+     "fwhm_nm": 6.294
+    },
+    {
+     "name": "B028",
+     "center_wavelength_nm": 550.687,
+     "fwhm_nm": 6.3518
+    },
+    {
+     "name": "B029",
+     "center_wavelength_nm": 555.873,
+     "fwhm_nm": 6.4099
+    },
+    {
+     "name": "B030",
+     "center_wavelength_nm": 561.112,
+     "fwhm_nm": 6.4681
+    },
+    {
+     "name": "B031",
+     "center_wavelength_nm": 566.405,
+     "fwhm_nm": 6.5265
+    },
+    {
+     "name": "B032",
+     "center_wavelength_nm": 571.756,
+     "fwhm_nm": 6.585
+    },
+    {
+     "name": "B033",
+     "center_wavelength_nm": 577.166,
+     "fwhm_nm": 6.6434
+    },
+    {
+     "name": "B034",
+     "center_wavelength_nm": 582.636,
+     "fwhm_nm": 6.7018
+    },
+    {
+     "name": "B035",
+     "center_wavelength_nm": 588.171,
+     "fwhm_nm": 6.7607
+    },
+    {
+     "name": "B036",
+     "center_wavelength_nm": 593.773,
+     "fwhm_nm": 6.8211
+    },
+    {
+     "name": "B037",
+     "center_wavelength_nm": 599.446,
+     "fwhm_nm": 6.8839
+    },
+    {
+     "name": "B038",
+     "center_wavelength_nm": 605.193,
+     "fwhm_nm": 6.9499
+    },
+    {
+     "name": "B039",
+     "center_wavelength_nm": 611.017,
+     "fwhm_nm": 7.02
+    },
+    {
+     "name": "B040",
+     "center_wavelength_nm": 616.923,
+     "fwhm_nm": 7.0951
+    },
+    {
+     "name": "B041",
+     "center_wavelength_nm": 622.92,
+     "fwhm_nm": 7.1753
+    },
+    {
+     "name": "B042",
+     "center_wavelength_nm": 628.987,
+     "fwhm_nm": 7.255
+    },
+    {
+     "name": "B043",
+     "center_wavelength_nm": 635.112,
+     "fwhm_nm": 7.3314
+    },
+    {
+     "name": "B044",
+     "center_wavelength_nm": 641.294,
+     "fwhm_nm": 7.4054
+    },
+    {
+     "name": "B045",
+     "center_wavelength_nm": 647.537,
+     "fwhm_nm": 7.4773
+    },
+    {
+     "name": "B046",
+     "center_wavelength_nm": 653.841,
+     "fwhm_nm": 7.5478
+    },
+    {
+     "name": "B047",
+     "center_wavelength_nm": 660.207,
+     "fwhm_nm": 7.6174
+    },
+    {
+     "name": "B048",
+     "center_wavelength_nm": 666.637,
+     "fwhm_nm": 7.6867
+    },
+    {
+     "name": "B049",
+     "center_wavelength_nm": 673.131,
+     "fwhm_nm": 7.7563
+    },
+    {
+     "name": "B050",
+     "center_wavelength_nm": 679.691,
+     "fwhm_nm": 7.8267
+    },
+    {
+     "name": "B051",
+     "center_wavelength_nm": 686.319,
+     "fwhm_nm": 7.8985
+    },
+    {
+     "name": "B052",
+     "center_wavelength_nm": 693.014,
+     "fwhm_nm": 7.9723
+    },
+    {
+     "name": "B053",
+     "center_wavelength_nm": 699.78,
+     "fwhm_nm": 8.0487
+    },
+    {
+     "name": "B054",
+     "center_wavelength_nm": 706.617,
+     "fwhm_nm": 8.1281
+    },
+    {
+     "name": "B055",
+     "center_wavelength_nm": 713.524,
+     "fwhm_nm": 8.2102
+    },
+    {
+     "name": "B056",
+     "center_wavelength_nm": 720.501,
+     "fwhm_nm": 8.2943
+    },
+    {
+     "name": "B057",
+     "center_wavelength_nm": 727.545,
+     "fwhm_nm": 8.3798
+    },
+    {
+     "name": "B058",
+     "center_wavelength_nm": 734.654,
+     "fwhm_nm": 8.4659
+    },
+    {
+     "name": "B059",
+     "center_wavelength_nm": 741.826,
+     "fwhm_nm": 8.552
+    },
+    {
+     "name": "B060",
+     "center_wavelength_nm": 749.06,
+     "fwhm_nm": 8.6373
+    },
+    {
+     "name": "B061",
+     "center_wavelength_nm": 756.353,
+     "fwhm_nm": 8.7213
+    },
+    {
+     "name": "B062",
+     "center_wavelength_nm": 763.703,
+     "fwhm_nm": 8.8031
+    },
+    {
+     "name": "B063",
+     "center_wavelength_nm": 771.108,
+     "fwhm_nm": 8.8821
+    },
+    {
+     "name": "B064",
+     "center_wavelength_nm": 778.567,
+     "fwhm_nm": 8.9578
+    },
+    {
+     "name": "B065",
+     "center_wavelength_nm": 786.078,
+     "fwhm_nm": 9.0303
+    },
+    {
+     "name": "B066",
+     "center_wavelength_nm": 793.639,
+     "fwhm_nm": 9.1005
+    },
+    {
+     "name": "B067",
+     "center_wavelength_nm": 801.248,
+     "fwhm_nm": 9.169
+    },
+    {
+     "name": "B068",
+     "center_wavelength_nm": 808.905,
+     "fwhm_nm": 9.2365
+    },
+    {
+     "name": "B069",
+     "center_wavelength_nm": 816.608,
+     "fwhm_nm": 9.3037
+    },
+    {
+     "name": "B070",
+     "center_wavelength_nm": 824.355,
+     "fwhm_nm": 9.3713
+    },
+    {
+     "name": "B071",
+     "center_wavelength_nm": 832.145,
+     "fwhm_nm": 9.4401
+    },
+    {
+     "name": "B072",
+     "center_wavelength_nm": 839.976,
+     "fwhm_nm": 9.5108
+    },
+    {
+     "name": "B073",
+     "center_wavelength_nm": 847.847,
+     "fwhm_nm": 9.584
+    },
+    {
+     "name": "B074",
+     "center_wavelength_nm": 855.757,
+     "fwhm_nm": 9.6603
+    },
+    {
+     "name": "B075",
+     "center_wavelength_nm": 863.703,
+     "fwhm_nm": 9.7397
+    },
+    {
+     "name": "B076",
+     "center_wavelength_nm": 871.683,
+     "fwhm_nm": 9.8216
+    },
+    {
+     "name": "B077",
+     "center_wavelength_nm": 879.692,
+     "fwhm_nm": 9.9055
+    },
+    {
+     "name": "B078",
+     "center_wavelength_nm": 887.729,
+     "fwhm_nm": 9.9909
+    },
+    {
+     "name": "B079",
+     "center_wavelength_nm": 895.789,
+     "fwhm_nm": 10.0772
+    },
+    {
+     "name": "B080",
+     "center_wavelength_nm": 901.962,
+     "fwhm_nm": 9.1772
+    },
+    {
+     "name": "B081",
+     "center_wavelength_nm": 903.87,
+     "fwhm_nm": 10.164
+    },
+    {
+     "name": "B082",
+     "center_wavelength_nm": 911.572,
+     "fwhm_nm": 9.319
+    },
+    {
+     "name": "B083",
+     "center_wavelength_nm": 911.968,
+     "fwhm_nm": 10.2508
+    },
+    {
+     "name": "B084",
+     "center_wavelength_nm": 920.08,
+     "fwhm_nm": 10.3369
+    },
+    {
+     "name": "B085",
+     "center_wavelength_nm": 921.32,
+     "fwhm_nm": 9.4544
+    },
+    {
+     "name": "B086",
+     "center_wavelength_nm": 928.204,
+     "fwhm_nm": 10.422
+    },
+    {
+     "name": "B087",
+     "center_wavelength_nm": 931.204,
+     "fwhm_nm": 9.584
+    },
+    {
+     "name": "B088",
+     "center_wavelength_nm": 936.335,
+     "fwhm_nm": 10.5054
+    },
+    {
+     "name": "B089",
+     "center_wavelength_nm": 941.218,
+     "fwhm_nm": 9.7083
+    },
+    {
+     "name": "B090",
+     "center_wavelength_nm": 944.47,
+     "fwhm_nm": 10.5862
+    },
+    {
+     "name": "B091",
+     "center_wavelength_nm": 951.361,
+     "fwhm_nm": 9.8279
+    },
+    {
+     "name": "B092",
+     "center_wavelength_nm": 952.608,
+     "fwhm_nm": 10.6589
+    },
+    {
+     "name": "B093",
+     "center_wavelength_nm": 960.748,
+     "fwhm_nm": 10.716
+    },
+    {
+     "name": "B094",
+     "center_wavelength_nm": 961.629,
+     "fwhm_nm": 9.9433
+    },
+    {
+     "name": "B095",
+     "center_wavelength_nm": 968.891,
+     "fwhm_nm": 10.75
+    },
+    {
+     "name": "B096",
+     "center_wavelength_nm": 972.017,
+     "fwhm_nm": 10.0551
+    },
+    {
+     "name": "B097",
+     "center_wavelength_nm": 977.037,
+     "fwhm_nm": 10.7533
+    },
+    {
+     "name": "B098",
+     "center_wavelength_nm": 982.524,
+     "fwhm_nm": 10.1638
+    },
+    {
+     "name": "B099",
+     "center_wavelength_nm": 985.186,
+     "fwhm_nm": 10.7183
+    },
+    {
+     "name": "B100",
+     "center_wavelength_nm": 993.145,
+     "fwhm_nm": 10.27
+    },
+    {
+     "name": "B101",
+     "center_wavelength_nm": 993.338,
+     "fwhm_nm": 10.6375
+    },
+    {
+     "name": "B102",
+     "center_wavelength_nm": 1003.88,
+     "fwhm_nm": 10.3742
+    },
+    {
+     "name": "B103",
+     "center_wavelength_nm": 1014.72,
+     "fwhm_nm": 10.4768
+    },
+    {
+     "name": "B104",
+     "center_wavelength_nm": 1025.66,
+     "fwhm_nm": 10.5775
+    },
+    {
+     "name": "B105",
+     "center_wavelength_nm": 1036.7,
+     "fwhm_nm": 10.6753
+    },
+    {
+     "name": "B106",
+     "center_wavelength_nm": 1047.84,
+     "fwhm_nm": 10.769
+    },
+    {
+     "name": "B107",
+     "center_wavelength_nm": 1059.07,
+     "fwhm_nm": 10.8578
+    },
+    {
+     "name": "B108",
+     "center_wavelength_nm": 1070.39,
+     "fwhm_nm": 10.9405
+    },
+    {
+     "name": "B109",
+     "center_wavelength_nm": 1081.79,
+     "fwhm_nm": 11.0162
+    },
+    {
+     "name": "B110",
+     "center_wavelength_nm": 1093.26,
+     "fwhm_nm": 11.0839
+    },
+    {
+     "name": "B111",
+     "center_wavelength_nm": 1104.81,
+     "fwhm_nm": 11.1437
+    },
+    {
+     "name": "B112",
+     "center_wavelength_nm": 1116.43,
+     "fwhm_nm": 11.196
+    },
+    {
+     "name": "B113",
+     "center_wavelength_nm": 1128.11,
+     "fwhm_nm": 11.2414
+    },
+    {
+     "name": "B114",
+     "center_wavelength_nm": 1139.84,
+     "fwhm_nm": 11.2806
+    },
+    {
+     "name": "B115",
+     "center_wavelength_nm": 1151.62,
+     "fwhm_nm": 11.3139
+    },
+    {
+     "name": "B116",
+     "center_wavelength_nm": 1163.44,
+     "fwhm_nm": 11.3421
+    },
+    {
+     "name": "B117",
+     "center_wavelength_nm": 1175.31,
+     "fwhm_nm": 11.3656
+    },
+    {
+     "name": "B118",
+     "center_wavelength_nm": 1187.2,
+     "fwhm_nm": 11.385
+    },
+    {
+     "name": "B119",
+     "center_wavelength_nm": 1199.11,
+     "fwhm_nm": 11.4009
+    },
+    {
+     "name": "B120",
+     "center_wavelength_nm": 1211.05,
+     "fwhm_nm": 11.4135
+    },
+    {
+     "name": "B121",
+     "center_wavelength_nm": 1223.0,
+     "fwhm_nm": 11.4229
+    },
+    {
+     "name": "B122",
+     "center_wavelength_nm": 1234.97,
+     "fwhm_nm": 11.4292
+    },
+    {
+     "name": "B123",
+     "center_wavelength_nm": 1246.95,
+     "fwhm_nm": 11.4325
+    },
+    {
+     "name": "B124",
+     "center_wavelength_nm": 1258.93,
+     "fwhm_nm": 11.4329
+    },
+    {
+     "name": "B125",
+     "center_wavelength_nm": 1270.92,
+     "fwhm_nm": 11.4305
+    },
+    {
+     "name": "B126",
+     "center_wavelength_nm": 1282.92,
+     "fwhm_nm": 11.4253
+    },
+    {
+     "name": "B127",
+     "center_wavelength_nm": 1294.91,
+     "fwhm_nm": 11.4176
+    },
+    {
+     "name": "B128",
+     "center_wavelength_nm": 1306.9,
+     "fwhm_nm": 11.4073
+    },
+    {
+     "name": "B129",
+     "center_wavelength_nm": 1318.88,
+     "fwhm_nm": 11.3946
+    },
+    {
+     "name": "B130",
+     "center_wavelength_nm": 1330.86,
+     "fwhm_nm": 11.3796
+    },
+    {
+     "name": "B131",
+     "center_wavelength_nm": 1342.82,
+     "fwhm_nm": 11.3624
+    },
+    {
+     "name": "B132",
+     "center_wavelength_nm": 1354.76,
+     "fwhm_nm": 11.343
+    },
+    {
+     "name": "B133",
+     "center_wavelength_nm": 1366.69,
+     "fwhm_nm": 11.3215
+    },
+    {
+     "name": "B134",
+     "center_wavelength_nm": 1378.6,
+     "fwhm_nm": 11.2981
+    },
+    {
+     "name": "B135",
+     "center_wavelength_nm": 1390.48,
+     "fwhm_nm": 11.2728
+    },
+    {
+     "name": "B136",
+     "center_wavelength_nm": 1449.43,
+     "fwhm_nm": 11.122
+    },
+    {
+     "name": "B137",
+     "center_wavelength_nm": 1461.11,
+     "fwhm_nm": 11.0876
+    },
+    {
+     "name": "B138",
+     "center_wavelength_nm": 1472.74,
+     "fwhm_nm": 11.052
+    },
+    {
+     "name": "B139",
+     "center_wavelength_nm": 1484.34,
+     "fwhm_nm": 11.0151
+    },
+    {
+     "name": "B140",
+     "center_wavelength_nm": 1495.89,
+     "fwhm_nm": 10.9772
+    },
+    {
+     "name": "B141",
+     "center_wavelength_nm": 1507.4,
+     "fwhm_nm": 10.9383
+    },
+    {
+     "name": "B142",
+     "center_wavelength_nm": 1518.87,
+     "fwhm_nm": 10.8984
+    },
+    {
+     "name": "B143",
+     "center_wavelength_nm": 1530.29,
+     "fwhm_nm": 10.8577
+    },
+    {
+     "name": "B144",
+     "center_wavelength_nm": 1541.68,
+     "fwhm_nm": 10.8161
+    },
+    {
+     "name": "B145",
+     "center_wavelength_nm": 1553.01,
+     "fwhm_nm": 10.7738
+    },
+    {
+     "name": "B146",
+     "center_wavelength_nm": 1564.31,
+     "fwhm_nm": 10.7308
+    },
+    {
+     "name": "B147",
+     "center_wavelength_nm": 1575.55,
+     "fwhm_nm": 10.6872
+    },
+    {
+     "name": "B148",
+     "center_wavelength_nm": 1586.76,
+     "fwhm_nm": 10.643
+    },
+    {
+     "name": "B149",
+     "center_wavelength_nm": 1597.91,
+     "fwhm_nm": 10.5985
+    },
+    {
+     "name": "B150",
+     "center_wavelength_nm": 1609.02,
+     "fwhm_nm": 10.5535
+    },
+    {
+     "name": "B151",
+     "center_wavelength_nm": 1620.09,
+     "fwhm_nm": 10.5082
+    },
+    {
+     "name": "B152",
+     "center_wavelength_nm": 1631.11,
+     "fwhm_nm": 10.4626
+    },
+    {
+     "name": "B153",
+     "center_wavelength_nm": 1642.08,
+     "fwhm_nm": 10.4169
+    },
+    {
+     "name": "B154",
+     "center_wavelength_nm": 1653.0,
+     "fwhm_nm": 10.371
+    },
+    {
+     "name": "B155",
+     "center_wavelength_nm": 1663.87,
+     "fwhm_nm": 10.3251
+    },
+    {
+     "name": "B156",
+     "center_wavelength_nm": 1674.7,
+     "fwhm_nm": 10.2793
+    },
+    {
+     "name": "B157",
+     "center_wavelength_nm": 1685.47,
+     "fwhm_nm": 10.2335
+    },
+    {
+     "name": "B158",
+     "center_wavelength_nm": 1696.2,
+     "fwhm_nm": 10.1879
+    },
+    {
+     "name": "B159",
+     "center_wavelength_nm": 1706.87,
+     "fwhm_nm": 10.1425
+    },
+    {
+     "name": "B160",
+     "center_wavelength_nm": 1717.5,
+     "fwhm_nm": 10.0974
+    },
+    {
+     "name": "B161",
+     "center_wavelength_nm": 1728.08,
+     "fwhm_nm": 10.0525
+    },
+    {
+     "name": "B162",
+     "center_wavelength_nm": 1738.6,
+     "fwhm_nm": 10.0079
+    },
+    {
+     "name": "B163",
+     "center_wavelength_nm": 1749.08,
+     "fwhm_nm": 9.9636
+    },
+    {
+     "name": "B164",
+     "center_wavelength_nm": 1759.51,
+     "fwhm_nm": 9.9195
+    },
+    {
+     "name": "B165",
+     "center_wavelength_nm": 1769.89,
+     "fwhm_nm": 9.8756
+    },
+    {
+     "name": "B166",
+     "center_wavelength_nm": 1780.22,
+     "fwhm_nm": 9.832
+    },
+    {
+     "name": "B167",
+     "center_wavelength_nm": 1967.66,
+     "fwhm_nm": 9.0469
+    },
+    {
+     "name": "B168",
+     "center_wavelength_nm": 1977.08,
+     "fwhm_nm": 9.0077
+    },
+    {
+     "name": "B169",
+     "center_wavelength_nm": 1986.45,
+     "fwhm_nm": 8.9688
+    },
+    {
+     "name": "B170",
+     "center_wavelength_nm": 1995.79,
+     "fwhm_nm": 8.93
+    },
+    {
+     "name": "B171",
+     "center_wavelength_nm": 2005.08,
+     "fwhm_nm": 8.8913
+    },
+    {
+     "name": "B172",
+     "center_wavelength_nm": 2014.33,
+     "fwhm_nm": 8.8529
+    },
+    {
+     "name": "B173",
+     "center_wavelength_nm": 2023.54,
+     "fwhm_nm": 8.8147
+    },
+    {
+     "name": "B174",
+     "center_wavelength_nm": 2032.71,
+     "fwhm_nm": 8.7767
+    },
+    {
+     "name": "B175",
+     "center_wavelength_nm": 2041.83,
+     "fwhm_nm": 8.7388
+    },
+    {
+     "name": "B176",
+     "center_wavelength_nm": 2050.92,
+     "fwhm_nm": 8.7011
+    },
+    {
+     "name": "B177",
+     "center_wavelength_nm": 2059.96,
+     "fwhm_nm": 8.6636
+    },
+    {
+     "name": "B178",
+     "center_wavelength_nm": 2068.97,
+     "fwhm_nm": 8.6263
+    },
+    {
+     "name": "B179",
+     "center_wavelength_nm": 2077.93,
+     "fwhm_nm": 8.5892
+    },
+    {
+     "name": "B180",
+     "center_wavelength_nm": 2086.86,
+     "fwhm_nm": 8.5524
+    },
+    {
+     "name": "B181",
+     "center_wavelength_nm": 2095.74,
+     "fwhm_nm": 8.5157
+    },
+    {
+     "name": "B182",
+     "center_wavelength_nm": 2104.59,
+     "fwhm_nm": 8.4793
+    },
+    {
+     "name": "B183",
+     "center_wavelength_nm": 2113.4,
+     "fwhm_nm": 8.4432
+    },
+    {
+     "name": "B184",
+     "center_wavelength_nm": 2122.17,
+     "fwhm_nm": 8.4073
+    },
+    {
+     "name": "B185",
+     "center_wavelength_nm": 2130.9,
+     "fwhm_nm": 8.3717
+    },
+    {
+     "name": "B186",
+     "center_wavelength_nm": 2139.6,
+     "fwhm_nm": 8.3363
+    },
+    {
+     "name": "B187",
+     "center_wavelength_nm": 2148.26,
+     "fwhm_nm": 8.3013
+    },
+    {
+     "name": "B188",
+     "center_wavelength_nm": 2156.88,
+     "fwhm_nm": 8.2665
+    },
+    {
+     "name": "B189",
+     "center_wavelength_nm": 2165.47,
+     "fwhm_nm": 8.2321
+    },
+    {
+     "name": "B190",
+     "center_wavelength_nm": 2174.02,
+     "fwhm_nm": 8.198
+    },
+    {
+     "name": "B191",
+     "center_wavelength_nm": 2182.53,
+     "fwhm_nm": 8.1642
+    },
+    {
+     "name": "B192",
+     "center_wavelength_nm": 2191.01,
+     "fwhm_nm": 8.1308
+    },
+    {
+     "name": "B193",
+     "center_wavelength_nm": 2199.46,
+     "fwhm_nm": 8.0977
+    },
+    {
+     "name": "B194",
+     "center_wavelength_nm": 2207.86,
+     "fwhm_nm": 8.065
+    },
+    {
+     "name": "B195",
+     "center_wavelength_nm": 2216.24,
+     "fwhm_nm": 8.0327
+    },
+    {
+     "name": "B196",
+     "center_wavelength_nm": 2224.58,
+     "fwhm_nm": 8.0007
+    },
+    {
+     "name": "B197",
+     "center_wavelength_nm": 2232.89,
+     "fwhm_nm": 7.9692
+    },
+    {
+     "name": "B198",
+     "center_wavelength_nm": 2241.16,
+     "fwhm_nm": 7.938
+    },
+    {
+     "name": "B199",
+     "center_wavelength_nm": 2249.4,
+     "fwhm_nm": 7.9073
+    },
+    {
+     "name": "B200",
+     "center_wavelength_nm": 2257.61,
+     "fwhm_nm": 7.8769
+    },
+    {
+     "name": "B201",
+     "center_wavelength_nm": 2265.79,
+     "fwhm_nm": 7.847
+    },
+    {
+     "name": "B202",
+     "center_wavelength_nm": 2273.93,
+     "fwhm_nm": 7.8173
+    },
+    {
+     "name": "B203",
+     "center_wavelength_nm": 2282.04,
+     "fwhm_nm": 7.7878
+    },
+    {
+     "name": "B204",
+     "center_wavelength_nm": 2290.12,
+     "fwhm_nm": 7.7587
+    },
+    {
+     "name": "B205",
+     "center_wavelength_nm": 2298.17,
+     "fwhm_nm": 7.7297
+    },
+    {
+     "name": "B206",
+     "center_wavelength_nm": 2306.19,
+     "fwhm_nm": 7.7008
+    },
+    {
+     "name": "B207",
+     "center_wavelength_nm": 2314.18,
+     "fwhm_nm": 7.672
+    },
+    {
+     "name": "B208",
+     "center_wavelength_nm": 2322.13,
+     "fwhm_nm": 7.6433
+    },
+    {
+     "name": "B209",
+     "center_wavelength_nm": 2330.05,
+     "fwhm_nm": 7.6146
+    },
+    {
+     "name": "B210",
+     "center_wavelength_nm": 2337.94,
+     "fwhm_nm": 7.5859
+    },
+    {
+     "name": "B211",
+     "center_wavelength_nm": 2345.81,
+     "fwhm_nm": 7.5572
+    },
+    {
+     "name": "B212",
+     "center_wavelength_nm": 2353.64,
+     "fwhm_nm": 7.5283
+    },
+    {
+     "name": "B213",
+     "center_wavelength_nm": 2361.44,
+     "fwhm_nm": 7.4992
+    },
+    {
+     "name": "B214",
+     "center_wavelength_nm": 2369.21,
+     "fwhm_nm": 7.47
+    },
+    {
+     "name": "B215",
+     "center_wavelength_nm": 2376.95,
+     "fwhm_nm": 7.4405
+    },
+    {
+     "name": "B216",
+     "center_wavelength_nm": 2384.66,
+     "fwhm_nm": 7.4108
+    },
+    {
+     "name": "B217",
+     "center_wavelength_nm": 2392.34,
+     "fwhm_nm": 7.3808
+    },
+    {
+     "name": "B218",
+     "center_wavelength_nm": 2400.0,
+     "fwhm_nm": 7.3504
+    },
+    {
+     "name": "B219",
+     "center_wavelength_nm": 2407.62,
+     "fwhm_nm": 7.3196
+    },
+    {
+     "name": "B220",
+     "center_wavelength_nm": 2415.21,
+     "fwhm_nm": 7.2883
+    },
+    {
+     "name": "B221",
+     "center_wavelength_nm": 2422.78,
+     "fwhm_nm": 7.2566
+    },
+    {
+     "name": "B222",
+     "center_wavelength_nm": 2430.32,
+     "fwhm_nm": 7.2243
+    },
+    {
+     "name": "B223",
+     "center_wavelength_nm": 2437.83,
+     "fwhm_nm": 7.1915
+    },
+    {
+     "name": "B224",
+     "center_wavelength_nm": 2445.3,
+     "fwhm_nm": 7.1581
+    }
+   ]
+  }
+ }
+}

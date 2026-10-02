@@ -1,0 +1,99 @@
+{
+ "darkness_max": 0.1,
+ "window_shape": [
+  25,
+  30
+ ],
+ "px_inside_locked_polygon": 84,
+ "px_water_final": 10,
+ "px_water_inside_polygon": 10,
+ "px_water_outside_polygon": 0,
+ "wet_fraction_of_polygon_pct": 11.904761904761905,
+ "threshold_sweep": [
+  {
+   "darkness_max": 0.078,
+   "px_raw": 8,
+   "px_final": 8,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.08,
+   "px_raw": 8,
+   "px_final": 8,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.085,
+   "px_raw": 8,
+   "px_final": 8,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.09,
+   "px_raw": 9,
+   "px_final": 9,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.1,
+   "px_raw": 11,
+   "px_final": 10,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.11,
+   "px_raw": 13,
+   "px_final": 12,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.12,
+   "px_raw": 15,
+   "px_final": 13,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  },
+  {
+   "darkness_max": 0.13,
+   "px_raw": 19,
+   "px_final": 17,
+   "px_outside_polygon": 0,
+   "connected_components": 1
+  }
+ ],
+ "max_leakage_across_sweep": 0,
+ "min_component_px": 3,
+ "buffer_px": 0,
+ "n_dates": 2,
+ "date_labels": [
+  "2022-09-08",
+  "2024-04-24"
+ ],
+ "bad_bands_dropped_per_date": {
+  "2022-09-08": [
+   129,
+   130,
+   131,
+   132,
+   133,
+   134
+  ],
+  "2024-04-24": [
+   130,
+   131,
+   132,
+   133,
+   134
+  ]
+ },
+ "scipy_available": true,
+ "px_water_raw": 11,
+ "px_water_after_components": 10,
+ "criterion": "max(brightness across all supplied dates) < darkness_max -- temporal persistence of broadband darkness, not a single-date spectral-shape index. See docs/WATER_MASK.md section 12."
+}

@@ -64,3 +64,15 @@ The loop targets exactly that trade-off.
 3. **Data → Source register**: every input, its licence and whether it is used.
 4. **Spectral Lab → What did 813 add?**: gains where measured, "no gain" and "not demonstrated" where not.
 5. **`docs/LIMITATIONS.md`**: what would change the conclusions.
+
+---
+
+## Inland complement: Shawka Dam (appended 2026-10-02)
+
+| | |
+|---|---|
+| **What** | A second, separately built site on **inland** water (the challenge covers inland and coastal water): Shawka Dam, Ras Al Khaimah, from two EnMAP L2A hyperspectral dates and a 28-observation Sentinel-2/Landsat baseline, integrated as an add-on without changing the coastal results |
+| **Relevance** | Inland reservoir monitoring in the UAE, on a real dam, with Satellite 813 simulated on a second hyperspectral sensor (EnMAP), not only on Tanager |
+| **Validity** | Carried over exactly: EnMAP's license is "proprietary" with redistribution terms not yet confirmed for public submission; and the anomaly/fingerprint results are based on a ~10-17 pixel background population, not a calibrated detector. The two-date test that did not confirm the first date is reported, and an integration review lists 15 flags with evidence (`docs/inland/REVIEW_FLAGS.md`) |
+| **Number** | Persistent wet core 10 px of 84 inside the polygon; 2024 fingerprint classes BLOOM_LIKE 1, CDOM_LIKE 7, BACKGROUND_WATER 2; 7/28 temporal flags against 3.7–12.2 expected by chance; 196/205 simulated 813 bands with real EnMAP support |
+| **Demo** | `/inland`: 3D wet-core map per date, EnMAP→813 band ladder, 3D deviation ribbon; `GET /api/inland/summary` |

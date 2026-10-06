@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLUEBAN 813 · Pitch deck</title>
+<!-- Source of docs/slides.pdf. Rebuild: python docs/slides/build_pdf.py -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #02050d; }
+  body { font-family: Inter, system-ui, sans-serif; color: #EAF1FF; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide {
+    width: 1280px; height: 720px; position: relative; overflow: hidden; break-after: page; page-break-after: always;
+    padding: 44px 60px 60px; display: flex; flex-direction: column; gap: 18px;
+    background:
+      radial-gradient(900px 620px at 6% -12%, rgba(47,123,255,.17), transparent 62%),
+      radial-gradient(760px 560px at 108% 112%, rgba(39,195,243,.10), transparent 60%),
+      #040915;
+  }
+  @media screen { body { padding: 28px 0; } .slide { margin: 0 auto 28px; border-radius: 10px; box-shadow: 0 24px 70px -24px rgba(0,0,0,.9); } }
+  .kicker { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: #7FD3F5; }
+  .kicker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #27C3F3; box-shadow: 0 0 12px #27C3F3; }
+  h1, h2, .display { font-family: "Exo 2", Inter, sans-serif; font-weight: 800; letter-spacing: .005em; }
+  h1 { font-size: 46px; line-height: 1.08; }
+  h2 { font-size: 36px; line-height: 1.14; max-width: 1120px; }
+  .hl { color: #FFC23D; }
+  .lead { font-size: 18.5px; line-height: 1.5; color: #B8C6E3; }
+  .muted { color: #93A6CB; }
+  .dim { color: #7088B3; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .card { background: linear-gradient(180deg, rgba(12,26,56,.92), rgba(7,16,36,.94)); border: 1px solid rgba(58,98,178,.34); border-radius: 12px; padding: 18px 20px; }
+  .row { display: flex; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stat .num { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 50px; line-height: 1; letter-spacing: -.01em; }
+  .stat .what { margin-top: 12px; font-size: 17px; line-height: 1.42; color: #DCE6FA; }
+  .stat .src { margin-top: 10px; font-size: 11.5px; line-height: 1.35; color: #7088B3; }
+  .c-y { color: #FFC23D; } .c-g { color: #23D484; } .c-c { color: #27C3F3; } .c-r { color: #FF4D5E; } .c-b { color: #4D93FF; }
+  .shot { display: block; border-radius: 10px; border: 1px solid rgba(77,147,255,.38); box-shadow: 0 30px 80px -30px rgba(0,0,0,.95); }
+  .foot { position: absolute; left: 60px; right: 60px; bottom: 22px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; letter-spacing: .04em; color: #6A80A8; }
+  .foot b { color: #9FB3D8; font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(58,98,178,.45); background: rgba(13,28,59,.8); border-radius: 999px; padding: 6px 13px; font-size: 13.5px; color: #DCE6FA; }
+  .tag { display: inline-block; border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+  .tag-sim { color: #FFC23D; background: rgba(255,194,61,.12); border: 1px solid rgba(255,194,61,.45); }
+  .bar { border-left: 3px solid #27C3F3; padding: 4px 0 4px 16px; }
+  ul.clean { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  ul.clean li { position: relative; padding-left: 18px; font-size: 15.5px; line-height: 1.42; color: #DCE6FA; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: #4D93FF; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.data th { text-align: left; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: #7088B3; font-weight: 600; padding: 0 12px 9px 0; border-bottom: 1px solid rgba(58,98,178,.4); }
+  table.data td { padding: 9px 12px 9px 0; border-bottom: 1px solid rgba(58,98,178,.18); vertical-align: top; line-height: 1.35; color: #DCE6FA; }
+  table.data td:first-child { font-weight: 700; color: #EAF1FF; white-space: nowrap; }
+  .step { flex: 1; position: relative; }
+  .step .n { font-family: "Exo 2"; font-weight: 800; font-size: 20px; letter-spacing: .12em; }
+  .step p { margin-top: 10px; font-size: 16px; line-height: 1.42; color: #C9D6EF; }
+  .arrow { align-self: center; color: #27C3F3; font-size: 22px; }
+  .callout { display: flex; gap: 12px; align-items: flex-start; }
+  .callout .k { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #2F7BFF; color: white; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(47,123,255,.7); }
+  .callout p { font-size: 15px; line-height: 1.42; color: #DCE6FA; }
+  .callout b { color: #EAF1FF; }
+  .note { font-size: 13px; line-height: 1.45; color: #93A6CB; }
+  .body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: safe center; gap: 18px; }
+  .fig { align-self: center; background: #fff; border-radius: 10px; padding: 8px; box-shadow: 0 30px 80px -30px rgba(0,0,0,.95); }
+  .fig img { display: block; width: auto; max-width: 100%; max-height: var(--figh, 340px); border-radius: 4px; }
+  .chips { display: flex; gap: 12px; }
+  .chip-stat { flex: 1; display: flex; align-items: baseline; gap: 12px; border: 1px solid rgba(58,98,178,.34); background: rgba(10,22,48,.8); border-radius: 10px; padding: 10px 16px; }
+  .chip-stat .num { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 26px; line-height: 1; white-space: nowrap; }
+  .chip-stat span { font-size: 14px; line-height: 1.3; color: #C9D6EF; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+  table.cmp td { padding: 9px 14px 9px 0; border-bottom: 1px solid rgba(58,98,178,.2); line-height: 1.35; vertical-align: top; }
+  table.cmp td:first-child { color: #93A6CB; width: 44%; }
+  table.cmp td:nth-child(2) { color: #27C3F3; width: 4%; font-weight: 700; }
+  table.cmp td:last-child { color: #EAF1FF; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Cover -->
+<section class="slide" style="justify-content:center">
+  <img src="img/dashboard.jpg" alt="BLUEBAN 813 Incident Control" class="shot" style="position:absolute; right:-150px; top:96px; width:820px; opacity:.97">
+  <div style="position:absolute; inset:0; background:linear-gradient(90deg, #040915 0%, rgba(4,9,21,.96) 44%, rgba(4,9,21,.25) 70%, rgba(4,9,21,0) 100%)"></div>
+  <div style="position:relative; width:610px; display:flex; flex-direction:column; gap:20px">
+    <img src="img/logo-full.png" alt="BLUEBAN 813 by Team Kanban" style="width:400px">
+    <div class="kicker">Arab Youth Space Hackathon 2026 · 813 Challenge</div>
+    <h1><span class="hl">Early warning</span> for the water in front of the UAE's intakes.</h1>
+    <p class="lead">Satellites flag water that is unusual for that exact place and season. A person decides, a field team confirms, and the model learns, going live only when it provably improves.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:10px">
+      <span class="pill">Team Kanban</span><span class="pill">United Arab Emirates</span><span class="pill">Theme: Water Quality &amp; Inland/Coastal Water Intelligence</span>
+    </div>
+    <p class="note">Live: <b style="color:#EAF1FF">blueban813.kanbanstudios.ae</b> &nbsp;·&nbsp; Code: <b style="color:#EAF1FF">github.com/4waiz/BlueBan-813</b></p>
+  </div>
+</section>
+
+<!-- 2 · Problem -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h2>The UAE drinks the sea. When the sea turns, <span class="hl">the taps are at risk.</span></h2>
+  <div class="body">
+  <div class="grid3">
+    <div class="card stat"><div class="num c-c">~70</div><div class="what">major desalination plants supply most of the UAE's drinking water, on its two coasts.</div><div class="src">Source: UAE Government portal (u.ae), Water</div></div>
+    <div class="card stat"><div class="num c-r">4 months</div><div class="what">the longest seawater reverse-osmosis shutdowns during the 2008–09 red tide in the Gulf of Oman, Fujairah's among them.</div><div class="src">Source: IOC-UNESCO (2017), Harmful Algal Blooms and Desalination, Manuals and Guides 78</div></div>
+    <div class="card stat"><div class="num c-y">2–5 days</div><div class="what">how often free Sentinel-2 images of this water arrive. Today they are looked at, not turned into decisions.</div><div class="src">Source: ESA Sentinel-2 mission (Sentinel-2A, 2B and 2C)</div></div>
+  </div>
+  <div class="card bar" style="border-left:3px solid #FF4D5E; border-radius:8px">
+    <p style="font-size:18px; line-height:1.5; color:#DCE6FA"><b>Today</b> the warning comes from the intake filters, a boat sample on a fixed calendar, or a complaint from the public: after the water has arrived.</p>
+  </div>
+  <div class="grid3" style="gap:12px">
+    <div class="pill" style="border-radius:10px; padding:10px 14px; font-size:14.5px"><b class="c-c">Why now ·</b>&nbsp;Satellite 813 brings ~205 narrow bands built for water</div>
+    <div class="pill" style="border-radius:10px; padding:10px 14px; font-size:14.5px"><b class="c-c">Why now ·</b>&nbsp;a nine-year open archive lets each pixel be judged against its own past</div>
+    <div class="pill" style="border-radius:10px; padding:10px 14px; font-size:14.5px"><b class="c-c">Why now ·</b>&nbsp;cloud catalogues make screening the whole coast cheap</div>
+  </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 02</span></div>
+</section>
+
+<!-- 3 · Users and the decision -->
+<section class="slide">
+  <div class="kicker">Who it is for · the business use case</div>
+  <h2>Built for the people who must <span class="hl">decide before the water reaches the intake.</span></h2>
+  <div class="body" style="gap:16px">
+  <div class="grid3">
+    <div class="card"><div class="display" style="font-size:20px">Desalination &amp; power operators</div>
+      <p class="lead" style="font-size:15px; margin-top:10px"><b style="color:#EAF1FF">Decide:</b> step up pre-treatment, prepare the intake, send a boat?</p>
+      <p class="note" style="margin-top:8px">Today: filters and lab results, after the fact.</p></div>
+    <div class="card"><div class="display" style="font-size:20px">Environment regulators &amp; municipalities</div>
+      <p class="lead" style="font-size:15px; margin-top:10px"><b style="color:#EAF1FF">Decide:</b> where to sample today, what to report, when to warn a beach.</p>
+      <p class="note" style="margin-top:8px">Today: a fixed sampling calendar and public reports.</p></div>
+    <div class="card"><div class="display" style="font-size:20px">Ports, fish farms &amp; beaches</div>
+      <p class="lead" style="font-size:15px; margin-top:10px"><b style="color:#EAF1FF">Decide:</b> protect stock, pause works, close a beach.</p>
+      <p class="note" style="margin-top:8px">Today: what can be seen from the shore.</p></div>
+  </div>
+  <div class="card" style="background:rgba(39,195,243,.06); border-color:rgba(39,195,243,.45)">
+    <div class="kicker" style="font-size:11.5px">Problem statement</div>
+    <p style="margin-top:10px; font-size:18px; line-height:1.5; color:#EAF1FF">We screen UAE coastal waters and the Shawka Dam reservoir for <b>unusual water colour</b>, on every Sentinel-2 pass since 2017, so that <b>desalination operators and environment regulators</b> can decide <b class="hl">whether, where and what to sample</b> before the water reaches an intake.</p>
+  </div>
+  <table class="cmp">
+    <tr><td>Boat samples on a fixed calendar</td><td>→</td><td>Extra sampling only where the evidence is, always with a clean-water control</td></tr>
+    <tr><td>"Is this normal?" answered from memory</td><td>→</td><td>Answered from years of images of that exact spot and season</td></tr>
+    <tr><td>A conclusion in an email</td><td>→</td><td>A decision with its evidence, model version and a tamper-evident log</td></tr>
+  </table>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 03</span></div>
+</section>
+
+<!-- 4 · Solution: the loop -->
+<section class="slide">
+  <div class="kicker">The solution</div>
+  <h2>Not a coloured map: <span class="hl">a loop that ends in a decision</span>, and learns from it.</h2>
+  <div class="body" style="gap:22px">
+  <div class="row" style="align-items:stretch; min-height:230px">
+    <div class="card step"><div class="n c-g">WATCH</div><p>Sentinel-2 L2A over 10 UAE coastal areas and one inland dam, every pass.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-y">DETECT</div><p>Each pixel against its <b>own</b> same-season history, not its neighbours.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-c">DIAGNOSE</div><p>Colour fingerprint, Sentinel-3 same-morning check, Satellite 813 simulated.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-b">VERIFY</div><p>A named analyst decides. A field team takes water samples.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-r">ACT</div><p>Intake watch, alerts, a sampling plan with a clean-water control.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n" style="color:#8B7BFF">LEARN</div><p>Verified labels train a candidate that must pass a frozen test and a person's sign-off.</p></div>
+  </div>
+  <div class="card" style="display:flex; gap:28px; align-items:center">
+    <div class="display" style="font-size:25px; line-height:1.3; flex:1">Satellites flag it. A person decides. The field confirms. <span class="hl">The model learns</span>, and goes live only when it provably improves.</div>
+    <div class="note" style="width:340px; font-size:14px">Every decision lands in a tamper-evident (hash-chained) audit log, and every number on screen carries its source: scene ID, licence and algorithm version.</div>
+  </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 04</span></div>
+</section>
+
+<!-- 5 · Data -->
+<section class="slide" style="gap:14px">
+  <div class="kicker">Data used</div>
+  <h2>Open data at the core, <span class="hl">hyperspectral where it improves the result.</span></h2>
+  <table class="data">
+    <tr><th>Dataset</th><th>Provider · level</th><th>Dates</th><th>Role in BLUEBAN</th></tr>
+    <tr><td>Sentinel-2 MSI L2A</td><td>ESA Copernicus via Planetary Computer · surface reflectance, 10–20 m</td><td>2017–2026 · 5,080 images</td><td>Detection, the primary sensor</td></tr>
+    <tr><td>Sentinel-3 OLCI WFR</td><td>EUMETSAT / ESA Copernicus · Level-2 water, 300 m</td><td>2017 – Feb 2026</td><td>Same-morning cross-check; 436 reference labels, never ground truth</td></tr>
+    <tr><td>Planet Tanager-1</td><td>Planet open archive (CC BY 4.0) · surface reflectance, &gt;420 bands, 35 m</td><td>1 Jun 2025 scene</td><td>Real pixels → simulated 813 bands; the 813 test</td></tr>
+    <tr><td>EnMAP HSI L2A</td><td>DLR · L2A surface reflectance, 224 bands, 30 m</td><td>8 Sep 2022, 24 Apr 2024</td><td>Inland: Shawka Dam water and anomalies; 813 simulated on EnMAP</td></tr>
+    <tr><td>Landsat 8/9 + Sentinel-2</td><td>USGS, ESA · 30 m / 20 m</td><td>Sep 2023 – Oct 2025</td><td>Inland baseline, 28 images</td></tr>
+    <tr><td>ERA5 10 m wind</td><td>ECMWF / Copernicus C3S</td><td>Per event</td><td>Wind-only drift scenario (not an ocean forecast)</td></tr>
+    <tr><td>OpenStreetMap</td><td>OSM contributors (ODbL)</td><td>2026 extract</td><td>120 coastal assets, incl. 8 desalination and 22 power plants</td></tr>
+  </table>
+  <p class="note"><span class="tag tag-sim">SIMULATED</span>&nbsp; Satellite 813 data was not available to teams in the PoC phase, so its published band set (~205 bands, 400–1700 nm, 20 m) is simulated from real hyperspectral pixels and labelled as simulated everywhere.</p>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 05</span></div>
+</section>
+
+<!-- 6 · Approach -->
+<section class="slide">
+  <div class="kicker">Technical approach</div>
+  <h2>An <span class="hl">explainable baseline first</span>, then a model that has to earn its place.</h2>
+  <div class="body" style="gap:20px">
+  <div class="row" style="align-items:stretch; min-height:250px">
+    <div class="card step"><div class="n c-g" style="font-size:16px">1 · READ CORRECTLY</div><p>Sentinel-2 L2A with each product's BOA offset, SCL cloud and shadow masks, a glint-aware water mask, 20 m grid.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-c" style="font-size:16px">2 · WATER FEATURES</div><p>NDCI, MCI red-edge peak, hue angle, turbidity (generic formula). Shown as proxies, never as concentrations.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-y" style="font-size:16px">3 · AGAINST ITS OWN PAST</div><p>Robust z and seasonal percentile vs the same pixel ±45 days in other years. Flag: z ≥ 3, ≥ 95th percentile, ≥ 0.5 km².</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-b" style="font-size:16px">4 · DIAGNOSE</div><p>Event vs background spectrum, Sentinel-3 the same morning, simulated 813 bands.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n" style="font-size:16px; color:#8B7BFF">5 · LEARN, SAFELY</div><p>L2 logistic candidate vs the rule on a frozen test set, bootstrap intervals, a person approves.</p></div>
+  </div>
+  <div class="grid3" style="grid-template-columns:repeat(4,1fr); gap:12px">
+    <div class="card" style="padding:14px 16px"><b class="c-g">No leakage</b><p class="note" style="margin-top:6px">Train and test split by area and month; 1.2 km spatial blocks for the 813 test.</p></div>
+    <div class="card" style="padding:14px 16px"><b class="c-y">Controls kept</b><p class="note" style="margin-top:6px">Known false alarms stay in the data on purpose: the system must stand down.</p></div>
+    <div class="card" style="padding:14px 16px"><b class="c-c">Same code twice</b><p class="note" style="margin-top:6px">Python and the in-browser trainer agree to 1e-7; CI runs the whole loop.</p></div>
+    <div class="card" style="padding:14px 16px"><b class="c-b">Reproducible</b><p class="note" style="margin-top:6px">A notebook reruns the Fujairah detection and the gate from committed sample data.</p></div>
+  </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 06</span></div>
+</section>
+
+<!-- 7 · Product: Incident Control -->
+<section class="slide" style="gap:14px">
+  <div class="kicker">The product · deployed and working</div>
+  <h2 style="font-size:32px">One screen: <span class="hl">where the water is unusual, why, and what to do next.</span></h2>
+  <div class="row" style="gap:22px">
+    <img src="img/dashboard.jpg" alt="Incident Control" class="shot" style="width:880px">
+    <div style="display:flex; flex-direction:column; gap:18px; padding-top:6px">
+      <div class="callout"><div class="k">1</div><p><b>The event, mapped.</b> 17 Feb 2024 true colour and the anomaly off Fujairah, with a five-point sampling plan.</p></div>
+      <div class="callout"><div class="k">2</div><p><b>Evidence, then a decision.</b> Proxies vs past years, Sentinel-3 agreement; Confirm, False alarm or Request a water sample.</p></div>
+      <div class="callout"><div class="k">3</div><p><b>Fingerprint and drift.</b> The spectral cube, event-minus-normal spectrum and a wind-only drift scenario.</p></div>
+    </div>
+  </div>
+  <p class="note">Live at <b style="color:#EAF1FF">blueban813.kanbanstudios.ae</b>: review, sampling, retraining and gated promotion all run in the browser. The FastAPI backend runs the same loop on a database, with an HTTP API.</p>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 07</span></div>
+</section>
+
+<!-- 8 · Product: Intake watch -->
+<section class="slide" style="gap:14px">
+  <div class="kicker">For the operator</div>
+  <h2 style="font-size:32px">The question is <span class="hl">per intake</span>, not per incident.</h2>
+  <div class="row" style="gap:22px">
+    <img src="img/intakes.jpg" alt="Intake watch" class="shot" style="width:800px">
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <div class="card stat" style="padding:14px 16px"><div class="num c-c" style="font-size:36px">31</div><div class="what" style="font-size:14.5px">intakes watched: 8 desalination plants, 22 power-plant cooling intakes, 1 industrial intake.</div></div>
+      <div class="card" style="padding:14px 16px"><div class="mono" style="font-size:12.5px; line-height:1.5; color:#DCE6FA"><b class="c-r">ACT NOW · Kalba Power Plant</b><br>Unusual water 12.1 km to the ENE · 100th percentile vs 33 past same-season images · Sentinel-3 agrees · drift scenario 9.8 km at +6 h · request water samples.</div></div>
+      <p class="note">Status rules are fixed and shown on screen. Alerts go out as JSON to the operator's webhook, then email, SMS or the control room.</p>
+    </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 08</span></div>
+</section>
+
+<!-- 9 · Evidence: Fujairah -->
+<section class="slide">
+  <div class="kicker">Evidence · a real event, reproduced by the notebook</div>
+  <h2>Fujairah, 17 February 2024: <span class="hl">unusual for this place and season.</span></h2>
+  <div class="body" style="gap:12px">
+  <div class="chips">
+    <div class="chip-stat"><span class="num c-y">z = 7.3</span><span>chlorophyll index vs 33 same-season images from other years: 100th percentile</span></div>
+    <div class="chip-stat"><span class="num c-c">54° vs 202°</span><span>water colour (hue) vs its usual blue: visibly discoloured</span></div>
+    <div class="chip-stat"><span class="num c-g">×4.1</span><span>Sentinel-3 chlorophyll product, same morning (a model, not a sample)</span></div>
+  </div>
+  <div class="fig" style="--figh:330px"><img src="img/nb_fujairah.jpg" alt="Notebook output: true colour with the event outline, the anomaly against past years, and the event vs background spectrum"></div>
+  <p class="note">Sentinel-2A, 06:49 UTC · 2.39 km², 8 km offshore · rerun from <b style="color:#EAF1FF">notebooks/blueban813_poc.ipynb</b> on the committed sample input. No species, toxin or concentration is claimed without a water sample.</p>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 09</span></div>
+</section>
+
+<!-- 10 · Evidence: validation -->
+<section class="slide">
+  <div class="kicker">Evidence · measured on held-back data</div>
+  <h2>The learned model beats the rule, <span class="hl">and still waits for a person.</span></h2>
+  <div class="body" style="gap:12px">
+  <div class="chips">
+    <div class="chip-stat"><span class="num c-g">0.66 → 0.94</span><span>AUPRC on 100 frozen test labels; gain CI [0.04, 0.48]</span></div>
+    <div class="chip-stat"><span class="num c-c">9 of 9</span><span>held-out areas where the candidate beats the rule</span></div>
+    <div class="chip-stat"><span class="num c-y">5,080</span><span>Sentinel-2 images screened over 10 UAE areas</span></div>
+  </div>
+  <div class="fig" style="--figh:262px"><img src="img/nb_learning_gate.jpg" alt="Notebook output: precision-recall curves, leave-one-area-out results and the promotion gate"></div>
+  <div class="card" style="padding:14px 18px">
+    <div class="kicker" style="font-size:11.5px; color:#FFC23D">Where it breaks, stated up front</div>
+    <ul class="clean" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px 28px">
+      <li style="font-size:14px">No public UAE water samples: indices stay proxies until lab results calibrate them.</li>
+      <li style="font-size:14px">Labels come from Sentinel-3, a model product (weight 0.5), not field truth.</li>
+      <li style="font-size:14px">It stands down on known false alarms: an index spike over unchanged blue water (Sentinel-3 ×1.1) and the Gulf of Annaba.</li>
+      <li style="font-size:14px">Bloom-like flags agree weakly with Sentinel-3 (ρ −0.19, n = 83); the drift is a wind-only scenario.</li>
+    </ul>
+  </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 10</span></div>
+</section>
+
+<!-- 11 · Hyperspectral -->
+<section class="slide">
+  <div class="kicker">Hyperspectral · Satellite 813</div>
+  <h2>What does 813 add? <span class="hl">Measured, not assumed.</span></h2>
+  <div class="body" style="gap:16px">
+  <div class="row" style="gap:22px; align-items:center">
+    <div style="display:flex; flex-direction:column; gap:12px; width:470px">
+      <div class="card stat" style="padding:14px 18px"><div class="num c-g" style="font-size:38px">159 → 84</div><div class="what" style="font-size:14.5px">false alarms on borderline cases at the same catch rate: Sentinel-2 bands vs simulated 813 bands on the same 25,513 real Tanager pixels (173 spatial blocks).</div></div>
+      <div class="card stat" style="padding:14px 18px"><div class="num c-y" style="font-size:38px">no gain</div><div class="what" style="font-size:14.5px">on obvious plumes, where both are near-perfect. 813 is the upgrade for hard, early cases.</div></div>
+      <div class="card stat" style="padding:14px 18px"><div class="num c-c" style="font-size:38px">196 / 205</div><div class="what" style="font-size:14.5px">simulated 813 bands with real EnMAP support over Shawka Dam, inland.</div></div>
+    </div>
+    <img src="img/spectra.jpg" alt="Spectral Lab" class="shot" style="width:640px">
+  </div>
+  <p class="note">Reference: a full-spectrum (368-band) anomaly detector, not field data. Every 813 value is simulated and labelled so; the reader for real 813 products is already written and tested.</p>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 11</span></div>
+</section>
+
+<!-- 12 · Impact and business model -->
+<section class="slide">
+  <div class="kicker">Impact · business model · why us</div>
+  <h2>Fewer wasted boat trips, earlier decisions, <span class="hl">a record a regulator can trust.</span></h2>
+  <div class="body" style="gap:16px">
+  <div class="row" style="align-items:stretch">
+    <div class="card" style="flex:1">
+      <div class="display" style="font-size:20px">Impact</div>
+      <ul class="clean" style="margin-top:12px">
+        <li>Earlier warning for potable-water and cooling intakes on both UAE coasts.</li>
+        <li>Scarce sampling goes where it resolves something, with a clean-water control.</li>
+        <li>SDG 6 (6.3, 6.5) and SDG 14 (14.1); ports from the Gulf to the Maghreb without re-tuning, and inland.</li>
+      </ul>
+    </div>
+    <div class="card" style="flex:1">
+      <div class="display" style="font-size:20px">Business model</div>
+      <ul class="clean" style="margin-top:12px">
+        <li><b>Who pays:</b> desalination and power operators, regulators and municipalities, ports, aquaculture, tourism.</li>
+        <li><b>Offer:</b> per-area monitoring · per-asset alerts · per-event 813 hyperspectral analysis · reports and API.</li>
+        <li><b>Unit economics:</b> open data in, near-zero hosting; marginal cost per area is compute and storage. No revenue claimed yet.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="padding:16px 20px">
+    <div class="kicker" style="font-size:11.5px">Why BLUEBAN, not another dashboard</div>
+    <table class="cmp" style="margin-top:8px; font-size:14.5px">
+      <tr><td>Index maps and satellite viewers</td><td>→</td><td>A picture with no baseline: a turbid harbour looks alarming every clear day. BLUEBAN judges each pixel against its own past.</td></tr>
+      <tr><td>Scheduled boat sampling</td><td>→</td><td>Accurate, but one point on a fixed date. BLUEBAN decides where and when the next sample resolves something.</td></tr>
+      <tr><td>Black-box detection models</td><td>→</td><td>BLUEBAN shows its evidence, logs every decision, and promotes a model only after a frozen test and a person's sign-off.</td></tr>
+    </table>
+  </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 12</span></div>
+</section>
+
+<!-- 13 · Next steps, the ask, the team -->
+<section class="slide">
+  <div class="kicker">Next steps · incubation</div>
+  <h2>Next: <span class="hl">one coast, one operator, one season.</span></h2>
+  <div class="body" style="gap:20px">
+  <div class="row" style="align-items:stretch; min-height:150px">
+    <div class="card step"><div class="n c-g" style="font-size:17px">1 · DEPLOY ON GIQ</div><p>The screening pipeline and operator screens, next to the data GIQ hosts.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-y" style="font-size:17px">2 · REAL 813 DATA</div><p>Swap the simulator for the real 813 reader the day products arrive.</p></div><div class="arrow">›</div>
+    <div class="card step"><div class="n c-c" style="font-size:17px">3 · ONE PILOT</div><p>Compare our flags with one operator's lab record for a season; calibrate concentrations from their samples.</p></div>
+  </div>
+  <div class="card" style="background:rgba(255,194,61,.07); border-color:rgba(255,194,61,.5); padding:20px 24px">
+    <div class="display" style="font-size:24px; line-height:1.35">We are asking for: <span class="hl">a pilot partner on the UAE coast</span> · access to Satellite 813 data · an incubation seat.</div>
+  </div>
+  <div class="row" style="align-items:flex-end; justify-content:space-between">
+    <div>
+      <div class="kicker" style="font-size:11.5px">Team Kanban · United Arab Emirates</div>
+      <div style="margin-top:10px; font-size:22px; font-weight:600">Awaiz Ahmed <span class="dim" style="font-weight:500">(team lead)</span> · Mohammad Umar · Huda Mueen · Bilal Feroz</div>
+      <p class="note" style="margin-top:8px; font-size:14px">Earth-observation processing · machine learning and validation · full-stack web, 3D and API · product</p>
+    </div>
+    <div class="note" style="text-align:right; line-height:1.75; font-size:14px">Live <b style="color:#EAF1FF">blueban813.kanbanstudios.ae</b><br>Code <b style="color:#EAF1FF">github.com/4waiz/BlueBan-813</b><br>Paper <b style="color:#EAF1FF">4waiz.github.io/BlueBan-813</b></div>
+  </div>
+  </div>
+  <div class="foot"><span><b>BLUEBAN 813</b> · Team Kanban · United Arab Emirates</span><span>Arab Youth Space Hackathon 2026 · 813 Challenge · 13</span></div>
+</section>
+
+</body>
+</html>

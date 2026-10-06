@@ -40,6 +40,8 @@ def pct(v, d=0):
 
 # --------------------------------------------------------------------------- data
 hero = J("outputs/incidents/BB-AE-2024-001.json")
+# The platform of the event image, from the incident's own provenance (not typed in).
+HERO_SAT = next((x.get("satellite") for x in (hero.get("provenance") or {}).get("sources", []) if x.get("sensor") == "MSI"), "Sentinel-2")
 art = J("outputs/incidents/BB-AE-2023-001.json")
 vs = J("outputs/validation/validation_summary.json")
 labels = J("outputs/labels/seed_labels.json") or {"labels": [], "stats": {}, "n": 0}
@@ -83,7 +85,7 @@ def figures():
     # Fig 1: the Fujairah case, three panels
     d = os.path.join(ROOT, "outputs", "incidents", "BB-AE-2024-001")
     fig, ax = plt.subplots(1, 3, figsize=(10, 3.6))
-    for a, (fn, title) in zip(ax, [("rgb.png", "(a) True colour, Sentinel-2B"),
+    for a, (fn, title) in zip(ax, [("rgb.png", f"(a) True colour, {HERO_SAT}"),
                                    ("ndci_z.png", "(b) NDCI robust z vs own season"),
                                    ("hue.png", "(c) Water-colour hue angle")]):
         im = Image.open(os.path.join(d, fn)).convert("RGBA")
@@ -298,7 +300,7 @@ ol.refs li {{ font-size:14px; margin-bottom:6px; }}
 </tbody></table>
 
 <h3>4.2 Fujairah, 17 February 2024</h3>
-<figure><img src="figures/fig1_fujairah.png" alt="Three panels: true colour showing bright green filaments off Fujairah, NDCI robust z map, and hue angle map"><figcaption><b>Figure 1.</b> BB-AE-2024-001, Sentinel-2B, 17 Feb 2024 06:49 UTC, 20 m. (a) Bright-green filaments off Fujairah (median {f(hero['model_features'].get('dist_shore_km'), 1)} km from the coast). (b) NDCI robust z against 33 same-season acquisitions from other years. (c) Hue angle: the filaments are yellow-green (~{f(fh['HUE_ANGLE']['value'], 0)}°) in water that is usually blue (~{f(fh['HUE_ANGLE']['baseline_median'], 0)}°).</figcaption></figure>
+<figure><img src="figures/fig1_fujairah.png" alt="Three panels: true colour showing bright green filaments off Fujairah, NDCI robust z map, and hue angle map"><figcaption><b>Figure 1.</b> BB-AE-2024-001, {HERO_SAT}, 17 Feb 2024 06:49 UTC, 20 m. (a) Bright-green filaments off Fujairah (median {f(hero['model_features'].get('dist_shore_km'), 1)} km from the coast). (b) NDCI robust z against 33 same-season acquisitions from other years. (c) Hue angle: the filaments are yellow-green (~{f(fh['HUE_ANGLE']['value'], 0)}°) in water that is usually blue (~{f(fh['HUE_ANGLE']['baseline_median'], 0)}°).</figcaption></figure>
 <p>The event covers {f(hero['area_km2'], 2)} km² at 20 m. Its median NDCI is {f(fh['NDCI']['value'], 2)} against a seasonal median of {f(fh['NDCI']['baseline_median'], 3)} (robust z {f(fh['NDCI']['z'], 1)}, 100th seasonal percentile), MCI is {f(fh['MCI']['value'], 4)} against {f(fh['MCI']['baseline_median'], 4)}, and the same location showed a similar signal on only {pct(hero['temporal'].get('persistence_frac'), 0)} of past same-season dates. Sentinel-3B OLCI, {abs(oh.get('dt_minutes') or 0):.0f} minutes earlier, gives a CHL_NN median of {f(oh.get('region_median'), 1)} mg m⁻³ over the {oh.get('n_region_px')} OLCI pixels overlapping the event against {f(oh.get('background_median'), 1)} mg m⁻³ around it. The spectrum (Fig. 2) shows the red-edge excess at 705 nm expected of dense phytoplankton. The timing matches the winter <i>Noctiluca</i> season, and NASA's PACE imaged a likely-<i>Noctiluca</i> bloom in the Gulf of Oman a month later [11]; neither confirms the species of this event. The incident is therefore raised as a bloom-like optical anomaly for analyst review, with a five-point sampling plan (core, edge, background control, uncertainty) and exposure to the nearest ports and the Fujairah and Kalba power and desalination plants.</p>
 <figure><img src="figures/fig2_spectra.png" alt="Event and background reflectance spectra"><figcaption><b>Figure 2.</b> Median Sentinel-2 spectra of the event and of background water (5–95 % band), SWIR-offset corrected.</figcaption></figure>
 <figure><img src="figures/fig3_record.png" alt="Time series of NDCI P95 and hue angle for the Fujairah AOI"><figcaption><b>Figure 3.</b> The Fujairah AOI's seasonal record (AOI P95 of NDCI and median hue angle per acquisition). The two detections are marked.</figcaption></figure>

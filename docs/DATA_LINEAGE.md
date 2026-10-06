@@ -121,7 +121,7 @@ Full treatment in `813_PRODUCT_NOTES.md`.
 | Acquisitions used | **1 265** (428 hotspot zone, 837 reference zone) |
 | Span | 2020-07-17 → 2025-12-28 (5.4 years) |
 | Bands | B03, B04, B05, B8A, B11, SCL at a common 20 m grid |
-| Correction applied | ESA processing-baseline 04.00 offset (−1000 DN) by acquisition date |
+| Correction applied | ESA processing-baseline 04.00 offset (−1000 DN) by acquisition date (the legacy rule in `pipeline/sentinel2.py`, used only for this Annaba baseline; the UAE pipeline reads each product's own processing baseline, `pipeline/s2_features.py`) |
 
 **Licence:** Copernicus open (free, full and open access).
 **Attribution:** *Contains modified Copernicus Sentinel-2 data, processed by

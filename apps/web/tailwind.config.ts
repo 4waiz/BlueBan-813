@@ -13,6 +13,8 @@ export default {
   theme: {
     extend: {
       screens: {
+        // named because arbitrary min-[…] variants are unavailable alongside raw screens
+        wide: "1700px",
         short: { raw: "(max-height: 980px)" },
         tiny: { raw: "(max-height: 820px)" },
       },
@@ -25,7 +27,8 @@ export default {
         line: "#1E3563",
         ink: "#EAF1FF",
         muted: "#93A6CB",
-        dim: "#5D7299",
+        // 5:1 on the panel colour (was #5D7299, 3.7:1, below WCAG AA for small text)
+        dim: "#7088B3",
         beam: "#2F7BFF",
         beam2: "#4D93FF",
         cyan: "#27C3F3",

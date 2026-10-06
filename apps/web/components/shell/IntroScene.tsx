@@ -5,7 +5,8 @@
  * line, in a slow star field. Decorative: no data is drawn here.
  */
 import React, { useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
+import Canvas from "@/components/three/ZoomCanvas";
 import * as THREE from "three";
 import { easeOutCubic, wavelengthColor } from "@/components/inland/visuals";
 

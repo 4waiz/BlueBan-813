@@ -1,0 +1,853 @@
+{
+ "name": "BLUEBAN 813 sample input: BB-AE-2024-001 (Fujairah, UAE, 17 Feb 2024)",
+ "purpose": "Offline input of notebooks/blueban813_poc.ipynb: the event acquisition and the per-pixel same-season baseline on the incident's own 20 m grid.",
+ "generated_utc": "2026-10-06T20:32:07Z",
+ "regenerate": {
+  "command": "python scripts/fetch_sample_input.py",
+  "audit_climatology_selection": "python scripts/fetch_sample_input.py --reselect",
+  "network": "anonymous HTTPS to planetarycomputer.microsoft.com and *.blob.core.windows.net",
+  "credentials": "none",
+  "environment_used": {
+   "python": "3.11.9",
+   "numpy": "2.4.6",
+   "rasterio": "1.4.4",
+   "gdal": "3.10.3",
+   "pystac_client": "0.9.0"
+  }
+ },
+ "source": {
+  "stac_api": "https://planetarycomputer.microsoft.com/api/stac/v1",
+  "collection": "sentinel-2-l2a",
+  "signing": "planetary_computer.sign (anonymous SAS token)",
+  "search": {
+   "datetime": "2017-01-01/2026-09-30",
+   "max_eo_cloud_cover_per_tile": 30.0,
+   "bbox_lonlat": [
+    56.35866452,
+    25.05,
+    56.53723987,
+    25.19369229
+   ]
+  }
+ },
+ "grid": {
+  "crs": "EPSG:32640",
+  "crs_name": "WGS 84 / UTM zone 40N",
+  "transform_gdal_order": [
+   20.0,
+   0.0,
+   435300.0,
+   0.0,
+   -20.0,
+   2782560.0
+  ],
+  "shape_rows_cols": [
+   600,
+   560
+  ],
+  "pixel_size_m": 20.0,
+  "bbox_utm": [
+   435300.0,
+   2770560.0,
+   446500.0,
+   2782560.0
+  ],
+  "bbox_lonlat": [
+   56.35802,
+   25.0493,
+   56.469614,
+   25.158105
+  ],
+  "size_km": [
+   12.0,
+   11.2
+  ],
+  "incident_grid": {
+   "epsg": 32640,
+   "transform": [
+    20.0,
+    0.0,
+    435300.0,
+    0.0,
+    -20.0,
+    2786560.0
+   ],
+   "shape": [
+    800,
+    904
+   ],
+   "bbox_lonlat": [
+    56.357831,
+    25.0493,
+    56.537819,
+    25.194456
+   ]
+  },
+  "window_in_incident_grid": {
+   "row0": 200,
+   "row1": 800,
+   "col0": 0,
+   "col1": 560
+  },
+  "derivation": "scripts/build_incidents.py: 9 km half-window around the DETECT candidate centroid (25.11230 N, 56.44795 E; outputs/detect/AE-FUJ.json, label 18), clipped to the AE-FUJ AOI, 20 m UTM; the sample keeps rows 200-799 and cols 0-559 of it (coast, the whole event, surrounding water)."
+ },
+ "event": {
+  "incident_id": "BB-AE-2024-001",
+  "datatake": "2024-02-17_R020_2A",
+  "stac_item_ids": [
+   "S2A_MSIL2A_20240217T064941_R020_T40RDN_20240217T105525"
+  ],
+  "skipped_redundant_tiles": [],
+  "datetime_utc": "2024-02-17T06:49:41.024000Z",
+  "platform": "Sentinel-2A",
+  "relative_orbit": 20,
+  "mgrs_tile": "40RDN",
+  "processing_baseline": "05.10",
+  "boa_add_offset": -1000.0,
+  "quantification_value": 10000.0,
+  "reflectance": "(DN + boa_add_offset) / quantification_value; DN 0 = no data (pipeline.s2_features.dn_to_reflectance)",
+  "file": "s2l2a_20240217_fujairah_20m_dn.tif",
+  "dtype": "float32",
+  "bands": [
+   {
+    "band": "B01",
+    "central_wavelength_nm": 442.7,
+    "native_resolution_m": 60,
+    "stored": "original integer DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "B02",
+    "central_wavelength_nm": 492.7,
+    "native_resolution_m": 10,
+    "stored": "nearest integer DN (max change 0.50 DN = 0.00005 reflectance)"
+   },
+   {
+    "band": "B03",
+    "central_wavelength_nm": 559.8,
+    "native_resolution_m": 10,
+    "stored": "nearest integer DN (max change 0.50 DN = 0.00005 reflectance)"
+   },
+   {
+    "band": "B04",
+    "central_wavelength_nm": 664.6,
+    "native_resolution_m": 10,
+    "stored": "float32 DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "B05",
+    "central_wavelength_nm": 704.1,
+    "native_resolution_m": 20,
+    "stored": "original integer DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "B06",
+    "central_wavelength_nm": 740.5,
+    "native_resolution_m": 20,
+    "stored": "original integer DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "B8A",
+    "central_wavelength_nm": 864.7,
+    "native_resolution_m": 20,
+    "stored": "original integer DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "B11",
+    "central_wavelength_nm": 1613.7,
+    "native_resolution_m": 20,
+    "stored": "original integer DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "B12",
+    "central_wavelength_nm": 2202.4,
+    "native_resolution_m": 20,
+    "stored": "original integer DN; decodes bit-identically to the reader's reflectance"
+   },
+   {
+    "band": "SCL",
+    "native_resolution_m": 20,
+    "stored": "Sen2Cor class"
+   }
+  ],
+  "reader": "pipeline.watch.load_datatake via scripts/build_incidents.py:load_features: 20 m bands land 1:1 on the grid, 60 m B01 is replicated (each 20 m pixel inside one 60 m pixel), 10 m bands are averaged by GDAL to 20 m (non-integer), SCL nearest"
+ },
+ "baseline": {
+  "file": "seasonal_baseline_20m.tif",
+  "transect_file": "seasonal_baseline_transect.npz",
+  "dtype": "float32",
+  "features": [
+   "NDCI",
+   "MCI",
+   "HUE_ANGLE",
+   "TUR_NECHAD2016"
+  ],
+  "layers": [
+   {
+    "name": "NDCI_n",
+    "rounding": "exact"
+   },
+   {
+    "name": "NDCI_median",
+    "rounding": "multiple of 2^-13"
+   },
+   {
+    "name": "NDCI_mad",
+    "rounding": "multiple of 2^-13"
+   },
+   {
+    "name": "NDCI_q95",
+    "rounding": "multiple of 2^-13"
+   },
+   {
+    "name": "NDCI_max",
+    "rounding": "multiple of 2^-8"
+   },
+   {
+    "name": "MCI_n",
+    "rounding": "exact"
+   },
+   {
+    "name": "MCI_median",
+    "rounding": "multiple of 2^-22"
+   },
+   {
+    "name": "MCI_mad",
+    "rounding": "multiple of 2^-22"
+   },
+   {
+    "name": "HUE_ANGLE_n",
+    "rounding": "exact"
+   },
+   {
+    "name": "HUE_ANGLE_median",
+    "rounding": "multiple of 2^-6"
+   },
+   {
+    "name": "HUE_ANGLE_mad",
+    "rounding": "multiple of 2^-2"
+   },
+   {
+    "name": "TUR_NECHAD2016_n",
+    "rounding": "exact"
+   },
+   {
+    "name": "TUR_NECHAD2016_median",
+    "rounding": "multiple of 2^-5"
+   }
+  ],
+  "n_acquisitions": 36,
+  "years": [
+   "2018",
+   "2019",
+   "2020",
+   "2021",
+   "2022",
+   "2023",
+   "2025",
+   "2026"
+  ],
+  "window_days": 45,
+  "excluded_year": 2024,
+  "selection": "same-season acquisitions within +/-45 days of the event day-of-year in other years (pipeline.detect.climatology_indices over the WATCH archive), kept when the 120 m WATCH water fraction near the candidate exceeds 0.25, then 36 drawn with numpy default_rng(813) (scripts/build_incidents.py)",
+  "per_acquisition": "s2_features.compute_features (SWIR-B12 surface correction) masked to s2_features.water_quality_mask(hole_buffer=False, 60 m buffer), exactly as build_incidents.load_features",
+  "z": "z = (x - median) / (1.4826 * mad + FLOORS[feature]), valid where n >= 6 (pipeline.detect.robust_anomaly)",
+  "percentile": "robust_anomaly: pct = 100 * #(clim < x) / n; pct >= 95 iff x > q95; pct = 100 iff x > max",
+  "transect": {
+   "window_row": 234,
+   "incident_grid_row": 434
+  },
+  "acquisitions": [
+   {
+    "tag": "2018-01-14_R020_2B",
+    "datetime": "2018-01-14T06:52:29.027000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20180114T065229_R020_T40RDN_20201025T201845"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 671949
+   },
+   {
+    "tag": "2018-01-19_R020_2A",
+    "datetime": "2018-01-19T06:52:01.026000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20180119T065201_R020_T40RDN_20201014T065252"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 697150
+   },
+   {
+    "tag": "2018-01-24_R020_2B",
+    "datetime": "2018-01-24T06:51:49.027000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20180124T065149_R020_T40RDN_20201025T215020"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 697383
+   },
+   {
+    "tag": "2018-02-03_R020_2B",
+    "datetime": "2018-02-03T06:50:59.027000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20180203T065059_R020_T40RDN_20201013T183255"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 697227
+   },
+   {
+    "tag": "2018-03-05_R020_2B",
+    "datetime": "2018-03-05T06:47:39.027000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20180305T064739_R020_T40RDN_20201013T070026"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 596346
+   },
+   {
+    "tag": "2018-03-20_R020_2A",
+    "datetime": "2018-03-20T06:46:21.026000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20180320T064621_R020_T40RDN_20201013T113230"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 694026
+   },
+   {
+    "tag": "2019-01-29_R020_2B",
+    "datetime": "2019-01-29T06:51:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20190129T065129_R020_T40RDN_20201008T054254"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 624072
+   },
+   {
+    "tag": "2019-02-03_R020_2A",
+    "datetime": "2019-02-03T06:51:01.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20190203T065101_R020_T40RDN_20201007T133512"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 629145
+   },
+   {
+    "tag": "2019-02-08_R020_2B",
+    "datetime": "2019-02-08T06:50:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20190208T065029_R020_T40RDN_20201007T150732"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 474758
+   },
+   {
+    "tag": "2019-02-13_R020_2A",
+    "datetime": "2019-02-13T06:50:01.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20190213T065001_R020_T40RDN_20201007T162109"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 457548
+   },
+   {
+    "tag": "2019-02-23_R020_2A",
+    "datetime": "2019-02-23T06:48:51.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20190223T064851_R020_T40RDN_20201030T022514"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 697454
+   },
+   {
+    "tag": "2019-03-05_R020_2A",
+    "datetime": "2019-03-05T06:47:41.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20190305T064741_R020_T40RDN_20201030T153909"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 673241
+   },
+   {
+    "tag": "2019-03-30_R020_2B",
+    "datetime": "2019-03-30T06:46:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20190330T064629_R020_T40RDN_20201007T122813"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 683061
+   },
+   {
+    "tag": "2020-01-04_R020_2B",
+    "datetime": "2020-01-04T06:52:49.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20200104T065249_R020_T40RDN_20201002T225336"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 698364
+   },
+   {
+    "tag": "2020-02-08_R020_2A",
+    "datetime": "2020-02-08T06:50:21.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20200208T065021_R020_T40RDN_20201001T082208"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 695442
+   },
+   {
+    "tag": "2020-02-28_R020_2A",
+    "datetime": "2020-02-28T06:48:21.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20200228T064821_R020_T40RDN_20200928T220645"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 697352
+   },
+   {
+    "tag": "2021-01-28_R020_2B",
+    "datetime": "2021-01-28T06:51:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20210128T065129_R020_T40RDN_20210130T001436"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 678063
+   },
+   {
+    "tag": "2021-02-17_R020_2B",
+    "datetime": "2021-02-17T06:49:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20210217T064929_R020_T40RDN_20210219T045642"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 697903
+   },
+   {
+    "tag": "2021-02-27_R020_2B",
+    "datetime": "2021-02-27T06:48:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20210227T064829_R020_T40RDN_20210227T154256"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 669211
+   },
+   {
+    "tag": "2021-03-14_R020_2A",
+    "datetime": "2021-03-14T06:46:41.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20210314T064641_R020_T40RDN_20210314T204618"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 692913
+   },
+   {
+    "tag": "2021-03-19_R020_2B",
+    "datetime": "2021-03-19T06:46:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20210319T064629_R020_T40RDN_20210319T192203"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "02.12"
+    ],
+    "water_px_incident_grid": 572007
+   },
+   {
+    "tag": "2021-04-03_R020_2A",
+    "datetime": "2021-04-03T06:46:21.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20210403T064621_R020_T40RDN_20210613T090711"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "03.00"
+    ],
+    "water_px_incident_grid": 685660
+   },
+   {
+    "tag": "2022-01-13_R020_2B",
+    "datetime": "2022-01-13T06:52:29.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20220113T065229_R020_T40RDN_20220113T173822"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "03.00"
+    ],
+    "water_px_incident_grid": 682745
+   },
+   {
+    "tag": "2022-01-23_R020_2B",
+    "datetime": "2022-01-23T06:51:49.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20220123T065149_R020_T40RDN_20220123T233448"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "03.00"
+    ],
+    "water_px_incident_grid": 497927
+   },
+   {
+    "tag": "2022-02-07_R020_2A",
+    "datetime": "2022-02-07T06:50:31.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20220207T065031_R020_T40RDN_20220219T215142"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "04.00"
+    ],
+    "water_px_incident_grid": 664049
+   },
+   {
+    "tag": "2022-02-12_R020_2B",
+    "datetime": "2022-02-12T06:50:09.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20220212T065009_R020_T40RDN_20220222T043519"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "04.00"
+    ],
+    "water_px_incident_grid": 680715
+   },
+   {
+    "tag": "2022-02-17_R020_2A",
+    "datetime": "2022-02-17T06:49:41.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20220217T064941_R020_T40RDN_20220224T131159"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "04.00"
+    ],
+    "water_px_incident_grid": 306466
+   },
+   {
+    "tag": "2022-02-27_R020_2A",
+    "datetime": "2022-02-27T06:48:31.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20220227T064831_R020_T40RDN_20220302T181759"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "04.00"
+    ],
+    "water_px_incident_grid": 517643
+   },
+   {
+    "tag": "2023-03-04_R020_2A",
+    "datetime": "2023-03-04T06:47:51.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20230304T064751_R020_T40RDN_20240819T072511"
+    ],
+    "skipped_redundant_tiles": [
+     "S2A_MSIL2A_20230304T064751_R020_T40RDN_20230304T121437"
+    ],
+    "processing_baselines": [
+     "05.10"
+    ],
+    "water_px_incident_grid": 651177
+   },
+   {
+    "tag": "2025-01-12_R020_2A",
+    "datetime": "2025-01-12T06:52:41.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20250112T065241_R020_T40RDN_20250112T101851"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.11"
+    ],
+    "water_px_incident_grid": 695571
+   },
+   {
+    "tag": "2025-02-01_R020_2C",
+    "datetime": "2025-02-01T06:51:41.025000Z",
+    "platform": "Sentinel-2C",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2C_MSIL2A_20250201T065141_R020_T40RDN_20250201T104612"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.11"
+    ],
+    "water_px_incident_grid": 659218
+   },
+   {
+    "tag": "2025-02-26_R020_2B",
+    "datetime": "2025-02-26T06:47:39.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20250226T064739_R020_T40RDN_20250226T085342"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.11"
+    ],
+    "water_px_incident_grid": 557724
+   },
+   {
+    "tag": "2025-03-23_R020_2C",
+    "datetime": "2025-03-23T06:46:51.025000Z",
+    "platform": "Sentinel-2C",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2C_MSIL2A_20250323T064651_R020_T40RDN_20250323T123317"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.11"
+    ],
+    "water_px_incident_grid": 490792
+   },
+   {
+    "tag": "2026-01-12_R020_2B",
+    "datetime": "2026-01-12T06:51:39.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20260112T065139_R020_T40RDN_20260112T090525"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.11"
+    ],
+    "water_px_incident_grid": 680293
+   },
+   {
+    "tag": "2026-01-22_R020_2B",
+    "datetime": "2026-01-22T06:50:59.024000Z",
+    "platform": "Sentinel-2B",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2B_MSIL2A_20260122T065059_R020_T40RDN_20260122T090256"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.11"
+    ],
+    "water_px_incident_grid": 689770
+   },
+   {
+    "tag": "2026-02-11_R020_2A",
+    "datetime": "2026-02-11T07:02:01.024000Z",
+    "platform": "Sentinel-2A",
+    "relative_orbit": 20,
+    "stac_item_ids": [
+     "S2A_MSIL2A_20260211T070201_R020_T40RDN_20260211T094207"
+    ],
+    "skipped_redundant_tiles": [],
+    "processing_baselines": [
+     "05.12"
+    ],
+    "water_px_incident_grid": 662143
+   }
+  ]
+ },
+ "files": {
+  "s2l2a_20240217_fujairah_20m_dn.tif": {
+   "bytes": 3292164,
+   "sha256": "8a234a911318b7280d0b1045ea52e41fab39476c80263612a8141bc90d269975"
+  },
+  "seasonal_baseline_20m.tif": {
+   "bytes": 5146302,
+   "sha256": "95cc9701577666a9494bd336ddb136ec1a47bb5e9a3dfd99e16c45d776343e65"
+  },
+  "seasonal_baseline_transect.npz": {
+   "bytes": 242572,
+   "sha256": "c0db79ea67d0f19f048d28cc04567eaeb974d4eec8e808bb2e83c71c1d090653"
+  }
+ },
+ "reference_check": {
+  "committed_incident": {
+   "area_km2": 2.394,
+   "ndci_z": 7.322510719299316,
+   "ndci_pct": 100.0,
+   "n_seasonal": 33,
+   "ndci_value": 0.6783186197280884,
+   "mci_value": 0.006799680646508932,
+   "mci_baseline_median": 0.0007398106390610337,
+   "hue_value": 54.0457763671875,
+   "hue_baseline_median": 201.84703063964844,
+   "dist_coast_km": 8.06823
+  },
+  "full_precision_incident_grid": {
+   "n_px": 5984,
+   "area_km2": 2.3936,
+   "water_px": 611053,
+   "ndci_value": 0.678319,
+   "ndci_z": 7.322511,
+   "ndci_pct": 100.0,
+   "n_seasonal_ndci": 31,
+   "n_seasonal_mci": 33,
+   "n_seasonal_hue": 33,
+   "ndci_baseline_median": -0.003185,
+   "mci_value": 0.0068,
+   "mci_z": 1.909094,
+   "mci_baseline_median": 0.00074,
+   "hue_value": 54.045776,
+   "hue_z": -5.763251,
+   "hue_baseline_median": 201.847031,
+   "tur_value": 1.265228,
+   "tur_baseline_median": 3.528949,
+   "dist_coast_km": 8.068234
+  },
+  "from_sample_files": {
+   "n_px": 5984,
+   "area_km2": 2.3936,
+   "water_px": 295080,
+   "ndci_value": 0.678319,
+   "ndci_z": 7.32373,
+   "ndci_pct": 100.0,
+   "n_seasonal_ndci": 31,
+   "n_seasonal_mci": 33,
+   "n_seasonal_hue": 33,
+   "ndci_baseline_median": -0.003174,
+   "mci_value": 0.0068,
+   "mci_z": 1.909168,
+   "mci_baseline_median": 0.00074,
+   "hue_value": 54.044228,
+   "hue_z": -5.767281,
+   "hue_baseline_median": 201.84375,
+   "tur_value": 1.265228,
+   "tur_baseline_median": 3.53125,
+   "dist_coast_km": 8.360598
+  },
+  "event_mask_identical": true,
+  "max_abs_ndci_z_difference_water": 0.04132080078125,
+  "pct_ge95_identical_on_common_water": false,
+  "water_mask_px_differing": 3368,
+  "dn_rounding_max_abs": {
+   "B02": 0.5,
+   "B03": 0.5
+  },
+  "notes": [
+   "full_precision_incident_grid: the reader's values and the 36-acquisition climatology at full precision on the full 800 x 904 incident grid (what scripts/build_incidents.py computes)",
+   "from_sample_files: the same rule on the files in this folder (12.0 x 11.2 km window, B02/B03 rounded to integer DN, baseline layers rounded to binary steps); ndci_pct there is the exact percentile class (0 = below 95, 95 = 95 to <100, 100 = above every past value)",
+   "water_mask_px_differing: pixels whose analysable-water flag changes because B02/B03 are rounded (MNDWI near 0 at the coast and at ships; the 60 m buffer enlarges each flip)"
+  ]
+ },
+ "licence": "Copernicus Sentinel data are free and open (Copernicus Sentinel Data Terms and Conditions; Commission Delegated Regulation (EU) No 1159/2013).",
+ "attribution": "Contains modified Copernicus Sentinel data 2024 (event) and 2018-2026 (seasonal baseline), processed by ESA, accessed via Microsoft Planetary Computer."
+}

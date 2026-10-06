@@ -1,0 +1,54 @@
+# BLUEBAN 813: pinned environment for the notebook (notebooks/blueban813_poc.ipynb),
+# the pipeline scripts (scripts/) and the test suite (python -m pytest -q).
+#
+#   python -m pip install -r requirements.txt
+#
+# Python 3.11 or 3.12 (Google Colab: 3.12). Every pin below publishes wheels for
+# CPython 3.11 and 3.12 on Linux (x86_64, aarch64), Windows (x86_64) and macOS
+# (arm64, x86_64), so nothing is compiled. No editable install is needed: the
+# notebook, the scripts and pytest put the repository root on sys.path.
+# pyproject.toml keeps the open >= ranges for `pip install -e ".[dev,inland]"`.
+
+# numerics and learning
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.9.1
+pandas==3.0.6                 # [inland] extra; also used for tables in the notebook
+
+# geospatial (rasterio wheels bundle GDAL and PROJ)
+rasterio==1.4.4
+pyproj==3.7.2
+shapely==2.1.2
+affine==3.0.1
+
+# Earth-observation access: Microsoft Planetary Computer STAC, anonymous
+pystac==1.15.2
+pystac-client==0.9.0
+planetary-computer==1.0.0
+requests==2.34.2
+fsspec==2026.9.0
+h5py==3.16.0                  # Tanager-1 HDF5 reader (pipeline/satellite813.py)
+h5netcdf==1.8.1               # Sentinel-3 OLCI NetCDF (pipeline/sentinel3.py)
+xarray==2026.9.0
+
+# configuration, figures, images
+PyYAML==6.0.3
+matplotlib==3.11.2
+pillow==12.3.0
+
+# API (services/api) and its contract tests
+fastapi==0.142.2
+uvicorn==0.54.0
+pydantic==2.13.5
+httpx==0.28.1
+
+# tests
+pytest==9.1.1
+
+# notebook execution (jupyter lab / nbconvert --execute)
+jupyterlab==4.6.4
+ipykernel==7.4.0
+nbclient==0.11.0
+nbconvert==7.17.1
+nbformat==5.11.1
+argon2-cffi-bindings==25.1.0  # jupyterlab dependency; 26.x has no Intel-macOS wheel

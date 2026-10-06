@@ -6,7 +6,7 @@
  * trajectory estimate, not a validated ocean forecast.
  */
 import React, { useMemo, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import Canvas from "@/components/three/ZoomCanvas";
 import { Line, OrbitControls } from "@react-three/drei";
 import Label from "@/components/three/Label";
 import * as THREE from "three";
@@ -55,7 +55,7 @@ export default function TimeCorridor({ steps, height = 260, wind }: { steps: Dri
         <Corridor steps={ok} sel={sel} />
         <OrbitControls enablePan={false} minDistance={2.5} maxDistance={7} />
       </Canvas>
-      {wind && <div className="panel-flat absolute right-2 top-9 px-2 py-1 text-[10.5px] text-muted">Wind {wind.speed_kmh?.toFixed(0)} km/h from {wind.from}</div>}
+      {wind && <div className="panel-flat absolute right-2 top-9 max-w-[calc(100%-1rem)] truncate whitespace-nowrap px-2 py-1 text-[10.5px] text-muted" title={`Wind ${wind.speed_kmh?.toFixed(0)} km/h from ${wind.from}`}>Wind {wind.speed_kmh?.toFixed(0)} km/h from {wind.from}</div>}
       <div className="absolute left-2 top-2 rounded bg-void/80 px-2 py-1 text-[10px] font-bold tracking-wider text-caution" title="Moved by wind only (about 3 % of wind speed) plus spreading. No tides or currents. Not a validated ocean forecast.">WIND-ONLY SCENARIO</div>
       <div className="absolute inset-x-2 bottom-2 flex items-center gap-2">
         {ok.map((s, i) => (

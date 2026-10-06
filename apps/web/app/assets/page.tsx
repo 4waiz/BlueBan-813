@@ -81,7 +81,7 @@ function Assets() {
         <div className="relative"><Search size={13} className="absolute left-2 top-2 text-dim" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search assets" className="w-full rounded-md border border-line bg-deep py-1.5 pl-7 pr-2 text-[12px]" /></div>
         <div className="min-h-0 flex-1 overflow-y-auto rounded-md border border-edge">
           <table className="w-full text-[11.5px]">
-            <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">Asset</th><th className="px-2 text-left">Type</th><th className="px-2 text-right">{inc ? "From incident" : "Location"}</th></tr></thead>
+            <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">Asset</th><th className="px-2 text-left">Type</th><th className="whitespace-nowrap px-2 text-right">{inc ? "From incident" : "Location"}</th></tr></thead>
             <tbody>{rows.map(({ a, d, dir }) => (
               <tr key={a.id} className="border-b border-edge/50" title={a.notes || a.source}>
                 <td className="px-2 py-1"><div className="font-semibold text-ink">{a.name}</div><div className="text-[10.5px] text-dim">{a.source}</div></td>

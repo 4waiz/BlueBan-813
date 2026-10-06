@@ -15,6 +15,16 @@ Team Kanban · Arab Youth Space Hackathon 2026, 813 Challenge
 
 ## 1. The problem, as a buyer experiences it
 
+**Why it matters in the UAE.** Most of the country's drinking water comes from
+about 70 major desalination plants on its two coasts
+([UAE Government portal, Water](https://u.ae/en/information-and-services/environment-and-energy/water-and-energy/water-)).
+In the 2008–09 *Cochlodinium polykrikoides* red tide in the Gulf of Oman and
+the Gulf, seawater reverse-osmosis plants shut for up to four months while
+pre-treatment struggled with the biomass; at Fujairah the reverse-osmosis plant
+was shut while the thermal plant kept running
+([IOC-UNESCO 2017, *Harmful Algal Blooms and Desalination*, Manuals and Guides 78](https://repository.oceanbestpractices.org/handle/11329/759)).
+A bloom is therefore a potable-supply risk here, not only an amenity problem.
+
 A coastal water authority is responsible for bathing-water compliance, for the
 source water feeding intakes, and for answering a minister within hours when a
 discolouration appears on a public beach.
@@ -59,16 +69,19 @@ features of their own coastline.
 
 ### Primary customer: national or regional water / environmental authority
 
-**Algeria (the demonstration AOI).** The Agence Nationale des Ressources
-Hydrauliques and the Commissariat National du Littoral hold coastal
-water-quality and bathing-water mandates. Algeria has also commissioned large
-seawater desalination capacity, which makes source-water screening a supply
-issue and not only an environmental one.
+**UAE and the wider Gulf (the demonstration case).** Environment agencies at
+emirate and federal level hold coastal monitoring mandates over water bodies
+that are hypersaline, shallow and desalination-dependent, where a harmful bloom
+is a potable-supply risk rather than an amenity problem. The ten monitored UAE
+areas cover both coasts, and the hero incident sits ~11–22 km from the Port of
+Fujairah, the Kalba power plant and the Fujairah F2 power and desalination
+plant.
 
-**UAE and the wider Gulf.** Environment agencies at emirate and federal level
-hold coastal monitoring mandates over water bodies that are hypersaline,
-shallow and desalination-dependent, where a harmful bloom is a potable-supply
-risk rather than an amenity problem.
+**Algeria and the Maghreb (portability).** The Agence Nationale des Ressources
+Hydrauliques and the Commissariat National du Littoral hold coastal
+water-quality and bathing-water mandates, and Algeria has commissioned large
+seawater desalination capacity. The Gulf of Annaba is BLUEBAN's negative
+control: the same method, no re-tuning, correctly stood down.
 
 ### The budget line it comes from
 
@@ -206,7 +219,16 @@ real product with different units fails loudly rather than silently.
 
 ---
 
-## 10. The first pilot we would ask for
+## 10. Go to market during incubation
+
+| Step | What | Why it matters |
+|---|---|---|
+| Deploy on GIQ | Package the screening pipeline and the operator interface for Space42's GIQ platform, next to the data it already hosts | The incubation stage is judged on a working solution deployed on GIQ or an equivalent; operators get it where their data already is |
+| Real 813 data | Replace the simulator with the real 813 reader (`pipeline/satellite813_real.py`, contract already written and tested) as soon as products are available | Turns the measured 813 benefit from simulated into observed, and gives the mission a first operational water product |
+| One paid pilot | One coast, one operator, one season (§11) | The only way to measure what a model cannot self-report: agreement with the operator's own laboratory record |
+| Local calibration | Feed the pilot's lab results through the matchup engine and calibration gate | Unlocks calibrated concentrations with uncertainty, which is what a regulator can report |
+
+## 11. The first pilot we would ask for
 
 One AOI, one operator, one season.
 

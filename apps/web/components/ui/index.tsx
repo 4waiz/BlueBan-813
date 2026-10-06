@@ -23,12 +23,14 @@ export function Panel({ title, right, children, className = "", bodyClass = "", 
   return (
     <section className={`panel flex min-h-0 flex-col ${className}`}>
       {(title || right) && (
-        <header className="flex items-center justify-between gap-3 px-4 pb-2 pt-3">
-          <div className="min-w-0">
-            {kicker && <div className="hud-kicker">{kicker}</div>}
+        // When the title and the controls do not fit on one line, the controls
+        // move to their own line instead of being squeezed until they wrap.
+        <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-4 pb-2 pt-3">
+          <div className="min-w-0 max-w-full">
+            {kicker && <div className="hud-kicker truncate">{kicker}</div>}
             {title && <h2 className="panel-title truncate">{title}</h2>}
           </div>
-          {right}
+          {right && <div className="flex min-w-0 max-w-full flex-wrap items-center justify-end">{right}</div>}
         </header>
       )}
       <div className={`min-h-0 flex-1 ${bodyClass}`}>{children}</div>
@@ -40,6 +42,11 @@ export function Panel({ title, right, children, className = "", bodyClass = "", 
 export const STATE_TEXT: Record<string, string> = {
   DETECTED: "New", UNDER_REVIEW: "Under review", FIELD_VALIDATION_REQUIRED: "Needs field check", FALSE_POSITIVE: "False alarm",
   PRODUCTION: "Live", CANDIDATE: "New model", LAB_PENDING: "At the lab", RESULT_RECEIVED: "Result in", INSUFFICIENT_EVIDENCE: "Inconclusive",
+};
+
+/** Short plain names for sampling-plan roles (map labels); the stored codes are unchanged. */
+export const SAMPLE_ROLE_TEXT: Record<string, string> = {
+  CORE: "core", EDGE: "edge", BACKGROUND: "clean-water control", UNCERTAINTY: "check point", ASSET_BOUNDARY: "near asset",
 };
 
 /** Sentence-case plain words for any workflow code (for selects, popups and toasts). */
@@ -58,6 +65,15 @@ export function Chip({ label, color, dot = true, className = "" }: { label: stri
   );
 }
 
+/** Shown while the workspace loads, so an empty state never flashes before the data arrives. */
+export function Loading({ label = "Loading…", className = "" }: { label?: string; className?: string }) {
+  return (
+    <div role="status" aria-live="polite" className={`flex items-center gap-2 text-[12px] text-muted ${className}`}>
+      <span className="spin h-3.5 w-3.5 shrink-0 rounded-full border-2 border-beam2/25 border-t-beam2" />{label}
+    </div>
+  );
+}
+
 export function Dot({ color = "#23D484", pulse = false, size = 8 }: { color?: string; pulse?: boolean; size?: number }) {
   return (
     <span className="relative inline-flex" style={{ width: size, height: size }}>
@@ -72,11 +88,12 @@ export function Meter({ value, color = "#2F7BFF", max = 1 }: { value: number | n
   return <div className="meter"><i style={{ width: `${v * 100}%`, background: `linear-gradient(90deg, ${color}99, ${color})` }} /></div>;
 }
 
-export function Tabs<T extends string>({ tabs, value, onChange, className = "" }: { tabs: { key: T; label: string }[]; value: T; onChange: (t: T) => void; className?: string }) {
+/** `fit` shares the row equally between the tabs, for narrow panels where a scrolling tab row would hide tabs. */
+export function Tabs<T extends string>({ tabs, value, onChange, className = "", fit = false }: { tabs: { key: T; label: string }[]; value: T; onChange: (t: T) => void; className?: string; fit?: boolean }) {
   return (
-    <div className={`flex gap-1 overflow-x-auto border-b border-edge ${className}`}>
+    <div role="tablist" className={`flex ${fit ? "gap-0" : "gap-1"} overflow-x-auto border-b border-edge ${className}`}>
       {tabs.map((t) => (
-        <button key={t.key} className="tab" data-active={t.key === value} onClick={() => onChange(t.key)}>{t.label}</button>
+        <button key={t.key} role="tab" aria-selected={t.key === value} className={`tab${fit ? " tab-fit" : ""}`} data-active={t.key === value} onClick={() => onChange(t.key)} title={t.label}>{t.label}</button>
       ))}
     </div>
   );

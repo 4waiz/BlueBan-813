@@ -1,59 +1,81 @@
 # Judging Matrix
 
-**BLUEBAN 813** · Team Kanban · updated 30 September 2026 (UAE revamp)
+**BLUEBAN 813** · Team Kanban · theme: Water Quality & Inland/Coastal Water Intelligence · updated 7 October 2026
 
-The official criteria are the five in the challenge README: **Impact, Creativity,
-Validity, Relevance, Presentation**. Each row maps a criterion to what addresses
-it, the evidence a judge can check, the number, and where it appears. Every
-figure is produced by the pipeline (`outputs/`) and shown by the app; none is
-typed into the interface.
+The Proof-of-Concept stage is judged on seven published criteria, with bonus
+points for effective use of hyperspectral data (Satellite 813 where available),
+and the technical score breaks ties. Each row below maps a criterion to what
+addresses it, the evidence a judge can check, the number, and where to see it.
+Every figure is produced by the pipeline (`outputs/`) and shown by the app;
+none is typed into the interface. Figures between `num` markers are rewritten
+by `scripts/build_validation.py`.
 
 ---
 
-## 1. Impact
+## 1. Problem definition
 
 | | |
 |---|---|
-| **What** | Incidents that reach a decision: verification queue, field plan, alerts, exposure to desalination and power plants, and a model that improves from every decision |
-| **Evidence** | BB-AE-2024-001 off Fujairah: 2.39 km² of discoloured water, ~11–22 km from the Port of Fujairah, Kalba power plant and Fujairah F2 desalination plant; five-point sampling plan with a mandatory background control |
+| **What** | Most of the UAE's drinking water comes from about 70 major desalination plants on its two coasts ([UAE Government portal](https://u.ae/en/information-and-services/environment-and-energy/water-and-energy/water-)). In the 2008–09 *Cochlodinium* red tide, seawater reverse-osmosis plants shut for up to four months, Fujairah's among them ([IOC-UNESCO 2017, Manuals and Guides 78](https://repository.oceanbestpractices.org/handle/11329/759)). Today the warning comes from intake filters, a boat sample on a fixed calendar, or the public |
+| **The gap** | Free Sentinel-2/3 images exist every few days, but nobody turns them into a decision: *is this unusual for this spot and season, and where should the boat go?* |
+| **Evidence** | `docs/BUSINESS_CASE.md` §1; README "The problem" |
+| **Demo** | Judge Mode step 1 ("Why this matters") |
+
+## 2. Technical robustness
+
+| | |
+|---|---|
+| **What** | Every pixel compared with its **own** same-season history (robust z and seasonal percentile), baseline-aware Sentinel-2 L2A reading, glint-aware water mask, same-morning Sentinel-3 OLCI cross-check, frozen grouped validation split with bootstrap intervals, negative controls, parity-tested trainer (Python and browser agree to 1e-7), CI |
+| **Scale** | 5,080 Sentinel-2 datatakes screened over 10 UAE areas (2017–2026). No threshold is absolute: a new area needs its baseline built, not a model re-tuned |
 | **Number** | <!--num:triage-->On the frozen validation set (100 labels) the learned triage candidate reaches AUPRC 0.94 vs 0.66 for the rule it would replace; the grouped bootstrap 95 % interval on the difference is [0.04, 0.48], excluding zero, and it beats the rule on 9 of 9 held-out AOIs (promotion still gated)<!--/num:triage--> |
-| **Demo** | Judge Mode steps 3, 7–10; Incident Control; Field Ops |
+| **Reproducible** | `notebooks/blueban813_poc.ipynb` runs offline from `data/sample_input/` and reproduces the Fujairah detection and the learning gate; `python -m pytest -q` |
+| **Demo** | Validation screen A–F; Judge Mode steps 5, 10–11 |
 
-The UAE draws most of its drinking water from desalination on two very different
-seas; a false alarm costs a boat dispatch and a missed bloom can shut an intake.
-The loop targets exactly that trade-off.
-
-## 2. Creativity
+## 3. Use of hyperspectral and Earth-observation data (+ hyperspectral bonus)
 
 | | |
 |---|---|
-| **What** | (i) Every pixel judged against its **own** same-season history, not its neighbours. (ii) An independent satellite as a same-morning cross-check and weak teacher. (iii) A governed learning loop where production is untouched until a candidate passes a frozen-validation gate and a named human approves. (iv) A measured, not assumed, answer to "what does 813 add?" |
-| **Evidence** | `pipeline/detect.py`, `scripts/build_labels.py`, `pipeline/learning.py` + `apps/web/lib/learning.ts` (parity 1e-7), the 813 ablation |
-| **Demo** | Judge Mode steps 4, 5, 9, 10; Satellite View (real orbits, real sun, UAE passes) |
+| **Multi-sensor** | Sentinel-2 L2A (detection, 20 m), Sentinel-3 OLCI (cross-sensor reference, never ground truth), Landsat 8/9 (inland baseline, thermal context), Sentinel-1 (optional dark-slick screen), ERA5 wind (drift scenario) |
+| **Hyperspectral** | Satellite 813's published band set (~205 bands, 400–1700 nm, 20 m) simulated from **real** hyperspectral pixels: Planet Tanager-1 (Gulf of Annaba) and EnMAP L2A (Shawka Dam, two dates; 196 of 205 simulated 813 bands have real EnMAP support) |
+| **Measured, not assumed** | On the same real pixels, at the operational decision boundary, the simulated 813 band set cut false alarms from 159 to 84 (−47 %) at the same recall; **no gain** on gross plumes; concentration vs OLCI **not demonstrated**. All 813 values are labelled SIMULATED: no 813 product was accessible to teams |
+| **Evidence** | `experiments/detectability_ablation.py`, `outputs/validation/detectability_lift*.json`, `docs/inland/SATELLITE_813_DECISION.md` |
+| **Demo** | Spectral Lab ("What did 813 add?"), Inland screen (EnMAP → 813 band ladder), Judge Mode step 6 |
 
-## 3. Validity
+## 4. Product and presentation
 
 | | |
 |---|---|
-| **What** | Honest data policy (no concentration from an uncalibrated index; OLCI is a reference, not truth; 813 is simulated), grouped/spatial validation, negative controls |
-| **Evidence** | Validation screen A–F; `docs/VALIDATION_REPORT.md` (generated); `docs/LIMITATIONS.md`; <!--num:xsensor-->436 OLCI references; Spearman ρ between the S2 change and the OLCI contrast 0.46 for sediment-like candidates (n = 353) and -0.19 for bloom-like ones (n = 83)<!--/num:xsensor-->, reported as the weakness it is |
+| **What** | A working decision-support web app (one-screen dashboards, works on phones), an HTTP API (FastAPI, `/api` screen documents every route), exportable incident reports and evidence packages, a research paper, and a reproducible notebook |
+| **Deployable** | Static build served from Cloudflare Pages at near-zero cost; the same app runs against the FastAPI + SQLite/PostgreSQL backend for operations |
+| **Evidence** | Live at BlueBan813.kanbanstudios.ae (blueban813.pages.dev); paper at 4waiz.github.io/BlueBan-813 |
+| **Demo** | One-click Judge Mode (13 steps, about 3 minutes, real review / retrain / promote actions); full-screen 3D Satellite View with real orbits |
+
+## 5. Innovation
+
+| | |
+|---|---|
+| **What** | (i) Judged against the pixel's **own** history, so a permanently turbid harbour stops raising alarms. (ii) An independent satellite as a same-morning cross-check and weak teacher. (iii) A governed learning loop: production is untouched until a candidate passes a frozen-validation gate **and** a named person approves; one-click rollback; hash-chained audit log. (iv) A measured answer to "what does 813 add?" before 813 data exists |
+| **Evidence** | `pipeline/detect.py`, `scripts/build_labels.py`, `pipeline/learning.py` + `apps/web/lib/learning.ts` |
+| **Demo** | Judge Mode steps 5, 9–11; Learn screen |
+
+## 6. Impact and strategic alignment
+
+| | |
+|---|---|
+| **What** | Protects potable-water intakes and coastal users on both UAE coasts; directs scarce sampling to where it resolves something; leaves an auditable record a regulator can rely on |
+| **Alignment** | Challenge theme 03 (water security and marine environments: harmful blooms, desalination protection); SDG 6 (targets 6.3, 6.5) and SDG 14 (target 14.1); the same method ports from the Gulf to the Maghreb (Annaba is the negative control) |
+| **Validity** | Honest data policy: no concentration from an uncalibrated index, OLCI is a reference, 813 is simulated; <!--num:xsensor-->436 OLCI references; Spearman ρ between the S2 change and the OLCI contrast 0.46 for sediment-like candidates (n = 353) and -0.19 for bloom-like ones (n = 83)<!--/num:xsensor-->, reported as the weakness it is |
 | **Negative controls** | Annaba (RX 99.7th percentile but 6.6th seasonal percentile → stood down) and BB-AE-2023-001 (NDCI spike over unchanged blue water; OLCI ×1.1 → rejectable) |
-| **What we do not claim** | "HAB confirmed", species, toxins, concentrations, oil from SAR darkness, pollution sources from trajectories |
+| **Demo** | Judge Mode step 12 ("Who uses it"); Validation → F |
 
-## 4. Relevance
-
-| | |
-|---|---|
-| **What** | Built for the 813 Challenge's water-quality track and the UAE coast; Satellite 813's aquatic band set drives the ablation and the spectral lab |
-| **Evidence** | 10 UAE AOIs on both coasts; UAE AOI tournament generated from data (`docs/UAE_AOI_TOURNAMENT.md`); 813 simulated from real Tanager hyperspectral pixels, labelled SIMULATED everywhere; at the decision boundary the 813 band set cut false alarms 159 → 84 (−47 %) at matched recall |
-| **Demo** | Spectral Lab ("What did 813 add?"), Judge Mode step 5 |
-
-## 5. Presentation
+## 7. Commercial viability
 
 | | |
 |---|---|
-| **What** | One-click Judge Mode (11 steps, 2–3 min, real actions), mission-control UI, full-screen 3D Satellite View, provenance on every result ("WHY AM I SEEING THIS?") |
-| **Evidence** | Live at BlueBan813.kanbanstudios.ae (blueban813.pages.dev); research paper at 4waiz.github.io/BlueBan-813 |
+| **Who pays** | Desalination and power operators (intake early warning), environment regulators and municipalities (targeted sampling, bathing-water compliance), ports, aquaculture and beach operators |
+| **How** | Per-area monitoring subscription; per-asset alerting; per-event hyperspectral (813) analysis; reports and API. Inputs are open data, so marginal cost per area is compute and storage |
+| **Next** | One pilot: one coast, one operator, one season, compared with the operator's own lab record. Incubation: deploy on the GIQ platform and swap the simulator for real 813 data |
+| **Evidence** | `docs/BUSINESS_CASE.md` (no revenue is claimed: no signed pilot yet) |
 
 ---
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useId, useMemo, useRef, useState } from "react";
 import { useElementSize } from "@/lib/useSize";
 
 export interface Spectrum {
@@ -15,9 +15,11 @@ export default function SpectrumPlot(props: {
 }) {
   const box = useElementSize<HTMLDivElement>();
   if (props.fill) {
+    // The chart takes exactly the box it is given (never a minimum), so it can
+    // not spill over a caption or the panel below it on short screens.
     return (
-      <div ref={box.ref} className="h-full w-full min-h-[120px]">
-        {box.width > 0 && box.height > 0 && <SpectrumPlotInner {...props} W={Math.max(240, box.width)} height={Math.max(110, box.height)} />}
+      <div ref={box.ref} className="h-full w-full overflow-hidden">
+        {box.width >= 120 && box.height >= 64 && <SpectrumPlotInner {...props} W={box.width} height={box.height} />}
       </div>
     );
   }
@@ -29,9 +31,13 @@ function SpectrumPlotInner({ spec, height = 240, showBands = true, showDiff = fa
 }) {
   const ref = useRef<SVGSVGElement>(null);
   const [hover, setHover] = useState<number | null>(null);
-  const W = Wp ?? 560, H = height, L = 44, R = 12, T = 12, B = 26;
+  // Small boxes drop the axis title and the band names instead of overlapping them.
+  const W = Wp ?? 560, H = height, roomy = H >= 150, L = 44, R = 12, T = 18, B = roomy ? 30 : 18;
+  const clipId = `spc-${useId().replace(/:/g, "")}`;
   const idx = useMemo(() => spec.wavelengths_nm.map((w, i) => i).filter((i) => spec.wavelengths_nm[i] >= range[0] && spec.wavelengths_nm[i] <= range[1]), [spec, range]);
-  const vals = idx.flatMap((i) => [spec.event[i], spec.background[i], spec.background_p95?.[i]]).filter((v): v is number => v != null && Number.isFinite(v));
+  // The y-range covers everything drawn (both envelope edges too), and the data is
+  // clipped to the plot frame, so nothing can spill onto the axis labels.
+  const vals = idx.flatMap((i) => [spec.event[i], spec.background[i], spec.background_p95?.[i], spec.background_p05?.[i]]).filter((v): v is number => v != null && Number.isFinite(v));
   const ymax = Math.max(0.01, ...vals) * 1.08, ymin = Math.min(0, ...vals);
   const x = (w: number) => L + ((w - range[0]) / (range[1] - range[0])) * (W - L - R);
   const y = (v: number) => T + (1 - (v - ymin) / (ymax - ymin)) * (H - T - B);
@@ -57,30 +63,39 @@ function SpectrumPlotInner({ spec, height = 240, showBands = true, showDiff = fa
   const hw = h != null ? spec.wavelengths_nm[h] : null;
   const band = hw != null ? S2_BANDS.find(([, c, fw]) => Math.abs(hw - c) <= fw / 2) : null;
   const diag = hw != null ? DIAGNOSTIC.find(([c]) => Math.abs(hw - c) <= 6) : null;
-  const ticks = [400, 500, 600, 700, 800, 900].filter((t) => t >= range[0] && t <= range[1]);
+  const allTicks = [400, 500, 600, 700, 800, 900].filter((t) => t >= range[0] && t <= range[1]);
+  // Narrow charts label every other tick so the numbers never touch.
+  const tickStep = (W - L - R) / Math.max(1, allTicks.length - 1) < 48 ? 2 : 1;
+  const ticks = allTicks.filter((_, i) => i % tickStep === 0);
   return (
     <div className="relative">
-      <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full select-none" onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
+      <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="block w-full select-none" onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
+        <text x={W - R} y={12} textAnchor="end" fontSize={10}>
+          <tspan fill="#FF4D5E">{W >= 280 ? "● Event pixels" : "● Event"}</tspan><tspan dx={10} fill="#27C3F3">{W >= 280 ? "● Normal water" : "● Normal"}</tspan>
+        </text>
         <rect x={L} y={T} width={W - L - R} height={H - T - B} fill="#040915" stroke="#16284D" />
         {showBands && S2_BANDS.filter(([, c]) => c >= range[0] && c <= range[1]).map(([n, c, fw]) => (
           <g key={n}><rect x={x(c - fw / 2)} y={T} width={Math.max(1, x(c + fw / 2) - x(c - fw / 2))} height={H - T - B} fill="#2F7BFF" opacity={0.07} />
-            <text x={x(c)} y={T + 10} textAnchor="middle" fontSize={8.5} fill="#5D7299">{n}</text></g>
+            {H >= 120 && <text x={x(c)} y={T + 10} textAnchor="middle" fontSize={8.5} fill="#7088B3">{n}</text>}</g>
         ))}
         {DIAGNOSTIC.filter(([c]) => c >= range[0] && c <= range[1]).map(([c, n]) => (
           <line key={n} x1={x(c)} x2={x(c)} y1={T} y2={H - B} stroke={highlight && Math.abs(highlight - c) < 4 ? "#FFC23D" : "#FFC23D55"} strokeDasharray="2 3" />
         ))}
-        {env && <path d={env} fill="#27C3F3" opacity={0.12} />}
-        <path d={path(spec.background)} fill="none" stroke="#27C3F3" strokeWidth={1.6} />
-        <path d={path(spec.event)} fill="none" stroke="#FF4D5E" strokeWidth={1.9} />
-        {showDiff && <path d={path(spec.event.map((v, i) => (v != null && spec.background[i] != null ? v - spec.background[i]! + ymin : null)))} fill="none" stroke="#FFC23D" strokeWidth={1} strokeDasharray="3 2" />}
-        {ticks.map((t) => <text key={t} x={x(t)} y={H - 8} textAnchor="middle" fontSize={9.5} fill="#93A6CB">{t}</text>)}
+        <clipPath id={clipId}><rect x={L} y={T} width={W - L - R} height={H - T - B} /></clipPath>
+        <g clipPath={`url(#${clipId})`}>
+          {env && <path d={env} fill="#27C3F3" opacity={0.12} />}
+          <path d={path(spec.background)} fill="none" stroke="#27C3F3" strokeWidth={1.6} />
+          <path d={path(spec.event)} fill="none" stroke="#FF4D5E" strokeWidth={1.9} />
+          {showDiff && <path d={path(spec.event.map((v, i) => (v != null && spec.background[i] != null ? v - spec.background[i]! + ymin : null)))} fill="none" stroke="#FFC23D" strokeWidth={1} strokeDasharray="3 2" />}
+        </g>
+        {ticks.map((t, k) => {
+          const unit = !roomy && k === ticks.length - 1;
+          return <text key={t} x={unit ? x(t) + 4 : x(t)} y={H - B + 12} textAnchor={unit ? "end" : "middle"} fontSize={9.5} fill="#93A6CB">{unit ? `${t} nm` : t}</text>;
+        })}
         {[0, 0.5, 1].map((f) => { const v = ymin + f * (ymax - ymin); return <text key={f} x={L - 5} y={y(v) + 3} textAnchor="end" fontSize={9} fill="#93A6CB">{v.toFixed(3)}</text>; })}
-        <text x={W / 2} y={H - 0.5} textAnchor="middle" fontSize={9} fill="#5D7299">Wavelength (nm)</text>
+        {roomy && <text x={W / 2} y={H - 3} textAnchor="middle" fontSize={9} fill="#7088B3">Wavelength (nm)</text>}
         {h != null && hw != null && <line x1={x(hw)} x2={x(hw)} y1={T} y2={H - B} stroke="#EAF1FF" strokeOpacity={0.5} />}
       </svg>
-      <div className="pointer-events-none absolute right-2 top-2 flex gap-3 text-[10.5px]">
-        <span className="text-critical">● Event pixels</span><span className="text-cyan">● Normal water</span>
-      </div>
       {h != null && hw != null && (
         <div className="panel pointer-events-none absolute left-14 top-6 px-3 py-2 text-[11px]">
           <div className="hud-value font-bold text-caution">{hw.toFixed(1)} nm {band ? `· Sentinel-2 ${band[0]}` : "· no Sentinel-2 band"}</div>

@@ -1,0 +1,320 @@
+{
+ "incident_id": "BB-AE-2024-001",
+ "status": "UNDER_REVIEW",
+ "hypothesis": "BLOOM_LIKE: bloom-like optical anomaly",
+ "observation": {
+  "utc": "2024-02-17T06:49:41.024000Z",
+  "platform": "Sentinel-2A",
+  "stac_item": "S2A_MSIL2A_20240217T064941_R020_T40RDN_20240217T105525",
+  "processing_baseline": "05.10",
+  "boa_add_offset": -1000.0
+ },
+ "grid": {
+  "crs": "EPSG:32640",
+  "pixel_m": 20.0,
+  "shape": [
+   600,
+   560
+  ]
+ },
+ "detect": {
+  "n_px": 5984,
+  "area_km2": 2.394,
+  "centroid_lonlat": [
+   56.450177,
+   25.115711
+  ],
+  "n_components": 17,
+  "ndci_z": 7.32373,
+  "share_above_all_past": 0.747159,
+  "share_ge95": 1.0,
+  "ndci_pct_median": 100.0,
+  "n_seasonal_ndci": 31,
+  "n_seasonal_hue": 33,
+  "ndci_value": 0.678319,
+  "ndci_usual": -0.003174,
+  "mci_value": 0.0068,
+  "mci_usual": 0.00074,
+  "mci_z": 1.909168,
+  "hue_value": 54.044228,
+  "hue_usual": 201.84375,
+  "hue_z": -5.767281,
+  "tur_value": 1.265228,
+  "tur_usual": 3.53125,
+  "dist_coast_km": 8.360598,
+  "rule": {
+   "z_min": 3.0,
+   "pct_min": 95.0,
+   "secondary": "MCI z >= 1",
+   "min_piece_km2": 0.125,
+   "detect_min_region_km2": 0.5,
+   "window_days": 45,
+   "floors": {
+    "NDCI": 0.02,
+    "MCI": 0.002,
+    "FAI": 0.002,
+    "TUR_NECHAD2016": 1.0,
+    "HUE_ANGLE": 5.0,
+    "CDOM_RATIO": 0.1
+   }
+  },
+  "baseline_acquisitions": 36,
+  "transect_check": [
+   {
+    "feature": "NDCI",
+    "pixels on transect": 341,
+    "max |z difference|": 0.013302,
+    "same z >= threshold decision": true
+   },
+   {
+    "feature": "MCI",
+    "pixels on transect": 479,
+    "max |z difference|": 0.000103,
+    "same z >= threshold decision": true
+   },
+   {
+    "feature": "HUE_ANGLE",
+    "pixels on transect": 479,
+    "max |z difference|": 0.067091
+   }
+  ],
+  "polygon_iou_vs_committed": 1.0
+ },
+ "diagnose": {
+  "spectrum_nm": [
+   443,
+   492,
+   560,
+   665,
+   704,
+   740,
+   865
+  ],
+  "event": [
+   0.0004,
+   0.0018,
+   0.0149,
+   0.003396,
+   0.0161,
+   0.0145,
+   0.0113
+  ],
+  "background": [
+   0.0044,
+   0.0045,
+   0.0052,
+   -0.000384,
+   0.0003,
+   -0.0014,
+   -0.0014
+  ],
+  "background_p05": [
+   0.0016,
+   0.0015,
+   0.0025,
+   -0.001648,
+   -0.0011,
+   -0.0031,
+   -0.0031
+  ],
+  "background_p95": [
+   0.0078,
+   0.0102,
+   0.0115,
+   0.001859,
+   0.0021,
+   0.0006,
+   0.0005
+  ],
+  "olci_crosscheck_loaded": {
+   "available": true,
+   "item_id": "S3B_OL_2_WFR_20240217T061813_20240217T062113_0179_089_362_2520",
+   "datetime": "2024-02-17T06:19:43Z",
+   "dt_minutes": -30.0,
+   "variable": "CHL_NN",
+   "units": "mg m^-3",
+   "n_region_px": 34,
+   "n_background_px": 42086,
+   "product": "ESA OLCI WFR L2 Case-2 neural net (a model product, not in situ)",
+   "agrees": true,
+   "region_median": 13.125,
+   "background_median": 3.191,
+   "ratio": 4.113,
+   "note": "Chlorophyll estimate 13.12 vs 3.19 mg/m\u00b3 around it (x4.11), 30 min before Sentinel-2. A separate satellite's estimate, not a water sample."
+  }
+ },
+ "satellite_813_simulated": {
+  "tanager_bands": 100,
+  "s2_bands_in_range": 9,
+  "s813_bands_in_range": 79,
+  "false_alarms_s2": 159,
+  "false_alarms_813_205": 84,
+  "change": -0.471698,
+  "chl_nn_r2_s2": 0.078202,
+  "chl_nn_r2_813": 0.009747,
+  "source": "outputs/validation (loaded)"
+ },
+ "learn": {
+  "n_labels": 436,
+  "n_train": 336,
+  "n_validation": 100,
+  "validation_hash": "c30fc552449c0de0",
+  "production": {
+   "auroc": 0.353067,
+   "auprc": 0.657884,
+   "f1": 0.857143,
+   "precision": 0.75,
+   "recall": 1.0,
+   "brier": 0.221769,
+   "log_loss": 0.682505,
+   "ece": 0.231553,
+   "n": 100,
+   "positives": 75,
+   "confusion": {
+    "tp": 75,
+    "fp": 25,
+    "fn": 0,
+    "tn": 0
+   }
+  },
+  "candidate": {
+   "auroc": 0.792533,
+   "auprc": 0.935932,
+   "f1": 0.786667,
+   "precision": 0.786667,
+   "recall": 0.786667,
+   "brier": 0.155617,
+   "log_loss": 0.43001,
+   "ece": 0.161613,
+   "n": 100,
+   "positives": 75,
+   "confusion": {
+    "tp": 59,
+    "fp": 16,
+    "fn": 16,
+    "tn": 9
+   }
+  },
+  "auprc_diff_ci95": [
+   0.039302,
+   0.476031
+  ],
+  "loao_wins": 9,
+  "loao_scored": 9,
+  "gate_passed": true,
+  "decision": "CANDIDATE passed the automatic gate - awaiting named human approval",
+  "gate_checks": [
+   {
+    "name": "model_test_suite",
+    "passed": true
+   },
+   {
+    "name": "validation_dataset_unchanged",
+    "passed": true
+   },
+   {
+    "name": "validation_has_both_classes",
+    "passed": true
+   },
+   {
+    "name": "primary_metric_not_worse",
+    "passed": true
+   },
+   {
+    "name": "calibration_acceptable",
+    "passed": true
+   },
+   {
+    "name": "no_subgroup_regression",
+    "passed": true
+   }
+  ]
+ },
+ "computed_vs_published": [
+  {
+   "quantity": "Event area (km2, 20 m)",
+   "published": 2.39,
+   "notebook": 2.39,
+   "note": "README; incident JSON 2.394"
+  },
+  {
+   "quantity": "NDCI robust z, event median",
+   "published": 7.3,
+   "notebook": 7.32,
+   "note": "README"
+  },
+  {
+   "quantity": "NDCI seasonal percentile, event median",
+   "published": 100,
+   "notebook": 100.0,
+   "note": "README"
+  },
+  {
+   "quantity": "Same-season scenes per event pixel (median)",
+   "published": 33,
+   "notebook": 33,
+   "note": "README (MCI/hue count; NDCI count 31, its ratio is undefined over the clearest water on some dates)"
+  },
+  {
+   "quantity": "MCI event / usual",
+   "published": "0.0068 / 0.0007",
+   "notebook": "0.0068 / 0.0007",
+   "note": "README"
+  },
+  {
+   "quantity": "Hue angle event / usual (deg)",
+   "published": "54 / 202",
+   "notebook": "54 / 202",
+   "note": "README"
+  },
+  {
+   "quantity": "Median distance from the coast (km)",
+   "published": 8,
+   "notebook": 8.4,
+   "note": "README (8.07 on the incident's 18 x 16 km window; distance to the nearest non-water pixel)"
+  },
+  {
+   "quantity": "OLCI CHL_NN event / surroundings (mg m-3)",
+   "published": "13.1 / 3.2 (x4.1)",
+   "notebook": "13.1 / 3.2 (x4.1)",
+   "note": "README; LOADED, not recomputed"
+  },
+  {
+   "quantity": "813 sim.: false alarms S2 -> 813 at matched recall",
+   "published": "159 -> 84 (-47 %)",
+   "notebook": "159 -> 84 (-47%)",
+   "note": "README; LOADED ablation, percentage recomputed"
+  },
+  {
+   "quantity": "Candidate vs rule AUPRC (frozen validation)",
+   "published": "0.94 vs 0.66",
+   "notebook": "0.94 vs 0.66",
+   "note": "docs/JUDGING_MATRIX.md (scripts/build_validation.py)"
+  },
+  {
+   "quantity": "AUPRC difference, grouped bootstrap 95% CI",
+   "published": "[0.04, 0.48]",
+   "notebook": "[0.04, 0.48]",
+   "note": "docs/JUDGING_MATRIX.md"
+  },
+  {
+   "quantity": "Held-out AOIs where the candidate wins",
+   "published": "9 of 9",
+   "notebook": "9 of 9",
+   "note": "docs/JUDGING_MATRIX.md"
+  },
+  {
+   "quantity": "Gate decision",
+   "published": "awaiting named human approval",
+   "notebook": "CANDIDATE passed the automatic gate - awaiting named human approval",
+   "note": "README: humans promote models"
+  }
+ ],
+ "attribution": "Contains modified Copernicus Sentinel data 2024 (event) and 2018-2026 (baseline); Tanager data: Planet Labs PBC (CC-BY-4.0)",
+ "software": {
+  "python": "3.11.9",
+  "numpy": "2.4.6",
+  "scikit_learn": "1.9.1",
+  "rasterio": "1.4.4"
+ }
+}

@@ -33,8 +33,10 @@ function SeriesChart({ s, feat, det }: { s: Series; feat: string; det: DetectDat
   const box = useElementSize<HTMLDivElement>();
   const stat = feat === "HUE_ANGLE" ? "p50" : "p95";
   const pts = s.rows.filter((r) => !r.error && (r.n_water || 0) > 500 && r.f?.[feat]).map((r) => ({ t: new Date(r.date).getTime(), v: r.f![feat]![stat], d: r.date }));
-  const W = Math.max(400, box.width), H = Math.max(200, box.height), L = 50, R = 12, T = 12, B = 26;
+  // Exactly the box it is given, so the chart never spills over the legend below it.
+  const W = box.width, H = box.height, L = 50, R = 12, T = 12, B = 26;
   if (!pts.length) return <div ref={box.ref} className="grid h-full place-items-center text-muted">No usable images yet</div>;
+  if (W < 160 || H < 90) return <div ref={box.ref} className="h-full w-full" />;
   const t0 = Math.min(...pts.map((p) => p.t)), t1 = Math.max(...pts.map((p) => p.t));
   const vs = pts.map((p) => p.v).sort((a, b) => a - b);
   const lo = vs[Math.floor(vs.length * 0.01)], hi = vs[Math.floor(vs.length * 0.99)];
@@ -46,8 +48,8 @@ function SeriesChart({ s, feat, det }: { s: Series; feat: string; det: DetectDat
   const years = [...new Set(pts.map((p) => p.d.slice(0, 4)))];
   const hits = new Set((det?.dates || []).filter((d) => (d.BLOOM_LIKE?.n || 0) + (d.SEDIMENT_LIKE?.n || 0) + (d.SURFACE_FILM_LIKE?.n || 0) > 0).map((d) => d.date));
   return (
-    <div ref={box.ref} className="h-full w-full">
-      <svg width={W} height={H}>
+    <div ref={box.ref} className="h-full w-full overflow-hidden">
+      <svg width={W} height={H} className="block">
         <rect x={L} y={T} width={W - L - R} height={H - T - B} fill="#040915" stroke="#16284D" />
         {years.map((yr) => { const tt = Date.UTC(Number(yr), 0, 1); return tt > t0 && tt < t1 ? <g key={yr}><line x1={x(tt)} x2={x(tt)} y1={T} y2={H - B} stroke="#16284D" /><text x={x(tt) + 3} y={H - 8} fontSize={10} fill="#93A6CB">{yr}</text></g> : null; })}
         {years.map((yr) => env.filter(Boolean).map((e) => { const tt = Date.UTC(Number(yr), 0, e!.b + 5); if (tt < t0 || tt > t1) return null; return <line key={`${yr}-${e!.b}`} x1={x(tt)} x2={x(tt) + 3} y1={y(e!.p90)} y2={y(e!.p90)} stroke="#FFC23D" strokeOpacity={0.35} />; }))}
@@ -88,10 +90,11 @@ export default function WatchPage() {
   const ranked = [...rows].sort((x, y) => (y.pct ?? -1) - (x.pct ?? -1));
   const cur = rows.find((r) => r.a.id === (sel || ranked[0]?.a.id));
   return (
-    <div className="grid h-full min-h-0 gap-3 p-3 short:gap-2 short:p-2 grid-rows-[auto_minmax(0,1fr)]">
-      <Panel title="Monitored areas" kicker="WATCH · Sentinel-2 image history" bodyClass="overflow-x-auto p-3">
+    // One screen: the area table and the trend chart share the height; the table scrolls inside its panel.
+    <div className="grid h-full min-h-0 grid-rows-[minmax(0,1.15fr)_minmax(0,1fr)] gap-3 p-3 short:gap-2 short:p-2">
+      <Panel title="Monitored areas" kicker="WATCH · Sentinel-2 image history" bodyClass="overflow-auto px-3 pb-3">
         <table className="w-full text-[12px]">
-          <thead><tr className="border-b border-edge text-left text-[10.5px] uppercase tracking-wider text-dim">
+          <thead className="sticky top-0 z-10 bg-panel"><tr className="border-b border-edge text-left text-[10.5px] uppercase tracking-wider text-dim">
             <th className="py-2 pr-3">Area</th><th className="pr-3">Coast</th><th className="pr-3" title="Latest image with enough clear water to measure">Latest image</th><th className="pr-3 text-right" title="Usable images: enough clear water to measure">Images</th>
             <th className="pr-3 text-right" title="Chlorophyll index (NDCI), 95th percentile over the area's water. The rank (e.g. 70th) compares it with the same time of year in past years.">Chlorophyll · rank</th><th className="pr-3 text-right" title="Turbidity, 95th percentile over the area's water. Generic formula, not calibrated. The rank compares it with the same time of year in past years.">Turbidity · rank</th><th className="pr-3" title="Chlorophyll compared with the same time of year in past years">Vs past years</th><th className="pr-3 text-right" title="Open incidents in this area">Open</th><th className="pr-3" title="Expected from the satellite's regular repeat orbit. Plans change, and clouds can spoil a pass.">Next pass (expected)</th></tr></thead>
           <tbody>

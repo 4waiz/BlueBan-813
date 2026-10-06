@@ -17,7 +17,8 @@ import {
 import type { Aoi, AssetRow, Incident, IncidentSummary, LayerRef, Sample } from "@/lib/engine/types";
 import { pipelineUrl } from "@/lib/engine";
 import { registerIcons } from "./icons";
-import { fmt, STATE_COLOR, statusText, toast } from "@/components/ui";
+import { useElementSize } from "@/lib/useSize";
+import { fmt, SAMPLE_ROLE_TEXT, STATE_COLOR, statusText, toast } from "@/components/ui";
 
 export type MapTool = "none" | "draw-aoi" | "place-asset" | "measure";
 export type MapMode = "2d" | "3d" | "split";
@@ -83,7 +84,7 @@ const LAYER_ORDER = ["rgb", "ndci", "ndci_z", "mci", "turbidity", "tur_z", "anom
 
 export default function IncidentMap(props: Props) {
   const { incident, incidents, aois, assets, stations, samples = [], compact = false, initialMode = "3d", showTimeline = true } = props;
-  const wrap = useRef<HTMLDivElement>(null);
+  const box = useElementSize<HTMLDivElement>();
   const el = useRef<HTMLDivElement>(null);
   const elB = useRef<HTMLDivElement>(null);
   const miniEl = useRef<HTMLDivElement>(null);
@@ -108,7 +109,9 @@ export default function IncidentMap(props: Props) {
   const lastMode = useRef<MapMode | null>(null);
 
   const rasters: LayerRef[] = useMemo(() => incident?.layers?.rasters || [], [incident]);
-  const timeline = incident?.layers?.timeline || [];
+  const timeline = useMemo(() => incident?.layers?.timeline || [], [incident]);
+  const eventDate = incident?.observation_time?.slice(0, 10) || null;
+  const eventIdx = useMemo(() => { const k = timeline.findIndex((t) => t.date === eventDate); return k >= 0 ? k : timeline.length - 1; }, [timeline, eventDate]);
   const rasterBy = useMemo(() => Object.fromEntries(rasters.map((r) => [r.key, r])), [rasters]);
 
   // ------------------------------------------------------------------ init
@@ -168,12 +171,21 @@ export default function IncidentMap(props: Props) {
       mapB.current = b;
       let lock = false;
       const sync = (src: MLMap, dst: MLMap) => () => { if (lock) return; lock = true; dst.jumpTo({ center: src.getCenter(), zoom: src.getZoom(), bearing: src.getBearing(), pitch: src.getPitch() }); lock = false; };
-      m.on("move", sync(m, b)); b.on("move", sync(b, m));
+      // The left map leads. The right map only drives the left one when a person
+      // moves it: its own start-up moves would otherwise cancel the fly-to.
+      m.on("move", sync(m, b));
+      b.on("move", (e: { originalEvent?: unknown }) => { if (e.originalEvent) sync(b, m)(); });
+      b.on("load", () => sync(m, b)());
       b.on("load", () => { setBLayers(b); });
     }
     if (mode !== "split" && mapB.current) { mapB.current.remove(); mapB.current = null; }
     setTimeout(() => { m.resize(); mapB.current?.resize(); }, 50);
   }, [mode, ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Entering before/after on the event image would compare it with itself.
+  useEffect(() => {
+    if (mode === "split" && tIdx === eventIdx && eventIdx > 0) setTIdx(eventIdx - 1);
+  }, [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------------ overlays (vector)
   useEffect(() => {
@@ -233,32 +245,62 @@ export default function IncidentMap(props: Props) {
     if (!m || !ready || compact) return;
     markers.current.forEach((x) => x.remove());
     markers.current = PLACES.map(([n, lon, lat]) => {
-      const d = document.createElement("div"); d.className = "map-pill"; d.textContent = n;
+      const d = document.createElement("div"); d.className = "map-pill bb-place"; d.textContent = n;
       return new maplibregl.Marker({ element: d, anchor: "left", offset: [6, 0] }).setLngLat([lon, lat]).addTo(m);
     });
     return () => { markers.current.forEach((x) => x.remove()); };
   }, [ready, compact]);
 
+  // Label declutter: a label that would overlap a map control or a more
+  // important label is hidden until there is room again. Sampling points come
+  // first, place names after; the sampling dots themselves always stay visible.
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !ready) return;
+    let raf = 0;
+    const run = () => {
+      raf = 0;
+      const host = box.ref.current?.parentElement;
+      if (!host) return;
+      const placed: DOMRect[] = [...host.querySelectorAll<HTMLElement>("[data-map-ui], .maplibregl-ctrl")].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
+      const labels = [...host.querySelectorAll<HTMLElement>(".bb-sample .map-pill"), ...host.querySelectorAll<HTMLElement>(".bb-place")];
+      for (const e of labels) {
+        e.style.visibility = "";
+        const r = e.getBoundingClientRect();
+        const clash = placed.some((p) => r.left < p.right + 2 && r.right > p.left - 2 && r.top < p.bottom + 2 && r.bottom > p.top - 2);
+        if (clash) e.style.visibility = "hidden"; else placed.push(r);
+      }
+    };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(run); };
+    m.on("move", schedule); m.on("resize", schedule); m.on("idle", schedule);
+    schedule();
+    return () => { m.off("move", schedule); m.off("resize", schedule); m.off("idle", schedule); if (raf) cancelAnimationFrame(raf); };
+  }, [ready, samples, compact, mode, panel, tool]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ------------------------------------------------------ incident rasters
+  // The analysis layers (indices, anomaly) exist for the event image only; the
+  // timeline holds true colour for the other dates. So a non-event date shows
+  // true colour alone, never an event-day overlay on another day's image, and
+  // the "after" side of before/after is always the event image.
   const setRasterLayers = useCallback((m: MLMap, which: "A" | "B") => {
     if (!incident) return;
+    const t = timeline.length && tIdx != null ? timeline[which === "B" ? eventIdx : tIdx] : null;
+    const otherDay = !!t && t.date !== eventDate;
     for (const key of LAYER_ORDER) {
       const r = rasterBy[key];
       const id = `r-${key}`;
       let url = r?.url;
-      if (r && timeline.length && tIdx != null && (key === "rgb" || key === "ndci" || key === "ndci_z")) {
-        const t = timeline[which === "B" ? timeline.length - 1 : tIdx];
-        if (t) url = key === "rgb" ? t.rgb : t.index || url;
-      }
+      if (r && t && (key === "rgb" || key === "ndci" || key === "ndci_z")) url = key === "rgb" ? t.rgb : t.index || url;
       if (!r || !url) { if (m.getLayer(id)) m.removeLayer(id); if (m.getSource(id)) m.removeSource(id); continue; }
       const full = pipelineUrl(url);
       const src = m.getSource(id) as maplibregl.ImageSource | undefined;
       if (src) src.updateImage({ url: full, coordinates: corners(r.bounds) });
       else m.addSource(id, { type: "image", url: full, coordinates: corners(r.bounds) });
       if (!m.getLayer(id)) m.addLayer({ id, type: "raster", source: id, paint: { "raster-opacity": key === "rgb" ? 1 : 0.82, "raster-fade-duration": 200, "raster-resampling": key === "rgb" ? "linear" : "nearest" } }, m.getLayer("aois-line") ? "aois-line" : undefined);
-      m.setLayoutProperty(id, "visibility", active[key] || (which === "B" && key === "rgb") ? "visible" : "none");
+      const hideOnOtherDay = otherDay && key !== "rgb" && !(t?.index && (key === "ndci" || key === "ndci_z"));
+      m.setLayoutProperty(id, "visibility", !hideOnOtherDay && (active[key] || (which === "B" && key === "rgb")) ? "visible" : "none");
     }
-  }, [incident, rasterBy, timeline, tIdx, active]);
+  }, [incident, rasterBy, timeline, tIdx, active, eventIdx, eventDate]);
 
   const setBLayers = useCallback((b: MLMap) => setRasterLayers(b, "B"), [setRasterLayers]);
 
@@ -271,7 +313,8 @@ export default function IncidentMap(props: Props) {
     const b = incident.layers?.bounds;
     if (b) m.fitBounds([[b[0], b[1]], [b[2], b[3]]] as LngLatBoundsLike, { padding: compact ? 20 : { top: 70, bottom: 40, left: 40, right: 70 }, duration: 1400, maxZoom: 13, pitch: mode === "3d" ? 40 : 0, bearing: mode === "3d" ? -10 : 0 });
     else if (incident.centroid) m.flyTo({ center: incident.centroid, zoom: 10.5, duration: 1400 });
-    setTIdx(timeline.length ? timeline.length - 1 : null);
+    // open on the event image (before/after starts one image earlier)
+    setTIdx(timeline.length ? (mode === "split" && eventIdx > 0 ? eventIdx - 1 : eventIdx) : null);
     const defaults = (incident.layers as unknown as { default?: string[] })?.default;
     if (defaults) setActive((a) => ({ ...a, ...Object.fromEntries(LAYER_ORDER.map((k) => [k, defaults.includes(k)])) }));
     // pixel grid for click-inspection
@@ -307,8 +350,10 @@ export default function IncidentMap(props: Props) {
     sampleMarkers.current.forEach((x) => x.remove());
     sampleMarkers.current = samples.map((s) => {
       const d = document.createElement("div");
+      d.className = "bb-sample";
       const c = STATE_COLOR[s.status] || "#EAF1FF";
-      d.innerHTML = `<div style="display:flex;align-items:center;gap:4px;cursor:grab"><div style="width:14px;height:14px;border-radius:50%;background:${c};border:2px solid #040915;box-shadow:0 0 10px ${c}"></div><span class="map-pill" style="font-size:10px">${s.code} ${s.role}</span></div>`;
+      d.innerHTML = `<div style="display:flex;align-items:center;gap:4px;cursor:grab"><div style="width:14px;height:14px;border-radius:50%;background:${c};border:2px solid #040915;box-shadow:0 0 10px ${c}"></div><span class="map-pill" style="font-size:10px">${s.code} · ${SAMPLE_ROLE_TEXT[s.role] ?? s.role.replace(/_/g, " ").toLowerCase()}</span></div>`;
+      d.title = `${s.code}: ${s.question || SAMPLE_ROLE_TEXT[s.role] || s.role}. Drag to move.`;
       const mk = new maplibregl.Marker({ element: d, draggable: !!props.onMoveSample, anchor: "left" }).setLngLat([s.lon, s.lat]).addTo(m);
       mk.on("dragend", () => { const p = mk.getLngLat(); props.onMoveSample?.(s, p.lng, p.lat); });
       return mk;
@@ -373,6 +418,11 @@ export default function IncidentMap(props: Props) {
     else toast(`No place, area or asset matches "${search}"`, "err");
   };
 
+  // Tool buttons are 32 px + 4 px gap; the overview map needs 118 px under them.
+  const showMini = box.height >= 430 && box.width >= 520;
+  const narrow = box.width > 0 && box.width < 560;
+  const toolCount = box.height ? Math.max(3, Math.min(8, Math.floor((box.height - 24 - (showMini ? 160 : 40)) / 36))) : 8;
+
   const layerDefs: { key: string; label: string; note?: string }[] = [
     { key: "rgb", label: "True colour" }, { key: "ndci", label: "Chlorophyll index (NDCI)" },
     { key: "ndci_z", label: "Chlorophyll vs past years" }, { key: "mci", label: "Chlorophyll peak (MCI)" },
@@ -383,29 +433,29 @@ export default function IncidentMap(props: Props) {
   ];
 
   return (
-    <div ref={wrap} className={`relative h-full w-full overflow-hidden rounded-[10px] ${props.className || ""}`}>
+    <div ref={box.ref} className={`relative h-full w-full overflow-hidden rounded-[10px] ${props.className || ""}`}>
       <div className="absolute inset-0 flex">
         <div ref={el} className={mode === "split" ? "h-full w-1/2" : "h-full w-full"} />
         {mode === "split" && <div ref={elB} className="h-full w-1/2 border-l-2 border-cyan" />}
       </div>
       {mode === "split" && (
         <>
-          <div className="map-pill absolute left-3 top-16 z-10">BEFORE · {timeline[tIdx ?? 0]?.date || "earlier"}</div>
-          <div className="map-pill absolute right-16 top-16 z-10">INCIDENT · {timeline[timeline.length - 1]?.date || incident?.observation_time?.slice(0, 10)}</div>
+          <div data-map-ui className="map-pill absolute left-3 top-16 z-10">{timeline[tIdx ?? 0]?.date === eventDate ? "EVENT DAY" : timeline[tIdx ?? 0]?.date && eventDate && timeline[tIdx ?? 0].date > eventDate ? "AFTER" : "BEFORE"} · {timeline[tIdx ?? 0]?.date || "earlier"}</div>
+          <div data-map-ui className="map-pill absolute right-16 top-16 z-10">INCIDENT · {timeline[eventIdx]?.date || eventDate}</div>
         </>
       )}
 
       {/* top toolbar */}
       {!compact && (
-        <div className="absolute left-3 right-16 top-3 z-10 flex flex-wrap items-center gap-2">
+        <div data-map-ui className="absolute left-3 right-16 top-3 z-10 flex flex-wrap items-center gap-2">
           <div className="panel-flat flex p-1">
-            {([["2d", "2D Map", <MapIcon key="m" size={14} />], ["3d", "3D Globe", <Globe2 key="g" size={14} />], ["split", "Before / after", <SplitSquareHorizontal key="s" size={14} />]] as const).map(([k, l, ic]) => (
-              <button key={k} onClick={() => setMode(k)} className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] font-semibold ${mode === k ? "bg-beam text-white shadow-beam" : "text-muted hover:text-ink"}`}>{ic}{l}</button>
+            {([["2d", "2D Map", "2D", <MapIcon key="m" size={14} />], ["3d", "3D Globe", "3D", <Globe2 key="g" size={14} />], ["split", "Before / after", "Split", <SplitSquareHorizontal key="s" size={14} />]] as const).map(([k, l, short, ic]) => (
+              <button key={k} onClick={() => setMode(k)} title={l} aria-pressed={mode === k} className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-[12px] font-semibold ${narrow ? "px-2" : ""} ${mode === k ? "bg-beam text-white shadow-beam" : "text-muted hover:text-ink"}`}>{ic}{narrow ? short : l}</button>
             ))}
           </div>
           {timeline.length > 0 && showTimeline && (
             <div className="panel-flat flex min-w-[320px] flex-1 items-center gap-3 px-3 py-1.5">
-              <span className="hud-value text-[11.5px] text-ink">{timeline[tIdx ?? 0]?.date}</span>
+              <span className="hud-value whitespace-nowrap text-[11.5px] text-ink" title={timeline[tIdx ?? 0]?.date === eventDate ? "The image the incident was detected on" : "True colour only: the anomaly layers belong to the event image"}>{timeline[tIdx ?? 0]?.date}{timeline[tIdx ?? 0]?.date === eventDate && <span className="ml-1.5 rounded bg-critical/20 px-1 text-[10px] font-bold text-critical">EVENT</span>}</span>
               <input name="timeline" type="range" min={0} max={timeline.length - 1} value={tIdx ?? 0} onChange={(e) => { setPlaying(false); setTIdx(Number(e.target.value)); }} className="flex-1 accent-[#2F7BFF]" aria-label="Image date" />
               <span className="text-[10.5px] text-muted">{timeline.length} images</span>
               <button onClick={() => setPlaying((p) => !p)} className="grid h-7 w-7 place-items-center rounded-full bg-beam text-white" aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause size={13} /> : <Play size={13} />}</button>
@@ -414,17 +464,19 @@ export default function IncidentMap(props: Props) {
         </div>
       )}
 
-      {/* right tool column */}
+      {/* right tool column: as many tools as the map's height allows, most used first */}
       {!compact && (
-        <div className="panel-flat absolute right-3 top-3 z-10 flex flex-col gap-1 p-1">
-          <ToolBtn title="Search places, areas and assets" active={searchOpen} onClick={() => { setSearchOpen((v) => !v); setPanel(true); }} icon={<Search size={16} />} />
-          <ToolBtn title="Layers" active={panel} onClick={() => setPanel((p) => !p)} icon={<Layers size={16} />} />
-          <ToolBtn title="Add a monitored area (drag a box)" active={tool === "draw-aoi"} onClick={() => setTool(tool === "draw-aoi" ? "none" : "draw-aoi")} icon={<SquareDashedMousePointer size={16} />} />
-          <ToolBtn title={props.placeLabel || "Add your own asset (e.g. a desalination plant)"} active={tool === "place-asset"} onClick={() => setTool(tool === "place-asset" ? "none" : "place-asset")} icon={<MapPinPlus size={16} />} />
-          <ToolBtn title="Measure distance" active={tool === "measure"} onClick={() => setTool(tool === "measure" ? "none" : "measure")} icon={<Ruler size={16} />} />
-          <ToolBtn title="Zoom to incident" onClick={() => { const b = incident?.layers?.bounds; if (b && map.current) map.current.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: 60 }); }} icon={<Crosshair size={16} />} />
-          <ToolBtn title="Reset view" onClick={() => map.current?.flyTo({ center: [55.2, 25.0], zoom: 6.4, pitch: mode === "3d" ? 48 : 0, bearing: 0 })} icon={<RotateCcw size={16} />} />
-          <ToolBtn title="Full screen" onClick={() => wrap.current?.requestFullscreen?.()} icon={<Maximize2 size={16} />} />
+        <div data-map-ui className="panel-flat absolute right-3 top-3 z-10 flex flex-col gap-1 p-1">
+          {[
+            <ToolBtn key="layers" title="Layers" active={panel} onClick={() => setPanel((p) => !p)} icon={<Layers size={16} />} />,
+            <ToolBtn key="zoom" title="Zoom to incident" onClick={() => { const b = incident?.layers?.bounds; if (b && map.current) map.current.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: 60 }); }} icon={<Crosshair size={16} />} />,
+            <ToolBtn key="search" title="Search places, areas and assets" active={searchOpen} onClick={() => { setSearchOpen((v) => !v); setPanel(true); }} icon={<Search size={16} />} />,
+            <ToolBtn key="reset" title="Reset view" onClick={() => map.current?.flyTo({ center: [55.2, 25.0], zoom: 6.4, pitch: mode === "3d" ? 48 : 0, bearing: 0 })} icon={<RotateCcw size={16} />} />,
+            <ToolBtn key="aoi" title="Add a monitored area (drag a box)" active={tool === "draw-aoi"} onClick={() => setTool(tool === "draw-aoi" ? "none" : "draw-aoi")} icon={<SquareDashedMousePointer size={16} />} />,
+            <ToolBtn key="pin" title={props.placeLabel || "Add your own asset (e.g. a desalination plant)"} active={tool === "place-asset"} onClick={() => setTool(tool === "place-asset" ? "none" : "place-asset")} icon={<MapPinPlus size={16} />} />,
+            <ToolBtn key="measure" title="Measure distance" active={tool === "measure"} onClick={() => setTool(tool === "measure" ? "none" : "measure")} icon={<Ruler size={16} />} />,
+            <ToolBtn key="full" title="Full screen" onClick={() => box.ref.current?.requestFullscreen?.()} icon={<Maximize2 size={16} />} />,
+          ].slice(0, toolCount)}
         </div>
       )}
 
@@ -461,13 +513,14 @@ export default function IncidentMap(props: Props) {
       )}
 
       {tool !== "none" && !compact && (
-        <div className="map-pill absolute bottom-14 left-1/2 z-10 -translate-x-1/2 text-[12px]">
+        <div data-map-ui className="map-pill absolute bottom-14 left-1/2 z-10 -translate-x-1/2 text-[12px]">
           {tool === "draw-aoi" ? "Drag a box on the map to add a monitored area" : tool === "place-asset" ? `Click the map: ${(props.placeLabel || "Add your asset").toLowerCase()}` : `Measure: click points · ${fmt.km(measureM)}`}
         </div>
       )}
 
+      {/* overview map: only when the map is big enough to keep it clear of the tools */}
       {!compact && (
-        <div className="panel absolute bottom-9 right-3 z-10 h-[118px] w-[170px] overflow-hidden p-0">
+        <div data-map-ui={showMini ? "" : undefined} aria-hidden={!showMini} className={`panel absolute bottom-9 right-3 z-10 h-[118px] w-[170px] overflow-hidden p-0 ${showMini ? "" : "invisible"}`}>
           <div ref={miniEl} className="h-full w-full" />
         </div>
       )}

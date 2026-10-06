@@ -37,7 +37,9 @@ export function useEngineQuery<T>(fn: (e: Engine) => Promise<T>, deps: unknown[]
     catch (e) { setError((e as Error).message); }
     finally { setLoading(false); }
   }, []);
-  useEffect(() => { load(); return onChanged(load); }, [load, ...deps]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A new query (changed deps) is "loading" until it answers; reloads after a
+  // workspace write keep showing the current data instead of flashing a spinner.
+  useEffect(() => { setLoading(true); load(); return onChanged(load); }, [load, ...deps]); // eslint-disable-line react-hooks/exhaustive-deps
   return { data, error, loading, reload: load };
 }
 

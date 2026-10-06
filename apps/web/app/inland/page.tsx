@@ -14,17 +14,19 @@ import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import { AlertTriangle, Droplets, FileText, Layers, ScanLine, ShieldAlert, Waves } from "lucide-react";
 import { pipelineUrl, useStatic } from "@/lib/engine";
-import { Chip, Drawer, Panel, SimBadge, Tween } from "@/components/ui";
+import { Chip, Drawer, Panel, SimBadge, Tabs, Tween } from "@/components/ui";
 import Markdown from "@/components/ui/Markdown";
 import { FP_COLOR, MASK_KEYS, SEVERITY_COLOR, type InlandSummary, type MaskKey } from "@/components/inland/types";
 import type { PixelHover } from "@/components/inland/WetCoreScene";
 import type { RibbonHover } from "@/components/inland/DeviationRibbon";
 import type { BandHover } from "@/components/inland/BandLadder";
 
-const loading3d = (h: number) => function Loading() { return <div className="grid place-items-center text-[12px] text-dim" style={{ height: h }}>Building 3D scene…</div>; };
-const WetCoreScene = dynamic(() => import("@/components/inland/WetCoreScene"), { ssr: false, loading: loading3d(440) });
-const DeviationRibbon = dynamic(() => import("@/components/inland/DeviationRibbon"), { ssr: false, loading: loading3d(360) });
-const BandLadder = dynamic(() => import("@/components/inland/BandLadder"), { ssr: false, loading: loading3d(360) });
+function Loading3d() { return <div className="grid h-full place-items-center text-[12px] text-dim">Building 3D scene…</div>; }
+const WetCoreScene = dynamic(() => import("@/components/inland/WetCoreScene"), { ssr: false, loading: Loading3d });
+const DeviationRibbon = dynamic(() => import("@/components/inland/DeviationRibbon"), { ssr: false, loading: Loading3d });
+const BandLadder = dynamic(() => import("@/components/inland/BandLadder"), { ssr: false, loading: Loading3d });
+
+type View = "pool" | "dates" | "notes";
 
 const LAYER_LABEL: Record<MaskKey, string> = {
   "2022-09-08": "Sep 2022", "2024-04-24": "Apr 2024", persistent_core: "Wet on both dates", mndwi_core: "Water-index check",
@@ -118,6 +120,7 @@ export default function InlandPage() {
   const [rh, setRh] = useState<RibbonHover | null>(null);
   const [bh, setBh] = useState<BandHover | null>(null);
   const [f2, setF2] = useState(false);
+  const [view, setView] = useState<View>("pool");
   const [doc, setDoc] = useState<{ key: string; text: string } | null>(null);
   const inlandDocs = useMemo(() => (docsIdx?.docs || []).filter((d) => d.key.startsWith("inland-")), [docsIdx]);
   const openDoc = async (key: string) => {
@@ -134,16 +137,18 @@ export default function InlandPage() {
   const classCounts = fpDate ? an.per_date?.[fpDate]?.fingerprint_top_class_counts : an.per_date?.["2024-04-24"]?.fingerprint_top_class_counts;
   const pxArea = s.window.resolution_m ** 2;
 
+  // Desktop: one screen. Header and caveats on top, the three sections behind
+  // tabs that fill the remaining height. Smaller screens stack and scroll.
   return (
-    <div className="space-y-3 p-3 short:space-y-2 short:p-2">
+    <div className="space-y-3 p-3 short:space-y-2 short:p-2 xl:flex xl:h-full xl:flex-col xl:gap-3 xl:space-y-0 short:xl:gap-2">
       {/* ---------------------------------------------------------------- header */}
-      <div className="relative overflow-hidden rounded-panel border border-edge/80 bg-gradient-to-br from-panel2/90 via-panel/70 to-void px-5 py-4">
+      <div className="relative shrink-0 overflow-hidden rounded-panel border border-edge/80 bg-gradient-to-br from-panel2/90 via-panel/70 to-void px-5 py-4 short:py-2.5">
         {!reduce && <motion.div aria-hidden className="pointer-events-none absolute inset-y-0 w-40 bg-gradient-to-r from-transparent via-cyan/10 to-transparent"
           initial={{ x: "-20%" }} animate={{ x: "120vw" }} transition={{ duration: 5.5, repeat: Infinity, ease: "linear", repeatDelay: 2 }} />}
         <div className="relative flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="hud-kicker flex items-center gap-2"><Droplets size={13} className="text-cyan" /> Inland water · {s.site.emirate} · EnMAP hyperspectral satellite</div>
-            <h1 className="font-display text-[30px] font-extrabold tracking-wide short:text-[26px]">
+            <h1 className="font-display text-[30px] font-extrabold tracking-wide short:text-[22px]">
               <span className="bg-gradient-to-r from-ink via-cyan to-beam2 bg-clip-text text-transparent">{s.site.name}</span>
               <span className="ml-3 align-middle text-[13px] font-semibold tracking-[0.2em] text-muted">{s.site.id}</span>
             </h1>
@@ -161,7 +166,7 @@ export default function InlandPage() {
       </div>
 
       {/* ---------------------------------------------------------------- caveats, verbatim */}
-      <div className="flex gap-3 rounded-panel border border-caution/50 bg-caution/[0.06] px-4 py-3">
+      <div className="flex shrink-0 gap-3 rounded-panel border border-caution/50 bg-caution/[0.06] px-4 py-3 short:py-2">
         <ShieldAlert size={18} className="mt-0.5 shrink-0 text-caution" />
         <div className="text-[12.5px] leading-relaxed">
           <div className="mb-0.5 font-bold tracking-wide text-caution">Please note</div>
@@ -171,14 +176,20 @@ export default function InlandPage() {
         </div>
       </div>
 
+      <Tabs className="shrink-0" value={view} onChange={setView} tabs={[
+        { key: "pool", label: "Where the water is" },
+        { key: "dates", label: "Unusual dates · 813 bands" },
+        { key: "notes", label: `Review notes (${s.flags.length}) · documents` },
+      ]} />
+
       {/* ---------------------------------------------------------------- wet core + stats */}
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+      {view === "pool" && <div className="grid gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <Panel kicker="Each tile is one 30 m pixel · drag to rotate" title="Where the water is"
           right={<div className="flex flex-wrap gap-1">{MASK_KEYS.map((k) => (
             <button key={k} onClick={() => setLayer(k)} className={`btn px-2.5 py-1 text-[11px] ${layer === k ? "border-beam bg-beam/20 text-ink" : ""}`}>
               {LAYER_LABEL[k]} <span className="hud-value text-dim">{m[k].n}</span></button>))}</div>}
-          bodyClass="relative">
-          <WetCoreScene s={s} layer={layer} onHover={setPx} height={440} />
+          bodyClass="relative h-[440px] overflow-hidden xl:h-auto">
+          <WetCoreScene s={s} layer={layer} onHover={setPx} height="100%" />
           <div className="pointer-events-none absolute left-3 top-3 max-w-[330px] rounded-md border border-edge/70 bg-void/80 px-3 py-2 text-[11px] leading-snug backdrop-blur">
             <div className="font-bold text-ink" title={m[layer].method}>{LAYER_LABEL[layer]}</div>
             <div className="text-muted">{LAYER_PLAIN[layer]}</div>
@@ -200,7 +211,8 @@ export default function InlandPage() {
           )}
         </Panel>
 
-        <div className="grid content-start gap-3">
+        {/* panels keep their natural height (shrink-0) so this column scrolls instead of squashing them */}
+        <div className="flex flex-col gap-3 xl:min-h-0 xl:overflow-y-auto xl:pr-1 [&>*]:shrink-0">
           <div className="grid grid-cols-2 gap-2">
             <Stat k="Water pool" v={m.persistent_core.n} suffix=" px" color="#27C3F3" delay={0}
               sub={<>about {((m.persistent_core.n * pxArea) / 1e4).toFixed(1)} ha · wet on both dates</>} />
@@ -228,12 +240,12 @@ export default function InlandPage() {
             <WaterPresence s={s} />
           </Panel>
         </div>
-      </div>
+      </div>}
 
       {/* ---------------------------------------------------------------- ribbon + ladder */}
-      <div className="grid gap-3 xl:grid-cols-2">
-        <Panel kicker="How unusual each image is · drag to rotate" title="Unusual dates · Sentinel-2 and Landsat" right={<ScanLine size={16} className="text-cyan" />} bodyClass="relative">
-          <DeviationRibbon s={s} height={360} onHover={setRh} />
+      {view === "dates" && <div className="grid gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-2">
+        <Panel kicker="How unusual each image is · drag to rotate" title="Unusual dates · Sentinel-2 and Landsat" right={<ScanLine size={16} className="text-cyan" />} bodyClass="relative h-[360px] overflow-hidden xl:h-auto">
+          <DeviationRibbon s={s} height="100%" onHover={setRh} />
           <div className="pointer-events-none absolute bottom-2 left-3 flex gap-3 text-[10.5px] text-muted">
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#27C3F3]" />Sentinel-2 ({t.per_sensor_n["sentinel-2-l2a"]})</span>
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#FFC23D]" />Landsat ({t.per_sensor_n["landsat-c2-l2"]})</span>
@@ -243,22 +255,22 @@ export default function InlandPage() {
             <div className="hud-value font-bold text-ink">{rh.date} · {rh.sensor}</div><div className="text-muted">{rh.index}</div>
             <div className={rh.flagged ? "text-critical" : "text-cyan"}>{rh.flagged ? "unusual" : "normal"} (score {rh.z.toFixed(1)})</div></div>}
         </Panel>
-        <Panel kicker="Every colour band each sensor sees · drag to rotate" title="EnMAP vs Satellite 813 bands" bodyClass="relative"
+        <Panel kicker="Every colour band each sensor sees · drag to rotate" title="EnMAP vs Satellite 813 bands" bodyClass="relative h-[360px] overflow-hidden xl:h-auto"
           right={<button onClick={() => setF2(!f2)} className={`btn px-2.5 py-1 text-[11px] ${f2 ? "border-caution bg-caution/15 text-ink" : ""}`}><Layers size={13} />{f2 ? "Hide" : "Show"} note F2</button>}>
-          <BandLadder s={s} showF2={f2} height={360} onHover={setBh} />
+          <BandLadder s={s} showF2={f2} height="100%" onHover={setBh} />
           {bh && <div className="pointer-events-none absolute right-3 top-3 max-w-[260px] rounded-md border border-edge bg-void/90 px-3 py-2 text-[11px]">
             <div className="font-bold text-ink">{bh.sensor} · {bh.band}</div>
             <div className="hud-value text-cyan">{bh.nm.toFixed(1)} nm · width {bh.fwhm.toFixed(1)} nm</div><div className="text-muted">{bh.note}</div></div>}
           {f2 && <div className="pointer-events-none absolute bottom-2 left-3 max-w-[70%] text-[10.5px] text-caution">The real Sep 2022 band positions: amber bands sit 11–12 nm off, red ones jumped a gap.</div>}
         </Panel>
-      </div>
+      </div>}
 
       {/* ---------------------------------------------------------------- flags + docs */}
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <Panel kicker="Review notes · flagged, not changed" title={<span className="flex items-center gap-2"><AlertTriangle size={15} className="text-caution" />Things to double-check</span>} bodyClass="px-4 pb-3">
+      {view === "notes" && <div className="grid gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        <Panel kicker="Review notes · flagged, not changed" title={<span className="flex items-center gap-2"><AlertTriangle size={15} className="text-caution" />Things to double-check</span>} bodyClass="px-4 pb-3 xl:overflow-y-auto">
           <Flags s={s} />
         </Panel>
-        <Panel kicker="Full write-ups" title="Documents" bodyClass="px-4 pb-3">
+        <Panel kicker="Full write-ups" title="Documents" bodyClass="px-4 pb-3 xl:overflow-y-auto">
           <div className="space-y-1">
             {inlandDocs.map((d) => (
               <button key={d.key} onClick={() => openDoc(d.key)} className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[12px] text-muted hover:bg-white/5 hover:text-ink">
@@ -271,7 +283,7 @@ export default function InlandPage() {
             Data: <span className="hud-value">data/inland/</span> · API: <span className="hud-value">/api/inland/summary</span>
           </div>
         </Panel>
-      </div>
+      </div>}
 
       <Drawer open={!!doc} onClose={() => setDoc(null)} title={doc ? DOC_TITLES[doc.key] || doc.key : ""} width={760}>
         {doc && <Markdown text={doc.text} />}

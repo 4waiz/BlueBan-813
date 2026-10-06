@@ -146,7 +146,8 @@ export default function LearnPage() {
   const rollback = (id: string) => { const o = who(); if (o) run("rollback", () => mutate((e) => e.rollback(id, o, "Rollback from Learning screen")), `Rolled back to ${id}`); };
 
   return (
-    <div className="space-y-3 p-3">
+    // Desktop: one screen; each panel scrolls inside itself. Smaller screens stack and scroll.
+    <div className="space-y-3 p-3 short:p-2 xl:grid xl:h-full xl:grid-rows-[auto_minmax(0,1.15fr)_minmax(0,1fr)] xl:gap-3 xl:space-y-0 short:xl:gap-2">
       <div className="flex flex-wrap items-center gap-3 px-1">
         <h1 className="font-display text-[22px] font-extrabold tracking-wide">LEARN · improve the model, safely</h1>
         <div className="flex flex-wrap items-center gap-1 text-[11px] text-muted">
@@ -155,9 +156,9 @@ export default function LearnPage() {
         </div>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[1fr_300px_1fr]">
-        <Panel title="Live model" kicker="IN USE NOW" bodyClass="p-3"><AnimatePresence mode="popLayout"><ModelCard key={prod?.id || "none"} m={prod} role="production" /></AnimatePresence></Panel>
-        <Panel title="Case library" kicker="WHAT THE MODEL LEARNS FROM" bodyClass="p-3 space-y-2">
+      <div className="grid gap-3 short:gap-2 xl:min-h-0 xl:grid-cols-[1fr_300px_1fr]">
+        <Panel title="Live model" kicker="IN USE NOW" bodyClass="p-3 overflow-y-auto"><AnimatePresence mode="popLayout"><ModelCard key={prod?.id || "none"} m={prod} role="production" /></AnimatePresence></Panel>
+        <Panel title="Case library" kicker="WHAT THE MODEL LEARNS FROM" bodyClass="p-3 space-y-2 overflow-y-auto">
           {[["New since the live model", counts.fresh, "#27C3F3"], ["Confirmed by an analyst", counts.confirmed, "#23D484"], ["False alarms (analyst)", counts.falsepos, "#FF4D5E"],
             ["Checked with water samples", counts.field, "#FFC23D"], ["Sentinel-3 checks", counts.reference, "#93A6CB"]].map(([k, v, c]) => (
             <div key={k as string} className="flex items-center justify-between rounded-md border border-edge bg-deep/70 px-3 py-2 text-[12px]">
@@ -170,11 +171,11 @@ export default function LearnPage() {
             {jobs.data![0].error && <div className="text-critical">{jobs.data![0].error}</div>}
           </div>}
         </Panel>
-        <Panel title="New model" kicker="NOT LIVE YET" bodyClass="p-3"><AnimatePresence mode="popLayout"><ModelCard key={cand?.id || "none"} m={cand} role="candidate" prodForDelta={prod} /></AnimatePresence></Panel>
+        <Panel title="New model" kicker="NOT LIVE YET" bodyClass="p-3 overflow-y-auto"><AnimatePresence mode="popLayout"><ModelCard key={cand?.id || "none"} m={cand} role="candidate" prodForDelta={prod} /></AnimatePresence></Panel>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[1.2fr_1fr]">
-        <Panel title="Safety check before going live" kicker="LIVE VS NEW MODEL · SAME HELD-BACK TEST SET" bodyClass="p-3">
+      <div className="grid gap-3 short:gap-2 xl:min-h-0 xl:grid-cols-[1.2fr_1fr]">
+        <Panel title="Safety check before going live" kicker="LIVE VS NEW MODEL · SAME HELD-BACK TEST SET" bodyClass="p-3 overflow-y-auto">
           {cand?.gate ? <>
             <GateView checks={cand.gate.checks} />
             <div className="mt-3 flex gap-2">
@@ -184,7 +185,7 @@ export default function LearnPage() {
             {!cand.gate.passed && <p className="mt-2 text-[11.5px] text-critical">Safety check failed, so it cannot go live. Fix the data or reject the new model.</p>}
           </> : <p className="text-[12.5px] text-muted" title="Compared on the same frozen validation labels, with a paired, grouped bootstrap">Train a new model to see its safety check. It is scored against the live model on the same held-back test set.</p>}
         </Panel>
-        <Panel title="Model history & log" bodyClass="p-3 space-y-2">
+        <Panel title="Model history & log" bodyClass="p-3 space-y-2 overflow-y-auto">
           {history.map((m) => (
             <div key={m.id} className="flex items-center justify-between rounded-md border border-edge bg-deep/60 px-3 py-2 text-[12px]">
               <span className="hud-value">{m.id}</span><span className="text-muted">{m.model_type}</span><Chip label={m.status} />

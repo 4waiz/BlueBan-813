@@ -17,7 +17,8 @@
  */
 import React, { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { advance, Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { advance, useFrame, useLoader, useThree } from "@react-three/fiber";
+import Canvas from "@/components/three/ZoomCanvas";
 import { OrbitControls } from "@react-three/drei";
 import { eciToGeodetic, gstime, jday, propagate, sunPos, twoline2satrec, type SatRec } from "satellite.js";
 import {

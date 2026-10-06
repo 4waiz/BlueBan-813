@@ -8,7 +8,8 @@
  * 2024-04-24 EnMAP date, which falls in the baseline's own coverage gap.
  */
 import React, { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
+import Canvas from "@/components/three/ZoomCanvas";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useReducedMotion } from "framer-motion";

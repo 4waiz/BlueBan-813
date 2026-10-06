@@ -6,7 +6,7 @@ import { AlertTriangle, Check, ChevronLeft, ChevronRight, FlaskConical, RefreshC
 import type { Decision, EventType, Incident } from "@/lib/engine/types";
 import { EVENT_TYPES } from "@/lib/engine/rules";
 import { getOperator, mutate, pipelineUrl } from "@/lib/engine";
-import { Chip, fmt, Kind, Meter, Modal, SimBadge, STATE_TEXT, Tabs, toast, WhyButton } from "@/components/ui";
+import { Chip, fmt, Kind, Loading, Meter, Modal, SimBadge, STATE_TEXT, Tabs, toast, WhyButton } from "@/components/ui";
 import SpectrumPlot from "@/components/spectra/SpectrumPlot";
 
 type Tab = "overview" | "spectral" | "temporal" | "assets" | "actions";
@@ -45,8 +45,8 @@ export function Provenance({ inc }: { inc: Incident }) {
   );
 }
 
-export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpenTimeline }: {
-  inc: Incident | null; index: number; total: number; onPrev?: () => void; onNext?: () => void; onOpenTimeline?: () => void;
+export default function IncidentPanel({ inc, loading = false, index, total, onPrev, onNext, onOpenTimeline }: {
+  inc: Incident | null; loading?: boolean; index: number; total: number; onPrev?: () => void; onNext?: () => void; onOpenTimeline?: () => void;
 }) {
   const [tab, setTab] = useState<Tab>("overview");
   const [busy, setBusy] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
   const agree = inc?.sensor_agreement || {};
   const nearest = useMemo(() => [...(inc?.exposure || [])].sort((a, b) => a.distance_m - b.distance_m)[0], [inc]);
 
-  if (!inc) return <div className="panel grid h-full place-items-center text-muted">No incident selected</div>;
+  if (!inc) return <div className="panel grid h-full place-items-center text-muted">{loading ? <Loading label="Loading the incident…" /> : "No incident selected"}</div>;
   const color = inc.role === "negative_control" ? "#8B7BFF" : inc.status === "UNDER_REVIEW" || inc.status === "DETECTED" ? "#FF4D5E" : "#FFC23D";
 
   const act = async (decision: Decision, extra: { new_hypothesis?: string } = {}) => {
@@ -78,8 +78,8 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
   const thumb = inc.layers?.rasters.find((r) => r.key === "ndci") || inc.layers?.rasters.find((r) => r.key === "rgb");
 
   return (
-    <section className="panel flex h-full min-h-0 flex-col">
-      <header className="flex items-center justify-between px-4 pb-2 pt-3">
+    <section className="panel flex h-full min-h-0 flex-col overflow-hidden">
+      <header className="flex shrink-0 items-center justify-between px-4 pb-2 pt-3">
         <h2 className="panel-title">Incident</h2>
         <div className="flex items-center gap-2 text-[12px] text-muted">
           <button onClick={onPrev} className="grid h-7 w-7 place-items-center rounded-md border border-edge hover:border-line" aria-label="Previous incident"><ChevronLeft size={15} /></button>
@@ -89,6 +89,8 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
       </header>
       <AnimatePresence mode="wait">
         <motion.div key={inc.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex min-h-0 flex-1 flex-col">
+          {/* Card, tabs and tab content scroll together inside the panel; the decision buttons stay pinned below. */}
+          <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-4 flex items-start gap-3 rounded-lg border p-3 short:p-2" style={{ borderColor: `${color}55`, background: `linear-gradient(90deg, ${color}22, transparent)` }}>
             <AlertTriangle size={30} style={{ color }} className="mt-0.5 shrink-0 short:hidden" />
             <div className="min-w-0 flex-1">
@@ -101,10 +103,10 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
               <div className="text-[11px] text-muted">{inc.aoi_name} · {fmt.utc(inc.observation_time)}</div>
             </div>
           </div>
-          <Tabs className="mx-4 mt-2" value={tab} onChange={setT} tabs={[
-            { key: "overview", label: "Overview" }, { key: "spectral", label: "Spectrum" }, { key: "temporal", label: "Past years" },
+          <Tabs fit className="sticky top-0 z-10 mx-4 mt-2 bg-panel" value={tab} onChange={setT} tabs={[
+            { key: "overview", label: "Overview" }, { key: "spectral", label: "Spectrum" }, { key: "temporal", label: "History" },
             { key: "assets", label: "Assets" }, { key: "actions", label: "Actions" }]} />
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+          <div className="px-4 py-3">
             {tab === "overview" && (
               <div className="grid grid-cols-[132px_1fr] gap-3">
                 <div className="overflow-hidden rounded-md border border-edge bg-deep">
@@ -183,7 +185,8 @@ export default function IncidentPanel({ inc, index, total, onPrev, onNext, onOpe
               </div>
             )}
           </div>
-          <div className="border-t border-edge p-2.5">
+          </div>
+          <div className="shrink-0 border-t border-edge p-2.5">
             <input name="review-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional note, saved with your decision" className="mb-2 short:mb-1.5 short:py-1 w-full rounded-md border border-line bg-deep px-3 py-1.5 text-[12px] outline-none focus:border-beam2" maxLength={400} />
             <div className="grid grid-cols-3 gap-2">
               <button disabled={!!busy} onClick={() => act("CONFIRM")} className="btn btn-good whitespace-nowrap px-2" title="A real event. The substance stays unconfirmed until water samples are tested."><Check size={15} /> Confirm</button>

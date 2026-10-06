@@ -1,12 +1,13 @@
 "use client";
 /**
- * JUDGE MODE - the closed loop in eleven steps, two to three minutes.
+ * JUDGE MODE - why it matters, the closed loop, and who it is for, in thirteen
+ * steps, about three minutes.
  *
  * Every number on screen is read live from this visitor's workspace (the same
- * engine the operational screens use) or from the pipeline outputs; nothing is
- * scripted into the page. Steps 7, 9 and 10 are real actions - a review, a
- * training job and a gated promotion - so autoplay waits for the presenter
- * there. The workspace can be reset from Settings.
+ * engine the operational screens use) or from the pipeline outputs; the only
+ * typed-in facts are the two sourced context facts on the first step. The
+ * review, training and promotion steps are real actions, so autoplay waits for
+ * the presenter there. The workspace can be reset from Settings.
  */
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -32,8 +33,9 @@ const GATE_LABEL: Record<string, string> = {
 const IncidentMap = dynamic(() => import("@/components/map/IncidentMap"), { ssr: false });
 const CubeViewer = dynamic(() => import("@/components/spectra/CubeViewer"), { ssr: false });
 
-type Stage = "coast" | "sensors" | "change" | "features" | "cube" | "quantify" | "review" | "label" | "retrain" | "gate" | "loop";
+type Stage = "why" | "coast" | "sensors" | "change" | "features" | "cube" | "quantify" | "review" | "label" | "retrain" | "gate" | "impact" | "loop";
 const STEPS: { stage: Stage; say: string; secs: number; action?: boolean }[] = [
+  { stage: "why", say: "The UAE drinks the sea. When the sea changes, the taps are at risk.", secs: 15 },
   { stage: "coast", say: "This is the UAE coastline BlueBan watches.", secs: 11 },
   { stage: "sensors", say: "Sentinel-2 photographs this water every few days. Sentinel-3 gives a second opinion.", secs: 12 },
   { stage: "change", say: "Something changed.", secs: 10 },
@@ -44,11 +46,23 @@ const STEPS: { stage: Stage; say: string; secs: number; action?: boolean }[] = [
   { stage: "label", say: "Each decision becomes a verified label the model can learn from.", secs: 10 },
   { stage: "retrain", say: "With enough verified labels, we train a new model.", secs: 12, action: true },
   { stage: "gate", say: "The live model stays until the new one passes a safety check. A person signs off.", secs: 14, action: true },
+  { stage: "impact", say: "Built for the people who must decide before the water reaches the intake.", secs: 16 },
   { stage: "loop", say: "BlueBan does more than detect. Satellites, analysts and field teams improve it with every incident.", secs: 16 },
+];
+
+/** The two context facts behind step 1, with their sources (not computed by BlueBan). */
+const WHY_FACTS = [
+  { k: "Drinking water", v: "~70 plants", sub: "Most of the UAE's drinking water comes from about 70 major desalination plants on its two coasts.", src: "UAE Government portal (u.ae), Water", url: "https://u.ae/en/information-and-services/environment-and-energy/water-and-energy/water-" },
+  { k: "2008–09 red tide", v: "up to 4 months", sub: "A Cochlodinium bloom spread across the Gulf of Oman and the Gulf. Reverse-osmosis desalination plants shut for up to four months, Fujairah's among them.", src: "IOC-UNESCO (2017), Harmful Algal Blooms and Desalination, Manuals and Guides 78", url: "https://repository.oceanbestpractices.org/handle/11329/759" },
 ];
 const CLOSING = "BlueBan turns every coastal incident into both a response and a lesson.";
 
-type VSum = { A_data_quality: { aois: { aoi_id: string; n_ok: number; n_usable: number; date_range: [string, string] }[] }; B_matchups: { cross_sensor: { n: number; median_abs_dt_minutes?: number | null } }; D_813_ablation: { hard?: { arms: Record<string, { confusion_matrix?: { fp: number } }> } } };
+type VSum = {
+  A_data_quality: { aois: { aoi_id: string; n_ok: number; n_usable: number; date_range: [string, string] }[] };
+  B_matchups: { cross_sensor: { n: number; median_abs_dt_minutes?: number | null } };
+  C_model_performance?: { production?: { metrics?: { auprc?: number } }; candidate?: { metrics?: { auprc?: number } }; bootstrap?: { auprc?: { ci?: [number, number] } } };
+  D_813_ablation: { hard?: { arms: Record<string, { confusion_matrix?: { fp: number } }> } };
+};
 
 function Fact({ k, v, sub, tone = "text-ink" }: { k: string; v: React.ReactNode; sub?: React.ReactNode; tone?: string }) {
   return (
@@ -139,6 +153,7 @@ function Judge() {
   const nDt = vs?.A_data_quality.aois.reduce((s, a) => s + a.n_ok, 0);
   const uaeAois = aois.filter((a) => a.id.startsWith("AE"));
   const fpA = vs?.D_813_ablation.hard?.arms?.S2_multispectral_11band?.confusion_matrix?.fp, fpB = vs?.D_813_ablation.hard?.arms?.["813_hyperspectral_205band"]?.confusion_matrix?.fp;
+  const apRule = vs?.C_model_performance?.production?.metrics?.auprc, apCand = vs?.C_model_performance?.candidate?.metrics?.auprc, apCi = vs?.C_model_performance?.bootstrap?.auprc?.ci;
   const showMap = ["coast", "sensors", "change"].includes(step.stage);
 
   return (
@@ -162,6 +177,46 @@ function Judge() {
           {showMap && (
             <IncidentMap incident={step.stage === "change" ? hero || null : null} incidents={step.stage === "change" && hero ? [{ id: hero.id, status: hero.status, aoi_id: hero.aoi_id, centroid: hero.centroid, title: hero.title, event_type_hypothesis: hero.event_type_hypothesis, priority: hero.priority, observation_time: hero.observation_time } as never] : []}
               aois={aois} assets={step.stage === "change" ? assets : []} compact showTimeline={false} initialMode="3d" />)}
+          {step.stage === "why" && (
+            <div className="grid h-full content-center gap-4 overflow-y-auto p-6 short:gap-3 short:p-4">
+              <div className="hud-kicker">Why this matters</div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {WHY_FACTS.map((x, k) => (
+                  <motion.div key={x.k} initial={{ opacity: 0, y: reduce ? 0 : 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: reduce ? 0 : 0.25 + k * 0.35 }}
+                    className="rounded-lg border border-edge bg-deep/70 p-4">
+                    <div className="hud-kicker">{x.k}</div>
+                    <div className="hud-value mt-1 text-[30px] font-bold leading-none text-caution short:text-[24px]">{x.v}</div>
+                    <p className="mt-2 text-[13px] leading-snug text-ink">{x.sub}</p>
+                    <a href={x.url} target="_blank" rel="noopener noreferrer" className="mt-2 block text-[11px] text-dim hover:text-cyan">Source: {x.src} ↗</a>
+                  </motion.div>))}
+              </div>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduce ? 0 : 1.1 }} className="rounded-lg border border-critical/40 bg-critical/5 p-4">
+                <div className="hud-kicker text-critical">The gap today</div>
+                <p className="mt-1 text-[13.5px] leading-snug text-ink">The warning comes from the intake filters, a boat sample on a fixed calendar, or the public. Satellite images of this water are free every few days, but nobody turns them into a decision: <b>is this unusual for this spot, and where should the boat go?</b></p>
+              </motion.div>
+            </div>)}
+          {step.stage === "impact" && (
+            <div className="grid h-full content-center gap-3 overflow-y-auto p-5 short:p-4">
+              <div className="hud-kicker">Who uses it · what it changes</div>
+              <div className="grid gap-2 md:grid-cols-3">
+                {[["Desalination & power plants", "Early warning for the water in front of the intake: distance, drift scenario, and a sampling plan."],
+                  ["Environment regulators", "Send the boat where it resolves something. Every decision goes into a tamper-evident log and can be exported."],
+                  ["Ports, fish farms, beaches", "An alert when unusual water appears near their site, with the evidence attached."]].map(([t, d], k) => (
+                  <motion.div key={t} initial={{ opacity: 0, y: reduce ? 0 : 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: reduce ? 0 : k * 0.2 }} className="rounded-lg border border-edge bg-deep/70 p-3">
+                    <div className="font-display text-[14px] font-bold">{t}</div><p className="mt-1 text-[12px] leading-snug text-muted">{d}</p>
+                  </motion.div>))}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                <Fact k="Images screened" v={nDt?.toLocaleString() ?? "…"} sub={`${uaeAois.length} UAE areas, 2017–2026, open data`} />
+                <Fact k="Learned model vs rule" v={apRule != null && apCand != null ? `${fmt.num(apRule, 2)} → ${fmt.num(apCand, 2)}` : "…"} sub={apCi ? `AUPRC on 100 held-back labels · gain CI [${fmt.num(apCi[0], 2)}, ${fmt.num(apCi[1], 2)}]` : "AUPRC on held-back labels"} tone="text-nominal" />
+                <Fact k="813 on borderline cases" v={fpA != null && fpB != null ? `${fpA} → ${fpB}` : "…"} sub={<span>false alarms at the same catch rate <SimBadge text="SIMULATED" /></span>} tone="text-caution" />
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-[11.5px]">
+                <span className="hud-kicker mr-1">How it is offered</span>
+                {["Per-area monitoring", "Per-asset alerts", "Per-event 813 hyperspectral analysis", "Reports and API"].map((t) => <span key={t} className="rounded-full border border-line bg-panel2 px-2.5 py-1 text-ink">{t}</span>)}
+                <span className="ml-auto rounded-full border border-cyan/50 px-2.5 py-1 text-cyan" title="UN Sustainable Development Goals 6 (clean water) and 14 (life below water)">SDG 6 · SDG 14</span>
+              </div>
+            </div>)}
           {step.stage === "features" && hero && (
             <div className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-2 p-4">
               <div className="flex flex-wrap items-center gap-2"><Chip label={hero.status} /><span className="font-display text-[18px] font-bold">{hero.title}</span><span className="text-[12px] text-muted">{hero.aoi_name} · {fmt.utc(hero.observation_time)}</span></div>
@@ -175,7 +230,7 @@ function Judge() {
               </div>
             </div>)}
           {step.stage === "cube" && hero?.cube && (
-            <div className="grid h-full min-h-0 grid-cols-[1.25fr_1fr]">
+            <div className="grid h-full min-h-0 grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
               <CubeViewer name={hero.cube} height="100%" sweep compact />
               <div className="flex min-h-0 flex-col gap-2 p-3">
                 <div className="hud-kicker">Event vs normal water · real Sentinel-2</div>
@@ -268,6 +323,11 @@ function Judge() {
               <div className="hud-kicker">Step {i + 1}</div>
               <p className="mt-1 font-display text-[24px] font-bold leading-snug short:text-[20px]">“{step.say}”</p>
               <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto text-[12.5px] text-muted">
+                {step.stage === "why" && <><p>BlueBan 813 watches the water in front of the UAE&apos;s intakes, beaches and ports from orbit. It flags water that is unusual <b className="text-ink">for that exact spot and season</b>, sends it to a person, then a boat, then a lab, and learns from every answer.</p>
+                  <p>Theme: Water Quality &amp; Inland/Coastal Water Intelligence. Built on open Sentinel-2/3 data, with Satellite 813 simulated from real hyperspectral pixels.</p></>}
+                {step.stage === "impact" && <><p>For an operator the question is per intake, not per incident: <Link href="/intakes" className="text-cyan hover:underline">Intake watch →</Link> shows each desalination and power-plant intake, the nearest unusual water, and the alert they would receive.</p>
+                  <p>The first pilot we ask for: <b className="text-ink">one coast, one operator, one season</b>. Their sampling calendar stays; we compare our flags with their lab results and measure whether the boat went to better places.</p>
+                  <p>No revenue is claimed and no concentration is printed without local water samples. <Link href="/validation" className="text-cyan hover:underline">See the evidence →</Link></p></>}
                 {step.stage === "coast" && <><p>{uaeAois.length} monitored areas on both UAE coasts. The Arabian Gulf is shallow, so the bright seabed shows through. The Gulf of Oman is deep and prone to algae blooms. A known false alarm from Annaba, Algeria, is kept as a test.</p><Link href="/watch" className="text-cyan hover:underline">Open WATCH →</Link></>}
                 {step.stage === "sensors" && <div className="grid grid-cols-2 gap-2">
                   <Fact k="Sentinel-2 images checked" v={nDt?.toLocaleString() ?? "…"} sub="2017–2026 · clouds and bad pixels masked" />
@@ -279,7 +339,8 @@ function Judge() {
                   Unusual water near {hero.aoi_name}. {fmt.ord(hero.temporal?.seasonal_percentile)} percentile for this time of year. Sentinel-3 check: {olci?.agrees ? "agrees" : "available"}. An analyst must review it.
                 </div>}
                 {step.stage === "features" && <p>Each number is compared with the same spot at the same time of year in past years. A sandbank that is always there scores low. A new event scores high. Sentinel-3, on the same morning, either agrees or not.</p>}
-                {step.stage === "cube" && <p>The colour sweep shows where the event differs from normal water: near 705 nm. Satellite 813 covers that region in narrow bands. We had no access to 813 data, so every 813 value here is <b className="text-ink">simulated</b> from real Tanager pixels.</p>}
+                {step.stage === "cube" && <><p>The colour sweep shows where the event differs from normal water: near 705 nm. Satellite 813 covers that region in narrow bands. We had no access to 813 data, so every 813 value here is <b className="text-ink">simulated</b> from real Tanager pixels.</p>
+                  <p>Inland, the same 813 band set is simulated on real EnMAP hyperspectral images of Shawka Dam. <Link href="/inland" className="text-cyan hover:underline">Open Inland →</Link></p></>}
                 {step.stage === "quantify" && <p>This is the honest state of UAE data, not a software limit. The Validation page shows the sample-matching rules and the calibration result.</p>}
                 {step.stage === "review" && <p>Each decision is saved with the reviewer’s name, the evidence they saw and the model version that raised the alert.</p>}
                 {step.stage === "label" && <p>Analyst labels count 1.0, field results 2.0 and Sentinel-3 checks 0.5. Labels from the same area and month stay together, in training or in the held-back test set. So the model is never tested on near-copies of what it learned from.</p>}

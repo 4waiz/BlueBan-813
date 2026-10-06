@@ -1,0 +1,14 @@
+quantity,published,this notebook,published in / note
+"Event area (km2, 20 m)",2.39,2.39,README; incident JSON 2.394
+"NDCI robust z, event median",7.3,7.32,README
+"NDCI seasonal percentile, event median",100,100.0,README
+Same-season scenes per event pixel (median),33,33,"README (MCI/hue count; NDCI count 31, its ratio is undefined over the clearest water on some dates)"
+MCI event / usual,0.0068 / 0.0007,0.0068 / 0.0007,README
+Hue angle event / usual (deg),54 / 202,54 / 202,README
+Median distance from the coast (km),8,8.4,README (8.07 on the incident's 18 x 16 km window; distance to the nearest non-water pixel)
+OLCI CHL_NN event / surroundings (mg m-3),13.1 / 3.2 (x4.1),13.1 / 3.2 (x4.1),"README; LOADED, not recomputed"
+813 sim.: false alarms S2 -> 813 at matched recall,159 -> 84 (-47 %),159 -> 84 (-47%),"README; LOADED ablation, percentage recomputed"
+Candidate vs rule AUPRC (frozen validation),0.94 vs 0.66,0.94 vs 0.66,docs/JUDGING_MATRIX.md (scripts/build_validation.py)
+"AUPRC difference, grouped bootstrap 95% CI","[0.04, 0.48]","[0.04, 0.48]",docs/JUDGING_MATRIX.md
+Held-out AOIs where the candidate wins,9 of 9,9 of 9,docs/JUDGING_MATRIX.md
+Gate decision,awaiting named human approval,CANDIDATE passed the automatic gate - awaiting named human approval,README: humans promote models

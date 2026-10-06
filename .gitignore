@@ -8,6 +8,9 @@ data/cache/
 *.zip
 *.tif
 !outputs/layers/*.tif
+# Small AOI clip + seasonal baseline read by notebooks/blueban813_poc.ipynb
+# (regenerate with scripts/fetch_sample_input.py; see data/sample_input/README.md)
+!data/sample_input/*.tif
 reference/
 
 # Python

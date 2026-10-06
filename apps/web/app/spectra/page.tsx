@@ -88,7 +88,7 @@ function Lab() {
                 {DIAGNOSTIC.map(([c, n]) => <button key={c} onClick={() => setHl(c)} className={`rounded px-2 py-0.5 ${hl === c ? "bg-caution/20 text-caution" : "text-muted hover:text-ink"}`}>{c} nm · {n}</button>)}
               </div>
             </div>) : <p className="text-muted">No spectrum for this incident.</p>)
-            : inc?.cube ? <div className="grid h-full min-h-0 grid-cols-[1.3fr_1fr] gap-3">
+            : inc?.cube ? <div className="grid h-full min-h-0 grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] gap-3">
                 <div className="min-h-[300px] overflow-hidden rounded-md border border-edge"><CubeViewer name={inc.cube} height="100%" onSpectrum={setPick} /></div>
                 <div className="flex min-h-0 flex-col">{pickSpec ? <><div className="hud-kicker mb-1">Pixel spectrum · row {pick!.row}, col {pick!.col}</div><div className="min-h-0 flex-1"><SpectrumPlot spec={pickSpec} fill range={[400, pick!.wavelengths_nm[pick!.wavelengths_nm.length - 1] > 1000 ? 1700 : 900]} showBands={false} /></div></> : <p className="text-[12px] text-muted">Click the bright slice to see one pixel&apos;s spectrum. Drag the slider or press Scan to move through the bands. Red dashed frames are bands with no valid data. They stay empty, never filled in.</p>}</div>
               </div>

@@ -10,7 +10,8 @@
  * browser. Heights are categorical (inside / outside / wet), not terrain.
  */
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
+import { ThreeEvent, useFrame } from "@react-three/fiber";
+import Canvas from "@/components/three/ZoomCanvas";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useReducedMotion } from "framer-motion";

@@ -148,7 +148,7 @@ export default function DataPage() {
       </div>
       {s ? <Policy p={s.data_policy} /> : <div className="text-muted">{st.error ? `Could not load status.json: ${st.error}` : "Loading…"}</div>}
       {tab === "sources" && s && (
-        <div className="grid min-h-0 gap-3 overflow-y-auto">
+        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0">
           {s.lineage && <Panel title="From satellite to incident" kicker="Counts read from the pipeline outputs" bodyClass="p-3"><Lineage l={s.lineage} /></Panel>}
           <Panel title="Data sources" kicker="Who provides it · licence · what we use it for" bodyClass="p-3">
             <div className="overflow-x-auto">

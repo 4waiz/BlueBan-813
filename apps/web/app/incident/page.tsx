@@ -67,7 +67,7 @@ function Investigation() {
               <span className="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full" style={{ background: e.color, boxShadow: `0 0 8px ${e.color}` }} />
               <div className="hud-value text-[10.5px] text-dim">{fmt.utc(e.at)} · {e.kind}</div>
               <div className="text-[12.5px] font-semibold">{e.title}</div>
-              {e.detail && <div className="text-[11.5px] text-muted">{e.detail}</div>}
+              {e.detail && <div className="break-words text-[11.5px] text-muted [overflow-wrap:anywhere]">{e.detail}</div>}
             </li>
           ))}
         </ol>
@@ -79,11 +79,12 @@ function Investigation() {
           <Link href={`/field?id=${inc.id}`} className="btn w-full">Water sampling for this incident</Link>
         </div>
       </Panel>
-      <div className="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] gap-3">
-        <div className="panel relative min-h-[380px] overflow-hidden p-0">
+      {/* one screen on desktop: the map takes the free height, the evidence scrolls inside its own panel */}
+      <div className="flex min-h-0 flex-col gap-3 short:gap-2">
+        <div className="panel relative h-[420px] min-h-0 shrink-0 overflow-hidden p-0 xl:h-auto xl:min-h-[200px] xl:flex-1 xl:shrink">
           <IncidentMap incident={inc} incidents={list.data || []} aois={aois.data || []} assets={assets.data || []} stations={stations.data} samples={inc.samples || []} initialMode="split" />
         </div>
-        <Panel title="Evidence" bodyClass="grid gap-3 p-3 md:grid-cols-2 2xl:grid-cols-3">
+        <Panel className="shrink-0 xl:max-h-[46%]" title="Evidence" bodyClass="grid content-start gap-3 overflow-y-auto p-3 md:grid-cols-2 2xl:grid-cols-3">
           <section className="panel-flat p-3 text-[12px]"><div className="hud-kicker mb-1">Detection</div>
             <div className="kv"><span title="How unusual the colour is vs all water in this image (RX detector, percentile). 100th = most unusual.">Spectral anomaly score</span><span className="hud-value">{fmt.ord(inc.spatial?.rx_percentile)}</span></div>
             <div className="kv"><span title="Robust z-score vs the same season in past years. 0 is normal. Higher is more unusual.">Score vs past years</span><span className="hud-value">{fmt.num(mf.robust_z_primary as number, 1)}</span></div>

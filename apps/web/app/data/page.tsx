@@ -7,12 +7,12 @@
  * documentation. Nothing here is typed in by hand except the source register,
  * which lives in one place (scripts/build_static_site.py).
  */
-import React, { useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, CircleX, Database, ExternalLink, FileText, Fingerprint, ShieldCheck } from "lucide-react";
+import React, { useMemo, useRef, useState } from "react";
+import { ArrowRight, CheckCircle2, CircleX, Database, ExternalLink, FileText, Fingerprint, ShieldCheck, Workflow } from "lucide-react";
 import { pipelineUrl, useEngineQuery, useStatic } from "@/lib/engine";
 import type { AuditEvent } from "@/lib/engine/types";
 import Markdown from "@/components/ui/Markdown";
-import { Chip, fmt, Panel } from "@/components/ui";
+import { Chip, fmt, Pager, Panel, useFitPage } from "@/components/ui";
 
 type Source = { name: string; provider: string; licence: string; role: string; status: string; url: string | null };
 type Status = {
@@ -71,6 +71,8 @@ function AuditLog() {
   const [verify, setVerify] = useState<{ ok: boolean; n: number; first_bad_seq?: number } | null>(null);
   const q = useEngineQuery((e) => e.audit(type || undefined, undefined, 300), [type]);
   const rows = q.data || [];
+  const box = useRef<HTMLDivElement>(null);
+  const pg = useFitPage(rows, box);
   const types = useMemo(() => ["", "incident", "review", "label", "sample", "measurement", "training_job", "model", "aoi", "asset", "alert"], []);
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
@@ -83,12 +85,13 @@ function AuditLog() {
           ? <span className="flex items-center gap-1 text-[12px] text-nominal"><CheckCircle2 size={14} /> Intact · {verify.n} events checked</span>
           : <span className="flex items-center gap-1 text-[12px] text-critical"><CircleX size={14} /> Broken at event {verify.first_bad_seq}</span>)}
         <span className="ml-auto text-[11px] text-dim" title="Each event stores the SHA-256 hash of the event before it.">Each event is sealed to the one before it. Editing a past event breaks the chain.</span>
+        <Pager {...pg} />
       </div>
-      <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
+      <div ref={box} className="scroll-quiet min-h-0 flex-1 overflow-y-auto rounded-md border border-edge">
         <table className="w-full text-[11.5px]">
           <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">#</th><th className="px-2 text-left">When (UTC)</th><th className="px-2 text-left">Who</th><th className="px-2 text-left">Action</th><th className="px-2 text-left">Record</th><th className="px-2 text-left" title="First 12 characters of the event's SHA-256 hash">Seal</th></tr></thead>
           <tbody>
-            {rows.map((a: AuditEvent) => (
+            {pg.rows.map((a: AuditEvent) => (
               <tr key={a.seq} className="border-b border-edge/50" title={JSON.stringify(a.detail)}>
                 <td className="hud-value px-2 py-1 text-dim">{a.seq}</td>
                 <td className="px-2">{fmt.utc(a.at)}</td>
@@ -116,14 +119,14 @@ function Docs() {
   const docs = idx?.docs || [];
   return (
     <div className="grid h-full min-h-0 gap-3 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <div className="min-h-0 space-y-1 overflow-y-auto">
+      <div className="scroll-quiet min-h-0 space-y-1 overflow-y-auto">
         {docs.map((d) => (
           <button key={d.key} onClick={() => open(d.key)} className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[12px] ${key === d.key ? "bg-beam/20 text-ink" : "text-muted hover:bg-white/5 hover:text-ink"}`}>
             <span className="flex items-center gap-2"><FileText size={13} />{d.file.replace(/^archive\//, "archive · ").replace(/\.md$/, "").replace(/_/g, " ")}</span>
             <span className="text-[10px] text-dim">{(d.bytes / 1024).toFixed(0)} KB</span>
           </button>))}
       </div>
-      <div className="min-h-0 overflow-y-auto rounded-md border border-edge bg-deep/40 px-5 py-3">
+      <div className="scroll-quiet min-h-0 overflow-y-auto rounded-md border border-edge bg-deep/40 px-5 py-3">
         {key ? <Markdown text={text} /> : <p className="text-[13px] text-muted">Pick a document on method, limits, data audits or validation. Older conclusions stay in the archive, marked historical.</p>}
       </div>
     </div>
@@ -132,8 +135,10 @@ function Docs() {
 
 export default function DataPage() {
   const st = useStatic<Status>("status.json");
-  const [tab, setTab] = useState<"sources" | "audit" | "docs">("sources");
+  const [tab, setTab] = useState<"sources" | "lineage" | "audit" | "docs">("sources");
   const s = st.data;
+  const srcBox = useRef<HTMLDivElement>(null);
+  const srcPg = useFitPage(s?.sources || [], srcBox);
   return (
     <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] gap-3 overflow-hidden p-3 short:gap-2 short:p-2">
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -142,19 +147,18 @@ export default function DataPage() {
           <h1 className="font-display text-[22px] font-bold tracking-wide">Where every number comes from</h1>
         </div>
         <div className="flex gap-1">
-          {([["sources", "Sources", <Database key="d" size={14} />], ["audit", "Audit log", <ShieldCheck key="a" size={14} />], ["docs", "Documents", <FileText key="f" size={14} />]] as const).map(([k, label, icon]) => (
+          {([["sources", "Sources", <Database key="d" size={14} />], ["lineage", "Lineage", <Workflow key="l" size={14} />], ["audit", "Audit log", <ShieldCheck key="a" size={14} />], ["docs", "Documents", <FileText key="f" size={14} />]] as const).map(([k, label, icon]) => (
             <button key={k} onClick={() => setTab(k)} className={`btn px-3 py-1.5 text-[12px] ${tab === k ? "border-beam bg-beam/15" : ""}`}>{icon}{label}</button>))}
         </div>
       </div>
       {s ? <Policy p={s.data_policy} /> : <div className="text-muted">{st.error ? `Could not load status.json: ${st.error}` : "Loading…"}</div>}
+      {tab === "lineage" && s?.lineage && <Panel title="From satellite to incident" kicker="Counts read from the pipeline outputs" className="min-h-0" bodyClass="scroll-quiet min-h-0 overflow-y-auto p-3"><Lineage l={s.lineage} /></Panel>}
       {tab === "sources" && s && (
-        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0">
-          {s.lineage && <Panel title="From satellite to incident" kicker="Counts read from the pipeline outputs" bodyClass="p-3"><Lineage l={s.lineage} /></Panel>}
-          <Panel title="Data sources" kicker="Who provides it · licence · what we use it for" bodyClass="p-3">
-            <div className="overflow-x-auto">
+          <Panel title="Data sources" kicker="Who provides it · licence · what we use it for" right={<Pager {...srcPg} />} className="min-h-0" bodyClass="flex min-h-0 flex-col p-3">
+            <div ref={srcBox} className="scroll-quiet min-h-0 flex-1 overflow-auto">
               <table className="w-full text-[12px]">
                 <thead><tr className="border-b border-edge text-dim"><th className="px-2 py-1.5 text-left">Source</th><th className="px-2 text-left">Provider</th><th className="px-2 text-left">Licence</th><th className="px-2 text-left">Used for</th><th className="px-2 text-left">Status</th></tr></thead>
-                <tbody>{(s.sources || []).map((r) => (
+                <tbody>{srcPg.rows.map((r) => (
                   <tr key={r.name} className="border-b border-edge/50 align-top">
                     <td className="px-2 py-1.5 font-semibold">{r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-cyan">{r.name}<ExternalLink size={11} /></a> : r.name}</td>
                     <td className="px-2 py-1.5 text-muted">{r.provider}</td>
@@ -164,9 +168,8 @@ export default function DataPage() {
                   </tr>))}</tbody>
               </table>
             </div>
-            <p className="mt-2 text-[11px] text-dim">Restricted data (login-only platforms, commercial imagery) stays in data/raw/private/, which is kept out of the repository. Nothing on this page or in the repository is restricted data.</p>
-          </Panel>
-        </div>)}
+            <p className="mt-2 shrink-0 text-[11px] text-dim">Restricted data (login-only platforms, commercial imagery) stays in data/raw/private/, which is kept out of the repository. Nothing on this page or in the repository is restricted data.</p>
+          </Panel>)}
       {tab === "audit" && <Panel title="Audit log" kicker="Tamper-proof · this workspace" bodyClass="min-h-0 p-3" className="min-h-0"><AuditLog /></Panel>}
       {tab === "docs" && <Panel title="Documentation" bodyClass="min-h-0 p-3" className="min-h-0"><Docs /></Panel>}
     </div>

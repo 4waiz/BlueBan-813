@@ -54,7 +54,7 @@ function Stat({ k, v, digits = 0, suffix = "", sub, color = "#EAF1FF", delay = 0
       className="rounded-lg border border-edge/80 bg-panel/60 px-3 py-2.5">
       <div className="hud-kicker">{k}</div>
       <div className="mt-0.5 text-[24px] font-bold leading-none" style={{ color }}><Tween value={shown} digits={digits} suffix={suffix} /></div>
-      <div className="mt-1 text-[11px] leading-snug text-muted">{sub}</div>
+      <div className="mt-1 text-[11px] leading-snug text-muted mini:hidden">{sub}</div>
     </motion.div>
   );
 }
@@ -63,7 +63,7 @@ function WaterPresence({ s }: { s: InlandSummary }) {
   const reduce = useReducedMotion();
   const max = Math.max(...s.water_presence_periods.map((p) => p.ndwi_gt0_pct[1]), 1) * 1.08;
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2 tiny:space-y-1.5">
       {s.water_presence_periods.map((p, i) => (
         <div key={p.period}>
           <div className="mb-1 flex justify-between text-[11px]"><span className="text-ink">{p.period}</span>
@@ -76,7 +76,7 @@ function WaterPresence({ s }: { s: InlandSummary }) {
           </div>
         </div>
       ))}
-      <p className="text-[10.5px] leading-snug text-dim">How much of the area shows water in monthly Sentinel-2 images. Blue: any water. White: clear open water.</p>
+      <p className="text-[10.5px] leading-snug text-dim mini:hidden">How much of the area shows water in monthly Sentinel-2 images. Blue: any water. White: clear open water.</p>
     </div>
   );
 }
@@ -183,7 +183,21 @@ export default function InlandPage() {
       ]} />
 
       {/* ---------------------------------------------------------------- wet core + stats */}
-      {view === "pool" && <div className="grid gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+      {view === "pool" && <div className="grid gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] xl:grid-rows-[auto_minmax(0,1fr)]">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:col-span-2 xl:grid-cols-6">
+            <Stat k="Water pool" v={m.persistent_core.n} suffix=" px" color="#27C3F3" delay={0}
+              sub={<>about {((m.persistent_core.n * pxArea) / 1e4).toFixed(1)} ha · wet on both dates</>} />
+            <Stat k="April 2024 alone" v={m["2024-04-24"].n} suffix=" px" color="#FFC23D" delay={0.08}
+              sub={<>{overlap === 0 ? "none of them overlap" : `${overlap} overlap`} with 2022 (note F11)</>} />
+            <Stat k="Water-index check" v={m.mndwi_core.n} suffix=" px" color="#FF8A3D" delay={0.16}
+              sub={<>a standard index does not confirm the pool</>} />
+            <Stat k="Anomaly alerts" v={(an.per_date?.["2022-09-08"]?.n_events || 0) + (an.per_date?.["2024-04-24"]?.n_events || 0)} color="#93A6CB" delay={0.24}
+              sub={<>expected by design, so not proof of clean water (F5)</>} />
+            <Stat k="Unusual dates" v={t.n_flagged} suffix={` / ${t.n_observations}`} color="#FF4D5E" delay={0.32}
+              sub={<>chance alone gives {t.chance_level.expected_flags_if_indices_perfectly_correlated}–{t.chance_level.expected_flags_if_indices_independent} (F4)</>} />
+            <Stat k="813 bands we can simulate" v={sup?.n_with_real_support || 0} suffix={` / ${s.satellite813.spec813.n_bands}`} color="#23D484" delay={0.4}
+              sub={<>{sup ? `${sup.unsupported_ranges_nm.length} gaps left empty, not invented` : "n/a"}</>} />
+          </div>
         <Panel kicker="Each tile is one 30 m pixel · drag to rotate" title="Where the water is"
           right={<div className="flex flex-wrap gap-1">{MASK_KEYS.map((k) => (
             <button key={k} onClick={() => setLayer(k)} className={`btn px-2.5 py-1 text-[11px] ${layer === k ? "border-beam bg-beam/20 text-ink" : ""}`}>
@@ -211,22 +225,8 @@ export default function InlandPage() {
           )}
         </Panel>
 
-        {/* panels keep their natural height (shrink-0) so this column scrolls instead of squashing them */}
-        <div className="flex flex-col gap-3 xl:min-h-0 xl:overflow-y-auto xl:pr-1 [&>*]:shrink-0">
-          <div className="grid grid-cols-2 gap-2">
-            <Stat k="Water pool" v={m.persistent_core.n} suffix=" px" color="#27C3F3" delay={0}
-              sub={<>about {((m.persistent_core.n * pxArea) / 1e4).toFixed(1)} ha · wet on both dates</>} />
-            <Stat k="April 2024 alone" v={m["2024-04-24"].n} suffix=" px" color="#FFC23D" delay={0.08}
-              sub={<>{overlap === 0 ? "none of them overlap" : `${overlap} overlap`} with 2022 (note F11)</>} />
-            <Stat k="Water-index check" v={m.mndwi_core.n} suffix=" px" color="#FF8A3D" delay={0.16}
-              sub={<>a standard index does not confirm the pool</>} />
-            <Stat k="Anomaly alerts" v={(an.per_date?.["2022-09-08"]?.n_events || 0) + (an.per_date?.["2024-04-24"]?.n_events || 0)} color="#93A6CB" delay={0.24}
-              sub={<>expected by design, so not proof of clean water (F5)</>} />
-            <Stat k="Unusual dates" v={t.n_flagged} suffix={` / ${t.n_observations}`} color="#FF4D5E" delay={0.32}
-              sub={<>chance alone gives {t.chance_level.expected_flags_if_indices_perfectly_correlated}–{t.chance_level.expected_flags_if_indices_independent} (F4)</>} />
-            <Stat k="813 bands we can simulate" v={sup?.n_with_real_support || 0} suffix={` / ${s.satellite813.spec813.n_bands}`} color="#23D484" delay={0.4}
-              sub={<>{sup ? `${sup.unsupported_ranges_nm.length} gaps left empty, not invented` : "n/a"}</>} />
-          </div>
+        {/* the six numbers sit in a strip above; this column holds two panels that fit */}
+        <div className="scroll-quiet flex flex-col gap-3 xl:grid xl:min-h-0 xl:grid-cols-2 xl:content-start xl:overflow-y-auto [&>*]:shrink-0">
           <Panel kicker={`Pool pixels by type · ${fpDate || "2024-04-24"}`} title="What the water looks like" bodyClass="px-4 pb-3">
             <div className="flex h-3 overflow-hidden rounded-full bg-deep">
               {Object.entries(classCounts || {}).map(([c, n]) => (
@@ -267,10 +267,10 @@ export default function InlandPage() {
 
       {/* ---------------------------------------------------------------- flags + docs */}
       {view === "notes" && <div className="grid gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <Panel kicker="Review notes · flagged, not changed" title={<span className="flex items-center gap-2"><AlertTriangle size={15} className="text-caution" />Things to double-check</span>} bodyClass="px-4 pb-3 xl:overflow-y-auto">
+        <Panel kicker="Review notes · flagged, not changed" title={<span className="flex items-center gap-2"><AlertTriangle size={15} className="text-caution" />Things to double-check</span>} bodyClass="px-4 pb-3 scroll-quiet xl:overflow-y-auto">
           <Flags s={s} />
         </Panel>
-        <Panel kicker="Full write-ups" title="Documents" bodyClass="px-4 pb-3 xl:overflow-y-auto">
+        <Panel kicker="Full write-ups" title="Documents" bodyClass="px-4 pb-3 scroll-quiet xl:overflow-y-auto">
           <div className="space-y-1">
             {inlandDocs.map((d) => (
               <button key={d.key} onClick={() => openDoc(d.key)} className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[12px] text-muted hover:bg-white/5 hover:text-ink">

@@ -457,7 +457,8 @@ function headlines(d: Summary): Record<string, string> {
 export default function ValidationPage() {
   const q = useStatic<Summary>("validation/validation_summary.json");
   const live = useEngineQuery((e) => e.models("triage").then((ms) => ms.find((m) => m.status === "PRODUCTION") || null));
-  const [open, setOpen] = useState<string>("all");
+  // One section at a time (A to F work as tabs), so the page fits the screen.
+  const [open, setOpen] = useState<string>("A");
   const d = q.data;
   const status = useMemo(() => {
     if (!d) return {} as Record<string, React.ReactNode>;
@@ -476,8 +477,8 @@ export default function ValidationPage() {
   const show = (k: string) => open === "all" || open === k;
   const H = headlines(d);
   return (
-    <div className="h-full overflow-y-auto p-3 short:p-2">
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+    <div className="p-3 short:p-2 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+      <div className="mb-3 flex shrink-0 flex-wrap items-center gap-2 short:mb-2">
         <div className="mr-2">
           <div className="hud-kicker">Validation · updated {fmt.utc(d.generated_utc)}</div>
           <h1 className="font-display text-[22px] font-bold tracking-wide">What the evidence shows, and what it doesn’t yet</h1>
@@ -498,20 +499,20 @@ export default function ValidationPage() {
           </div>
         </WhyButton>
       </div>
-      <div className="mb-3 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-3 grid shrink-0 grid-cols-2 gap-2 short:mb-2 md:grid-cols-3 xl:grid-cols-6" role="tablist" aria-label="Evidence sections">
         {SECTIONS.map((s) => (
-          <button key={s.key} onClick={() => setOpen(open === s.key ? "all" : s.key)} className={`panel-flat flex items-center gap-2 px-3 py-2 text-left ${open === s.key ? "border-beam" : ""}`}>
-            <span className="grid h-7 w-7 place-items-center rounded-md bg-beam/15 font-display font-bold text-beam">{s.key}</span>
+          <button key={s.key} role="tab" aria-selected={open === s.key} onClick={() => setOpen(s.key)} className={`panel-flat flex items-center gap-2 px-3 py-2 text-left ${open === s.key ? "border-beam bg-beam/10" : "hover:border-line"}`}>
+            <span className="grid h-7 w-7 place-items-center rounded-md bg-beam/15 font-display font-bold text-beam2">{s.key}</span>
             <span className="min-w-0"><span className="flex items-center gap-1 text-[12px] font-bold tracking-wide">{s.icon}{s.title}</span><span className="block truncate text-[11px] text-muted">{status[s.key]}</span></span>
           </button>))}
       </div>
-      <div className="space-y-3">
-        {show("A") && <Panel kicker="A · Data quality" title={H.A} right={<span className="flex shrink-0 items-center gap-3"><DataQualityWhy d={d.A_data_quality} /><CheckCircle2 size={16} className="text-nominal" /></span>} bodyClass="p-3"><DataQuality d={d.A_data_quality} /></Panel>}
-        {show("B") && <Panel kicker="B · Independent checks" title={H.B} right={<span className="flex shrink-0 items-center gap-3"><MatchupsWhy d={d.B_matchups} /><AlertTriangle size={16} className="text-critical" /></span>} bodyClass="p-3"><Matchups d={d.B_matchups} /></Panel>}
-        {show("C") && <Panel kicker="C · Model performance" title={H.C} right={<span className="flex shrink-0 items-center gap-3"><PerformanceWhy d={d.C_model_performance} /></span>} bodyClass="p-3"><Performance d={d.C_model_performance} live={live.data} /></Panel>}
-        {show("D") && <Panel kicker="D · What 813 adds" title={H.D} right={<span className="flex shrink-0 items-center gap-3"><AblationWhy d={d.D_813_ablation} /><SimBadge /></span>} bodyClass="p-3"><Ablation d={d.D_813_ablation} /></Panel>}
-        {show("E") && <Panel kicker="E · Unseen areas" title={H.E} right={<span className="flex shrink-0 items-center gap-3"><HoldoutWhy /></span>} bodyClass="p-3"><Holdout d={d.E_spatial_holdout} /></Panel>}
-        {show("F") && <Panel kicker="F · False-alarm test" title={H.F} right={<span className="flex shrink-0 items-center gap-3"><NegativeWhy d={d.F_negative_control} /><CircleSlash size={16} className="text-nominal" /></span>} bodyClass="p-3"><Negative d={d.F_negative_control} /></Panel>}
+      <div className="space-y-3 lg:min-h-0 lg:flex-1 lg:[&>section]:h-full">
+        {show("A") && <Panel kicker="A · Data quality" title={H.A} right={<span className="flex shrink-0 items-center gap-3"><DataQualityWhy d={d.A_data_quality} /><CheckCircle2 size={16} className="text-nominal" /></span>} bodyClass="scroll-quiet p-3 lg:overflow-y-auto"><DataQuality d={d.A_data_quality} /></Panel>}
+        {show("B") && <Panel kicker="B · Independent checks" title={H.B} right={<span className="flex shrink-0 items-center gap-3"><MatchupsWhy d={d.B_matchups} /><AlertTriangle size={16} className="text-critical" /></span>} bodyClass="scroll-quiet p-3 lg:overflow-y-auto"><Matchups d={d.B_matchups} /></Panel>}
+        {show("C") && <Panel kicker="C · Model performance" title={H.C} right={<span className="flex shrink-0 items-center gap-3"><PerformanceWhy d={d.C_model_performance} /></span>} bodyClass="scroll-quiet p-3 lg:overflow-y-auto"><Performance d={d.C_model_performance} live={live.data} /></Panel>}
+        {show("D") && <Panel kicker="D · What 813 adds" title={H.D} right={<span className="flex shrink-0 items-center gap-3"><AblationWhy d={d.D_813_ablation} /><SimBadge /></span>} bodyClass="scroll-quiet p-3 lg:overflow-y-auto"><Ablation d={d.D_813_ablation} /></Panel>}
+        {show("E") && <Panel kicker="E · Unseen areas" title={H.E} right={<span className="flex shrink-0 items-center gap-3"><HoldoutWhy /></span>} bodyClass="scroll-quiet p-3 lg:overflow-y-auto"><Holdout d={d.E_spatial_holdout} /></Panel>}
+        {show("F") && <Panel kicker="F · False-alarm test" title={H.F} right={<span className="flex shrink-0 items-center gap-3"><NegativeWhy d={d.F_negative_control} /><CircleSlash size={16} className="text-nominal" /></span>} bodyClass="scroll-quiet p-3 lg:overflow-y-auto"><Negative d={d.F_negative_control} /></Panel>}
       </div>
     </div>
   );

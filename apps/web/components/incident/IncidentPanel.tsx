@@ -90,7 +90,7 @@ export default function IncidentPanel({ inc, loading = false, index, total, onPr
       <AnimatePresence mode="wait">
         <motion.div key={inc.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex min-h-0 flex-1 flex-col">
           {/* Card, tabs and tab content scroll together inside the panel; the decision buttons stay pinned below. */}
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="scroll-quiet min-h-0 flex-1 overflow-y-auto">
           <div className="mx-4 flex items-start gap-3 rounded-lg border p-3 short:p-2" style={{ borderColor: `${color}55`, background: `linear-gradient(90deg, ${color}22, transparent)` }}>
             <AlertTriangle size={30} style={{ color }} className="mt-0.5 shrink-0 short:hidden" />
             <div className="min-w-0 flex-1">
@@ -106,11 +106,11 @@ export default function IncidentPanel({ inc, loading = false, index, total, onPr
           <Tabs fit className="sticky top-0 z-10 mx-4 mt-2 bg-panel" value={tab} onChange={setT} tabs={[
             { key: "overview", label: "Overview" }, { key: "spectral", label: "Spectrum" }, { key: "temporal", label: "History" },
             { key: "assets", label: "Assets" }, { key: "actions", label: "Actions" }]} />
-          <div className="px-4 py-3">
+          <div className="px-4 py-3 tiny:py-2">
             {tab === "overview" && (
-              <div className="grid grid-cols-[132px_1fr] gap-3">
+              <div className="grid grid-cols-[132px_1fr] gap-3 tiny:grid-cols-[112px_1fr] tiny:gap-2">
                 <div className="overflow-hidden rounded-md border border-edge bg-deep">
-                  {thumb ? <img src={pipelineUrl(thumb.url)} alt={thumb.label} className="h-[150px] w-full object-cover" /> : <div className="grid h-[150px] place-items-center text-[11px] text-dim">No image</div>}
+                  {thumb ? <img src={pipelineUrl(thumb.url)} alt={thumb.label} className="h-[150px] w-full object-cover tiny:h-[124px]" /> : <div className="grid h-[150px] place-items-center text-[11px] text-dim tiny:h-[124px]">No image</div>}
                 </div>
                 <div>
                   <div className="kv"><span>Suspected type</span><span className="text-right font-semibold">{EVENT_TYPES[inc.event_type_hypothesis]?.split(" /")[0]}</span></div>
@@ -121,7 +121,7 @@ export default function IncidentPanel({ inc, loading = false, index, total, onPr
                 <div className="col-span-2">
                   {Object.entries({ ...est, ...wq }).slice(0, 6).map(([k, v]) => (
                     <div key={k} className="kv">
-                      <span className="flex items-center gap-2">{v.label || k} <Kind kind={v.quantity_kind} /></span>
+                      <span className="flex min-w-0 items-center gap-2"><span className="truncate" title={v.label || k}>{v.label || k}</span> <Kind kind={v.quantity_kind} /></span>
                       <span className="flex items-center gap-2">
                         <span className="hud-value">{fmt.num(v.value, Math.abs(v.value ?? 0) < 1 ? 3 : 1)}{v.units && v.units !== "dimensionless" ? ` ${v.units}` : ""}</span>
                         {v.seasonal_percentile != null && <span className="text-[10.5px] text-caution" title="Percentile vs the same season in past years">{fmt.ord(v.seasonal_percentile)} pct</span>}
@@ -130,11 +130,11 @@ export default function IncidentPanel({ inc, loading = false, index, total, onPr
                   ))}
                   <div className="kv"><span title="Do other satellites see it too? Sentinel-3 is a second-satellite check, not ground truth.">Satellite agreement</span>
                     <span className="flex flex-wrap justify-end gap-1">{Object.entries(agree).map(([k, v]) => (
-                      <span key={k} title={v.note} className="rounded px-1.5 py-0.5 text-[10px] font-bold" style={{ color: v.agrees ? "#23D484" : v.agrees === false ? "#FF4D5E" : "#5D7299", background: "#0A1630", border: "1px solid #16284D" }}>
+                      <span key={k} title={v.note} className="rounded px-1.5 py-0.5 text-[10px] font-bold" style={{ color: v.agrees ? "#23D484" : v.agrees === false ? "#FF4D5E" : "#93A6CB", background: "#0A1630", border: "1px solid #16284D" }}>
                         {v.agrees ? "✓" : v.agrees === false ? "✗" : "·"} {k.split(" (")[0]}</span>))}</span></div>
-                  <div className="kv"><span>Nearest asset</span><span className="text-right">{nearest ? <>{nearest.asset.name}<div className="text-[10.5px] text-muted">{fmt.km(nearest.distance_m)}</div></> : "None nearby"}</span></div>
+                  <div className="kv"><span>Nearest asset</span><span className="text-right">{nearest ? <>{nearest.asset.name} <span className="whitespace-nowrap text-[10.5px] text-muted">· {fmt.km(nearest.distance_m)}</span></> : "None nearby"}</span></div>
                   <div className="kv"><span>Field check</span><span className="text-right text-caution">{inc.recommendation?.action === "FIELD_VERIFICATION" ? "● Water sample recommended" : inc.field_validation?.status || inc.recommendation?.action?.replace(/_/g, " ")}</span></div>
-                  <div className="mt-2 flex justify-end"><WhyButton title={`Why am I seeing ${inc.id}?`}><Provenance inc={inc} /></WhyButton></div>
+                  <div className="mt-1 flex justify-end"><WhyButton title={`Why am I seeing ${inc.id}?`}><Provenance inc={inc} /></WhyButton></div>
                 </div>
                 {inc.summary && <p className="col-span-2 rounded-md border border-edge bg-deep/60 p-3 text-[12px] leading-relaxed text-muted">{inc.summary}</p>}
               </div>

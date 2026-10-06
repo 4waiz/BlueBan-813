@@ -178,7 +178,7 @@ function Judge() {
             <IncidentMap incident={step.stage === "change" ? hero || null : null} incidents={step.stage === "change" && hero ? [{ id: hero.id, status: hero.status, aoi_id: hero.aoi_id, centroid: hero.centroid, title: hero.title, event_type_hypothesis: hero.event_type_hypothesis, priority: hero.priority, observation_time: hero.observation_time } as never] : []}
               aois={aois} assets={step.stage === "change" ? assets : []} compact showTimeline={false} initialMode="3d" />)}
           {step.stage === "why" && (
-            <div className="grid h-full content-center gap-4 overflow-y-auto p-6 short:gap-3 short:p-4">
+            <div className="grid h-full content-center gap-4 scroll-quiet overflow-y-auto p-6 short:gap-3 short:p-4">
               <div className="hud-kicker">Why this matters</div>
               <div className="grid gap-3 md:grid-cols-2">
                 {WHY_FACTS.map((x, k) => (
@@ -196,7 +196,7 @@ function Judge() {
               </motion.div>
             </div>)}
           {step.stage === "impact" && (
-            <div className="grid h-full content-center gap-3 overflow-y-auto p-5 short:p-4">
+            <div className="grid h-full content-center gap-3 scroll-quiet overflow-y-auto p-5 short:p-4">
               <div className="hud-kicker">Who uses it · what it changes</div>
               <div className="grid gap-2 md:grid-cols-3">
                 {[["Desalination & power plants", "Early warning for the water in front of the intake: distance, drift scenario, and a sampling plan."],
@@ -252,7 +252,7 @@ function Judge() {
             </div>)}
           {step.stage === "review" && hero && (
             <div className="grid h-full content-center gap-4 p-6">
-              <div className="flex items-center gap-2"><UserCheck className="text-beam" /><span className="font-display text-[22px] font-bold">Analyst review · {hero.id}</span><Chip label={reviewOut ? reviewOut.after : hero.status} /></div>
+              <div className="flex items-center gap-2"><UserCheck className="text-beam2" /><span className="font-display text-[22px] font-bold">Analyst review · {hero.id}</span><Chip label={reviewOut ? reviewOut.after : hero.status} /></div>
               <p className="max-w-[640px] text-[13.5px] text-muted">The model only ranks incidents. A named analyst decides after seeing the spectrum, the measurements, the Sentinel-3 check and the timeline. The decision goes into the audit log.</p>
               {!reviewOut ? (
                 <div className="flex flex-wrap gap-3">
@@ -270,7 +270,7 @@ function Judge() {
             <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2 p-4">
               <div className="flex items-center gap-3"><Sparkles className="text-caution" /><span className="font-display text-[20px] font-bold">Verified labels · triage model</span>
                 <span className="text-[12px] text-muted">{labels.length} active labels · {labels.filter((l) => l.split === "validation").length} held back for testing</span></div>
-              <div className="min-h-0 overflow-y-auto rounded-md border border-edge">
+              <div className="min-h-0 scroll-quiet overflow-y-auto rounded-md border border-edge">
                 <table className="w-full text-[11.5px]">
                   <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">Label</th><th className="px-2 text-left">Source</th><th className="px-2 text-right" title="1 = real event, 0 = not an event">Outcome</th><th className="px-2 text-right">Weight</th><th className="px-2 text-left">Used for</th></tr></thead>
                   <tbody>
@@ -307,7 +307,7 @@ function Judge() {
                 {[["SATELLITE", <Satellite key="s" size={22} />], ["MODEL", <BrainCircuit key="m" size={22} />], ["OPERATOR", <UserCheck key="o" size={22} />], ["FIELD TEAM", <FlaskConical key="f" size={22} />], ["VERIFIED DATA", <ShieldCheck key="v" size={22} />], ["BETTER MODEL", <Sparkles key="b" size={22} />]].map(([t, ic], k) => (
                   <React.Fragment key={String(t)}>
                     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: reduce ? 0 : k * 0.35 }} className="panel-flat flex w-[132px] flex-col items-center gap-2 px-3 py-4 text-center">
-                      <span className="text-beam">{ic}</span><span className="font-display text-[13px] font-bold tracking-wider">{t}</span>
+                      <span className="text-beam2">{ic}</span><span className="font-display text-[13px] font-bold tracking-wider">{t}</span>
                     </motion.div>
                     {k < 5 && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduce ? 0 : k * 0.35 + 0.2 }}><ArrowRight className="text-cyan" /></motion.span>}
                   </React.Fragment>))}
@@ -322,7 +322,7 @@ function Judge() {
             <motion.div key={i} initial={{ opacity: 0, y: reduce ? 0 : 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.35 }} className="flex min-h-0 flex-1 flex-col">
               <div className="hud-kicker">Step {i + 1}</div>
               <p className="mt-1 font-display text-[24px] font-bold leading-snug short:text-[20px]">“{step.say}”</p>
-              <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto text-[12.5px] text-muted">
+              <div className="mt-3 min-h-0 flex-1 space-y-2 scroll-quiet overflow-y-auto text-[12.5px] text-muted">
                 {step.stage === "why" && <><p>BlueBan 813 watches the water in front of the UAE&apos;s intakes, beaches and ports from orbit. It flags water that is unusual <b className="text-ink">for that exact spot and season</b>, sends it to a person, then a boat, then a lab, and learns from every answer.</p>
                   <p>Theme: Water Quality &amp; Inland/Coastal Water Intelligence. Built on open Sentinel-2/3 data, with Satellite 813 simulated from real hyperspectral pixels.</p></>}
                 {step.stage === "impact" && <><p>For an operator the question is per intake, not per incident: <Link href="/intakes" className="text-cyan hover:underline">Intake watch →</Link> shows each desalination and power-plant intake, the nearest unusual water, and the alert they would receive.</p>

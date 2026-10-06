@@ -107,13 +107,13 @@ function Home() {
 
   const spectrumFromPick = pick && incident?.spectral ? { ...incident.spectral, wavelengths_nm: pick.wavelengths_nm, event: pick.values, background: incident.spectral.background.length === pick.values.length ? incident.spectral.background : pick.values.map(() => null), background_p05: undefined, background_p95: undefined } : null;
 
-  // Desktop: one screen, no page scroll. Map + incident panel over three panels;
-  // every panel fits its own box (the incident panel scrolls inside itself).
-  // Phones and portrait tablets: the panels stack and the page scrolls.
+  // Desktop: one screen, nothing scrolls. The incident panel runs the full height
+  // on the right; the map sits over three panels on the left; every panel fits
+  // its own box. Phones and portrait tablets: the panels stack and the page scrolls.
   return (
-    <div className={`flex flex-col gap-3 p-3 short:gap-2 short:p-2 lg:grid lg:h-full ${big ? "lg:grid-rows-[minmax(0,1fr)]" : "lg:grid-rows-[minmax(0,1fr)_clamp(190px,30vh,330px)]"}`}>
-      <div className={`flex min-h-0 flex-col gap-3 short:gap-2 lg:grid ${big ? "lg:grid-cols-[1fr]" : "lg:grid-cols-[minmax(0,1fr)_clamp(340px,26vw,440px)]"}`}>
-        <div className={`panel relative min-h-0 overflow-hidden p-0 lg:h-auto ${big ? "h-[78vh]" : "h-[56vh] min-h-[320px]"}`}>
+    <div className={`flex flex-col gap-3 p-3 short:gap-2 short:p-2 lg:grid lg:h-full ${big ? "lg:grid-cols-[1fr] lg:grid-rows-[minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)_clamp(340px,26vw,440px)] lg:grid-rows-[minmax(0,1fr)_clamp(190px,30vh,330px)]"}`}>
+      <div className="flex min-h-0 flex-col gap-3 short:gap-2 lg:contents">
+        <div className={`panel relative min-h-0 overflow-hidden p-0 lg:col-start-1 lg:row-start-1 lg:h-auto ${big ? "h-[78vh]" : "h-[56vh] min-h-[320px]"}`}>
           <IncidentMap incident={incident} incidents={incidents} aois={aois.data || []} assets={assets.data || []} stations={stations.data}
             samples={incident?.samples || []} onSelectIncident={(id) => router.replace(`/?id=${id}`, { scroll: false })}
             onMoveSample={moveSample} onDrawAoi={onDrawAoi} onPlaceAsset={(lon, lat) => setAssetDraft({ lon, lat, name: "", type: "DESALINATION_PLANT" })} onPixel={setPixel} />
@@ -127,10 +127,10 @@ function Home() {
             </div>
           )}
         </div>
-        {!big && <div className="h-[640px] min-h-0 lg:h-auto"><IncidentPanel inc={incident} loading={inc.loading || list.loading} index={idx} total={ordered.length} onPrev={() => go(-1)} onNext={() => go(1)} onOpenTimeline={() => current && router.push(`/incident?id=${current.id}`)} /></div>}
+        {!big && <div className="h-[640px] min-h-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-auto"><IncidentPanel inc={incident} loading={inc.loading || list.loading} index={idx} total={ordered.length} onPrev={() => go(-1)} onNext={() => go(1)} onOpenTimeline={() => current && router.push(`/incident?id=${current.id}`)} /></div>}
       </div>
       {!big && (
-        <div className="grid gap-3 short:gap-2 md:grid-cols-2 lg:min-h-0 lg:grid-cols-[clamp(220px,18vw,330px)_minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div className="grid gap-3 short:gap-2 md:grid-cols-2 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:grid-cols-[clamp(220px,17vw,300px)_minmax(0,1.3fr)_minmax(0,1fr)]">
           <Panel className="h-[320px] lg:h-auto" title="Satellite view" bodyClass="px-3 pb-3 min-h-0 overflow-hidden"><SensorCard incident={incident} /></Panel>
           <Panel className="h-[480px] sm:h-[320px] md:col-span-2 md:row-start-2 lg:col-span-1 lg:row-start-auto lg:h-auto"
             title={<span className="flex items-center gap-2" title="Hyperspectral cube: each pixel holds a full light spectrum, not just red, green and blue">Spectral cube {incident?.cube?.includes("813") && <SimBadge />}</span>} bodyClass="px-3 pb-3 overflow-hidden"

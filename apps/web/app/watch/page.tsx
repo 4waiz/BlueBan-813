@@ -4,12 +4,12 @@
  * own seasonal baseline. Series come from scripts/build_watch.py (Sentinel-2
  * L2A zone statistics per acquisition); anomaly hits from scripts/build_detect.py.
  */
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { pipelineUrl, useEngineQuery } from "@/lib/engine";
 import { nextPass } from "@/lib/passes";
 import type { Aoi } from "@/lib/engine/types";
-import { Chip, fmt, Panel } from "@/components/ui";
+import { Chip, fmt, Pager, Panel, useFitPage } from "@/components/ui";
 import { useElementSize } from "@/lib/useSize";
 
 type Row = { date: string; datetime?: string; platform?: string; n_water?: number; cloud?: number; error?: boolean; f?: Record<string, { p50: number; p95: number } | null> };
@@ -89,18 +89,21 @@ export default function WatchPage() {
   });
   const ranked = [...rows].sort((x, y) => (y.pct ?? -1) - (x.pct ?? -1));
   const cur = rows.find((r) => r.a.id === (sel || ranked[0]?.a.id));
+  const tableBox = useRef<HTMLDivElement>(null);
+  const pg = useFitPage(ranked, tableBox);
   return (
-    // One screen: the area table and the trend chart share the height; the table scrolls inside its panel.
+    // One screen: the area table and the trend chart share the height; the table pages instead of scrolling.
     <div className="grid h-full min-h-0 grid-rows-[minmax(0,1.15fr)_minmax(0,1fr)] gap-3 p-3 short:gap-2 short:p-2">
-      <Panel title="Monitored areas" kicker="WATCH · Sentinel-2 image history" bodyClass="overflow-auto px-3 pb-3">
+      <Panel title="Monitored areas" kicker="WATCH · Sentinel-2 image history" right={<Pager {...pg} />} bodyClass="flex min-h-0 flex-col px-3 pb-3">
+        <div ref={tableBox} className="scroll-quiet min-h-0 flex-1 overflow-y-auto">
         <table className="w-full text-[12px]">
           <thead className="sticky top-0 z-10 bg-panel"><tr className="border-b border-edge text-left text-[10.5px] uppercase tracking-wider text-dim">
             <th className="py-2 pr-3">Area</th><th className="pr-3">Coast</th><th className="pr-3" title="Latest image with enough clear water to measure">Latest image</th><th className="pr-3 text-right" title="Usable images: enough clear water to measure">Images</th>
             <th className="pr-3 text-right" title="Chlorophyll index (NDCI), 95th percentile over the area's water. The rank (e.g. 70th) compares it with the same time of year in past years.">Chlorophyll · rank</th><th className="pr-3 text-right" title="Turbidity, 95th percentile over the area's water. Generic formula, not calibrated. The rank compares it with the same time of year in past years.">Turbidity · rank</th><th className="pr-3" title="Chlorophyll compared with the same time of year in past years">Vs past years</th><th className="pr-3 text-right" title="Open incidents in this area">Open</th><th className="pr-3" title="Expected from the satellite's regular repeat orbit. Plans change, and clouds can spoil a pass.">Next pass (expected)</th></tr></thead>
           <tbody>
-            {ranked.map(({ a, s, ok, last, pct, pctT, open, np }) => (
+            {pg.rows.map(({ a, s, ok, last, pct, pctT, open, np }) => (
               <tr key={a.id} onClick={() => setSel(a.id)} className={`cursor-pointer border-b border-edge/60 hover:bg-panel2/50 ${cur?.a.id === a.id ? "bg-beam/10" : ""}`}>
-                <td className="py-2 pr-3"><div className="font-semibold">{a.name}</div><div className="hud-value text-[10.5px] text-dim">{a.id}</div></td>
+                <td className="py-1.5 pr-3"><div className="font-semibold">{a.name}</div><div className="hud-value text-[10.5px] text-dim">{a.id}</div></td>
                 <td className="pr-3 text-muted">{a.coast}</td>
                 <td className="pr-3">{last ? <>{fmt.utc(last.datetime || last.date)}<div className="text-[10.5px] text-muted">{last.platform} · {(last.n_water || 0).toLocaleString()} water pixels</div></> : s === null ? <span className="text-dim">loading…</span> : <span className="text-dim">no data yet</span>}</td>
                 <td className="hud-value pr-3 text-right">{ok.length || "–"}</td>
@@ -113,9 +116,10 @@ export default function WatchPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </Panel>
       <Panel title={cur ? `${cur.a.name} · ${FEATS.find((f) => f[0] === feat)?.[1]}` : "Trend"} right={
-        <div className="flex gap-1">{FEATS.map(([k, l]) => <button key={k} onClick={() => setFeat(k)} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${feat === k ? "bg-beam text-white" : "text-muted hover:text-ink"}`}>{l.split(" (")[0].split(" P")[0]}</button>)}</div>
+        <div className="flex gap-1">{FEATS.map(([k, l]) => <button key={k} onClick={() => setFeat(k)} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${feat === k ? "bg-beam-fill text-white" : "text-muted hover:text-ink"}`}>{l.split(" (")[0].split(" P")[0]}</button>)}</div>
       } bodyClass="flex min-h-0 flex-col p-3">
         <div className="min-h-0 flex-1">{cur?.s ? <SeriesChart s={cur.s} feat={feat} det={det[cur.a.id] || null} /> : <div className="grid h-full place-items-center text-muted">Pick an area that has image history</div>}</div>
         <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-muted">

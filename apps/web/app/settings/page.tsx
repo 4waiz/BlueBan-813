@@ -50,13 +50,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto p-3 short:p-2">
+    <div className="h-full scroll-quiet overflow-y-auto p-3 short:p-2">
       <div className="mb-3">
         <div className="hud-kicker">Settings</div>
         <h1 className="font-display text-[22px] font-bold tracking-wide">Operator, workspace and alerts</h1>
       </div>
       <div className="grid gap-3 lg:grid-cols-2">
-        <Panel title="Your name" right={<UserRound size={16} className="text-beam" />} bodyClass="space-y-2 p-3 text-[12.5px]">
+        <Panel title="Your name" right={<UserRound size={16} className="text-beam2" />} bodyClass="space-y-2 p-3 text-[12.5px]">
           <p className="text-muted">Reviews, samples, training and model approvals are logged under this name. A model goes live only when a named person approves it.</p>
           <div className="flex gap-2">
             <input value={op} onChange={(e) => setOp(e.target.value)} placeholder="Your name" className="flex-1 rounded-md border border-line bg-deep px-3 py-1.5" />

@@ -17,6 +17,7 @@ export default {
         wide: "1700px",
         short: { raw: "(max-height: 980px)" },
         tiny: { raw: "(max-height: 820px)" },
+        mini: { raw: "(max-height: 700px)" },
       },
       colors: {
         void: "#040915",
@@ -31,11 +32,15 @@ export default {
         dim: "#7088B3",
         beam: "#2F7BFF",
         beam2: "#4D93FF",
+        // solid fills that carry white text: 5.2:1 (beam itself is 3.9:1, below WCAG AA)
+        "beam-fill": "#2563EB",
         cyan: "#27C3F3",
         nominal: "#23D484",
         caution: "#FFC23D",
         alert: "#FF8A3D",
         critical: "#FF4D5E",
+        // white text on it: 4.8:1 (critical itself is 3.2:1)
+        "critical-fill": "#D63041",
         violet: "#8B7BFF",
       },
       fontFamily: {

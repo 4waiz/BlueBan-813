@@ -162,33 +162,33 @@ function MissionRail({ incidents, aois, models, labels, className = "" }: { inci
     ] },
   ];
   return (
-    <nav aria-label="Main" className={`shrink-0 flex-col gap-2 overflow-y-auto p-3 short:gap-1.5 short:p-2 ${className}`}>
-      <Link href="/" aria-current={isActive("/") ? "page" : undefined} className={`flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-[11.5px] font-bold tracking-[0.14em] ${isActive("/") ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
+    <nav aria-label="Main" className={`scroll-quiet shrink-0 flex-col gap-2 overflow-y-auto p-3 short:gap-1.5 short:p-2 mini:gap-1 ${className}`}>
+      <Link href="/" aria-current={isActive("/") ? "page" : undefined} className={`flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-[11.5px] font-bold tracking-[0.14em] mini:py-1.5 ${isActive("/") ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
         <LayoutDashboard size={16} className="shrink-0" /> INCIDENT CONTROL
       </Link>
       {items.map((it) => {
         const active = isActive(it.href);
         return (
           <Link key={it.label} href={it.href} aria-current={active ? "page" : undefined}
-            className={`group relative flex items-center gap-3 rounded-lg border px-3 py-3 transition short:py-2 ${active ? "border-beam/70 bg-beam/10 shadow-beam" : "border-edge/70 bg-panel/50 hover:border-line"}`}>
+            className={`group relative flex items-center gap-3 rounded-lg border px-3 py-3 transition short:py-2 mini:py-1.5 ${active ? "border-beam/70 bg-beam/10 shadow-beam" : "border-edge/70 bg-panel/50 hover:border-line"}`}>
             <span className="absolute bottom-2 left-0 top-2 w-[3px] rounded-r" style={{ background: RAIL_COLOR[it.state] }} />
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-edge bg-deep short:h-8 short:w-8" style={{ color: it.state === "idle" ? "#93A6CB" : RAIL_COLOR[it.state] }}>{it.icon}</span>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-edge bg-deep short:h-8 short:w-8 mini:h-7 mini:w-7" style={{ color: it.state === "idle" ? "#93A6CB" : RAIL_COLOR[it.state] }}>{it.icon}</span>
             <span className="min-w-0 flex-1 leading-tight">
               <span className="block whitespace-nowrap font-display text-[14px] font-bold tracking-[0.1em] text-ink">{it.label}</span>
               <span className="block truncate text-[11px] text-muted">{it.sub}</span>
               <span className="block truncate text-[10px] tiny:hidden" style={{ color: RAIL_COLOR[it.state] }}>{it.note}</span>
             </span>
-            {it.badge ? <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-critical px-1.5 text-[10px] font-bold text-white" aria-label={`${it.badge} open incidents`}>{it.badge}</span> : null}
+            {it.badge ? <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-critical-fill px-1.5 text-[11px] font-bold text-white" aria-label={`${it.badge} open incidents`}>{it.badge}</span> : null}
           </Link>
         );
       })}
       {groups.map((g) => (
         <div key={g.title} className="mt-1">
-          <div className="rule-h mb-2" />
+          <div className="rule-h mb-2 mini:mb-1" />
           <div className="hud-kicker mb-1 px-3">{g.title}</div>
           {g.links.map((n) => (
             <Link key={n.label} href={n.href} aria-current={isActive(n.href) ? "page" : undefined}
-              className={`flex items-center gap-3 whitespace-nowrap rounded-md px-3 py-2 text-[11.5px] font-bold tracking-[0.12em] short:py-1.5 ${isActive(n.href) ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
+              className={`flex items-center gap-3 whitespace-nowrap rounded-md px-3 py-2 text-[11.5px] font-bold tracking-[0.12em] short:py-1.5 mini:py-1 ${isActive(n.href) ? "bg-beam/15 text-ink" : "text-muted hover:text-ink"}`}>
               <span className="shrink-0">{n.icon}</span><span className="min-w-0 truncate">{n.label}</span>
             </Link>
           ))}

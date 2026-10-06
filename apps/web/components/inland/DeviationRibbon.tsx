@@ -109,7 +109,7 @@ export default function DeviationRibbon({ s, height = 360, onHover }: { s: Inlan
           <mesh position={[(clusterX0 + clusterX1) / 2, 0.15, 0]} raycast={() => null}><boxGeometry args={[clusterX1 - clusterX0, 4.1, 6.4]} /><meshBasicMaterial color="#FFC23D" transparent opacity={0.06} depthWrite={false} /></mesh>
           <Label text="Sep–Oct 2025: both satellites agree" position={[(clusterX0 + clusterX1) / 2, 2.55, 3.2]} color="#FFD27A" size={0.32} />
           {INDEX_LANES.map((l, i) => <Label key={l.key} text={l.label} position={[-XW / 2 - 2.1, 0.05, zOf(i)]} color="#93A6CB" size={0.32} />)}
-          {ticks.map((d) => <Label key={d} text={d.slice(0, 7)} position={[xOf(d), -0.05, 3.75]} color="#5D7299" size={0.32} />)}
+          {ticks.map((d) => <Label key={d} text={d.slice(0, 7)} position={[xOf(d), -0.05, 3.75]} color="#93A6CB" size={0.32} />)}
           <Ribbon obs={s.temporal.observations} zt={zt} onHover={onHover} reduce={reduce} />
         </group>
         <OrbitControls enablePan={false} enableZoom={false} enableDamping maxPolarAngle={1.45} />

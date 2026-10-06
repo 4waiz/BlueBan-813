@@ -13,7 +13,7 @@ import type { Decision, EventType, Incident } from "@/lib/engine/types";
 import { EVENT_TYPES } from "@/lib/engine/rules";
 import IncidentPanel, { Provenance } from "@/components/incident/IncidentPanel";
 import SpectrumPlot from "@/components/spectra/SpectrumPlot";
-import { Chip, fmt, Kind, Panel, toast, WhyButton } from "@/components/ui";
+import { Chip, fmt, Kind, Panel, Tabs, toast, WhyButton } from "@/components/ui";
 import { download, incidentReportMd } from "@/lib/report";
 
 const IncidentMap = dynamic(() => import("@/components/map/IncidentMap"), { ssr: false });
@@ -48,6 +48,7 @@ function Investigation() {
   const stations = useStatic<GeoJSON.FeatureCollection>("registers/stations_ead.geojson");
   const inc = q.data;
   const [busy, setBusy] = useState(false);
+  const [ev, setEv] = useState<"detect" | "signal" | "field">("detect");
   const evs = useMemo(() => (inc ? timeline(inc) : []), [inc]);
   if (!inc) return <div className="p-6 text-muted">{q.loading ? "Loading incident…" : "Incident not found."}</div>;
   const feats = { ...(inc.water_quality?.estimates || {}), ...(inc.water_quality?.features || {}) };
@@ -59,8 +60,8 @@ function Investigation() {
     catch (e) { toast((e as Error).message, "err"); } finally { setBusy(false); }
   };
   return (
-    <div className="grid h-full min-h-0 gap-3 p-3 short:gap-2 short:p-2 xl:grid-cols-[300px_minmax(0,1fr)_400px]">
-      <Panel title="Incident timeline" kicker={inc.id} bodyClass="overflow-y-auto px-4 pb-4">
+    <div className="grid gap-3 p-3 short:gap-2 short:p-2 xl:h-full xl:min-h-0 xl:grid-cols-[300px_minmax(0,1fr)_400px]">
+      <Panel title="Incident timeline" kicker={inc.id} bodyClass="scroll-quiet overflow-y-auto px-4 pb-4">
         <ol className="relative ml-2 border-l border-edge">
           {evs.map((e, i) => (
             <li key={i} className="mb-4 ml-4">
@@ -79,12 +80,14 @@ function Investigation() {
           <Link href={`/field?id=${inc.id}`} className="btn w-full">Water sampling for this incident</Link>
         </div>
       </Panel>
-      {/* one screen on desktop: the map takes the free height, the evidence scrolls inside its own panel */}
+      {/* one screen on desktop: the map takes the free height; the evidence sits in tabs of two cards so it never scrolls */}
       <div className="flex min-h-0 flex-col gap-3 short:gap-2">
         <div className="panel relative h-[420px] min-h-0 shrink-0 overflow-hidden p-0 xl:h-auto xl:min-h-[200px] xl:flex-1 xl:shrink">
           <IncidentMap incident={inc} incidents={list.data || []} aois={aois.data || []} assets={assets.data || []} stations={stations.data} samples={inc.samples || []} initialMode="split" />
         </div>
-        <Panel className="shrink-0 xl:max-h-[46%]" title="Evidence" bodyClass="grid content-start gap-3 overflow-y-auto p-3 md:grid-cols-2 2xl:grid-cols-3">
+        <Panel className="shrink-0 xl:max-h-[46%]" title="Evidence" right={<Tabs value={ev} onChange={setEv} tabs={[{ key: "detect", label: "Detection" }, { key: "signal", label: "Spectrum" }, { key: "field", label: "Indicators" }]} />}
+          bodyClass="scroll-quiet grid content-start gap-3 overflow-y-auto p-3 md:grid-cols-2">
+          {ev === "detect" && <>
           <section className="panel-flat p-3 text-[12px]"><div className="hud-kicker mb-1">Detection</div>
             <div className="kv"><span title="How unusual the colour is vs all water in this image (RX detector, percentile). 100th = most unusual.">Spectral anomaly score</span><span className="hud-value">{fmt.ord(inc.spatial?.rx_percentile)}</span></div>
             <div className="kv"><span title="Robust z-score vs the same season in past years. 0 is normal. Higher is more unusual.">Score vs past years</span><span className="hud-value">{fmt.num(mf.robust_z_primary as number, 1)}</span></div>
@@ -95,11 +98,15 @@ function Investigation() {
             <div className="kv"><span>Past images, same season</span><span className="hud-value">{inc.temporal?.n_seasonal ?? "n/a"}</span></div>
             <div className="kv"><span title="Share of past same-season images where this spot was also unusual. High means a lasting feature, not a new event.">Also unusual in past years</span><span className="hud-value">{inc.temporal?.persistence_frac != null ? fmt.pct(inc.temporal.persistence_frac) : "n/a"}</span></div>
             <p className="mt-1 text-[11px] text-dim">{inc.temporal?.note}</p></section>
+          </>}
+          {ev === "signal" && <>
           <section className="panel-flat p-3 text-[12px]"><div className="hud-kicker mb-1">Spectrum</div>
             {inc.spectral ? <SpectrumPlot spec={inc.spectral} height={150} range={[400, 900]} /> : <span className="text-muted">None</span>}</section>
           <section className="panel-flat p-3 text-[12px]"><div className="hud-kicker mb-1" title="Sentinel-3 is a second-satellite check, not ground truth">Satellite agreement</div>
             {Object.entries(inc.sensor_agreement || {}).map(([k, a]) => (
-              <div key={k} className="kv"><span>{k}</span><span style={{ color: a.agrees ? "#23D484" : a.agrees === false ? "#FF4D5E" : "#5D7299" }}>{a.agrees ? "agrees" : a.agrees === false ? "does not agree" : "n/a"}{a.note ? ` · ${a.note}` : ""}</span></div>))}</section>
+              <div key={k} className="kv"><span>{k}</span><span style={{ color: a.agrees ? "#23D484" : a.agrees === false ? "#FF4D5E" : "#93A6CB" }}>{a.agrees ? "agrees" : a.agrees === false ? "does not agree" : "n/a"}{a.note ? ` · ${a.note}` : ""}</span></div>))}</section>
+          </>}
+          {ev === "field" && <>
           <section className="panel-flat p-3 text-[12px]"><div className="hud-kicker mb-1" title="Indices and proxies, not lab values, until water samples calibrate them">Water indicators</div>
             {Object.entries(feats).map(([k, e]) => (
               <div key={k} className="kv"><span className="flex items-center gap-1.5">{e.label || k} <Kind kind={e.quantity_kind} /></span><span className="hud-value" title="Value · percentile vs past years">{fmt.num(e.value, 3)}{e.seasonal_percentile != null ? ` · ${fmt.ord(e.seasonal_percentile)}` : ""}</span></div>))}
@@ -109,9 +116,10 @@ function Investigation() {
             <div className="kv"><span>Samples</span><span className="hud-value">{inc.samples?.length || 0} ({inc.samples?.filter((s) => s.status === "RESULT_RECEIVED").length || 0} with results)</span></div>
             <div className="kv"><span>Status</span><Chip label={inc.status} /></div>
             <p className="mt-1 text-[11.5px] text-muted">{inc.disposition || "No final outcome yet."}</p></section>
+          </>}
         </Panel>
       </div>
-      <IncidentPanel inc={inc} index={0} total={1} />
+      <div className="h-[640px] min-h-0 xl:h-auto"><IncidentPanel inc={inc} index={0} total={1} /></div>
     </div>
   );
 }

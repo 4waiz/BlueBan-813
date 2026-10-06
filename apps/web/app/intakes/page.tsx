@@ -10,14 +10,14 @@
  * screen. Intake positions are not public, so distances are to the facility
  * centre from OpenStreetMap; nothing here claims a bloom has reached an intake.
  */
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Copy, ExternalLink, FlaskConical, Siren } from "lucide-react";
 import { useEngineQuery } from "@/lib/engine";
 import { EVENT_TYPES, OPEN_STATES } from "@/lib/engine/rules";
 import { nextPass } from "@/lib/passes";
 import type { Aoi, AssetRow, Incident } from "@/lib/engine/types";
-import { Chip, fmt, Loading, Panel, toast } from "@/components/ui";
+import { Chip, fmt, Loading, Pager, Panel, toast, useFitPage } from "@/components/ui";
 
 type Level = "ALERT" | "WATCH" | "CLEAR" | "NOT_MONITORED";
 const LEVEL: Record<Level, { text: string; color: string; rule: string }> = {
@@ -105,6 +105,8 @@ export default function IntakeWatch() {
       .sort((a, b) => ["ALERT", "WATCH", "CLEAR", "NOT_MONITORED"].indexOf(a.level) - ["ALERT", "WATCH", "CLEAR", "NOT_MONITORED"].indexOf(b.level) || (a.distM ?? 1e12) - (b.distM ?? 1e12));
   }, [assetsQ.data, aoisQ.data, openQ.data, all]);
 
+  const tableBox = useRef<HTMLDivElement>(null);
+  const pg = useFitPage(rows, tableBox);
   const counts = rows.reduce((m, r) => { m[r.level] = (m[r.level] || 0) + 1; return m; }, {} as Record<Level, number>);
   const cur = rows.find((r) => r.asset.id === sel) || rows.find((r) => r.inc) || rows[0] || null;
   const loading = assetsQ.loading || aoisQ.loading || listQ.loading || openQ.loading;
@@ -113,19 +115,20 @@ export default function IntakeWatch() {
     <div className="grid gap-3 p-3 short:gap-2 short:p-2 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1.6fr)_minmax(360px,1fr)]">
       <Panel kicker="ACT · per intake, not per incident" title="Intake watch: is the water in front of each intake unusual?"
         right={<div className="flex gap-1">
-          <button onClick={() => setAll(false)} className={`rounded-md px-2.5 py-1 text-[11.5px] font-semibold ${!all ? "bg-beam text-white" : "text-muted hover:text-ink"}`}>Intakes</button>
-          <button onClick={() => setAll(true)} className={`rounded-md px-2.5 py-1 text-[11.5px] font-semibold ${all ? "bg-beam text-white" : "text-muted hover:text-ink"}`}>All coastal assets</button>
+          <button onClick={() => setAll(false)} className={`rounded-md px-2.5 py-1 text-[11.5px] font-semibold ${!all ? "bg-beam-fill text-white" : "text-muted hover:text-ink"}`}>Intakes</button>
+          <button onClick={() => setAll(true)} className={`rounded-md px-2.5 py-1 text-[11.5px] font-semibold ${all ? "bg-beam-fill text-white" : "text-muted hover:text-ink"}`}>All coastal assets</button>
         </div>}
-        className="xl:min-h-0" bodyClass="flex min-h-0 flex-col gap-2 px-3 pb-3">
-        <div className="flex flex-wrap gap-2">
+        className="min-w-0 xl:min-h-0" bodyClass="flex min-h-0 flex-col gap-2 px-3 pb-3">
+        <div className="flex flex-wrap items-center gap-2">
           {(Object.keys(LEVEL) as Level[]).map((l) => (
             <div key={l} title={LEVEL[l].rule} className="flex items-center gap-2 rounded-md border border-edge bg-deep/60 px-3 py-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: LEVEL[l].color, boxShadow: `0 0 8px ${LEVEL[l].color}` }} />
               <span className="hud-value text-[15px] font-bold" style={{ color: LEVEL[l].color }}>{counts[l] || 0}</span>
               <span className="text-[11.5px] text-muted">{LEVEL[l].text}</span>
             </div>))}
+          <Pager {...pg} className="ml-auto" />
         </div>
-        <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
+        <div ref={tableBox} className="scroll-quiet min-h-0 flex-1 overflow-y-auto rounded-md border border-edge">
           {loading && !rows.length ? <Loading className="p-4" label="Loading assets and open incidents…" /> : (
             <table className="w-full text-[12px]">
               <thead className="sticky top-0 z-10 bg-panel"><tr className="border-b border-edge text-left text-[10.5px] uppercase tracking-wider text-dim">
@@ -133,7 +136,7 @@ export default function IntakeWatch() {
                 <th className="whitespace-nowrap pr-3 text-right" title="Wind-only drift scenario: closest approach of the modelled drift">Drift scenario</th>
                 <th className="whitespace-nowrap pr-3" title="Latest usable Sentinel-2 image over the area, and the next expected pass">Eyes on it</th></tr></thead>
               <tbody>
-                {rows.map((r) => {
+                {pg.rows.map((r) => {
                   const np = r.aoi ? nextPass([r.aoi], now) : null;
                   return (
                     <tr key={r.asset.id} onClick={() => setSel(r.asset.id)} className={`cursor-pointer border-b border-edge/60 hover:bg-panel2/50 ${cur?.asset.id === r.asset.id ? "bg-beam/10" : ""}`}>
@@ -150,7 +153,7 @@ export default function IntakeWatch() {
         <p className="text-[11px] text-dim">Distances are to the facility centre (OpenStreetMap): intake positions are not public, so none is guessed. Status rules: {(["ALERT", "WATCH"] as Level[]).map((l) => `${LEVEL[l].text}: ${LEVEL[l].rule.toLowerCase()}`).join(" · ")}.</p>
       </Panel>
 
-      <Panel kicker="What the operator receives" title={cur ? cur.asset.name : "Alert preview"} className="xl:min-h-0" bodyClass="flex min-h-0 flex-col gap-3 overflow-y-auto px-4 pb-4">
+      <Panel kicker="What the operator receives" title={cur ? cur.asset.name : "Alert preview"} className="min-w-0 xl:min-h-0" bodyClass="flex min-h-0 flex-col gap-3 scroll-quiet overflow-y-auto px-4 pb-4">
         {!cur ? <Loading /> : !cur.inc ? (
           <div className="rounded-md border border-edge bg-deep/60 p-4 text-[12.5px] text-muted">
             <Chip label={LEVEL[cur.level].text} color={LEVEL[cur.level].color} />

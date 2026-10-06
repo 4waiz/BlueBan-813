@@ -59,6 +59,8 @@ export default function ApiPage() {
   const [out, setOut] = useState<string>("");
   const [copied, setCopied] = useState<string | null>(null);
   const live = DATA_MODE === "live";
+  const [grp, setGrp] = useState(GROUPS[0].tag);
+  const g = GROUPS.find((x) => x.tag === grp) || GROUPS[0];
   const run = async () => {
     setOut("…");
     try { const r = await fetch(path); const t = await r.text(); try { setOut(`${r.status}\n${JSON.stringify(JSON.parse(t), null, 2).slice(0, 20000)}`); } catch { setOut(`${r.status}\n${t.slice(0, 20000)}`); } }
@@ -66,10 +68,16 @@ export default function ApiPage() {
   };
   return (
     <div className="grid h-full min-h-0 gap-3 overflow-hidden p-3 short:p-2 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-      <Panel title="API endpoints" kicker="services/api (FastAPI) · interactive docs at /docs" right={<Chip label={live ? "CONNECTED TO SERVER" : "HOSTED: RUNS IN YOUR BROWSER"} color={live ? "#23D484" : "#FFC23D"} />} bodyClass="min-h-0 overflow-y-auto p-3">
-        {GROUPS.map((g) => (
-          <div key={g.tag} className="mb-3">
-            <div className="mb-1 flex items-baseline gap-2"><span className="hud-kicker">{g.tag}</span><span className="text-[11px] text-dim">{g.task}</span></div>
+      <Panel title="API endpoints" kicker="services/api (FastAPI) · interactive docs at /docs" right={<Chip label={live ? "CONNECTED TO SERVER" : "HOSTED: RUNS IN YOUR BROWSER"} color={live ? "#23D484" : "#FFC23D"} />} bodyClass="scroll-quiet min-h-0 overflow-y-auto p-3">
+        {/* one group of endpoints at a time, so the list never scrolls */}
+        <div className="mb-2 flex flex-wrap gap-1" role="tablist" aria-label="Endpoint groups">
+          {GROUPS.map((x) => (
+            <button key={x.tag} role="tab" aria-selected={grp === x.tag} onClick={() => setGrp(x.tag)}
+              className={`rounded-md border px-2 py-1 text-[11px] font-semibold ${grp === x.tag ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted hover:text-ink"}`}>
+              {x.tag} <span className="hud-value text-muted">{x.eps.length}</span></button>))}
+        </div>
+        <div className="mb-3">
+            <div className="mb-1 flex items-baseline gap-2"><span className="hud-kicker">{g.tag}</span><span className="text-[11px] text-muted">{g.task}</span></div>
             {g.eps.map((e) => (
               <div key={e.m + e.p} className="mb-1 grid grid-cols-[62px_minmax(0,1fr)_auto] items-start gap-2 rounded-md border border-edge bg-deep/50 px-2 py-1.5 text-[12px]">
                 <span className="hud-value font-bold" style={{ color: MC[e.m] }}>{e.m}</span>
@@ -79,12 +87,12 @@ export default function ApiPage() {
                   <button className="btn px-1.5 py-1" title="Copy curl command" onClick={() => { navigator.clipboard?.writeText(`curl -X ${e.m} http://localhost:8813${e.p}${e.body ? ` -H 'content-type: application/json' -d '${e.body}'` : ""}`); setCopied(e.p); setTimeout(() => setCopied(null), 1200); }}>{copied === e.p ? <Check size={12} /> : <Copy size={12} />}</button>
                 </div>
               </div>))}
-          </div>))}
+        </div>
       </Panel>
       <Panel title="Console" kicker={live ? "Try read-only calls on this server" : "Needs the self-hosted server"} bodyClass="flex min-h-0 flex-col gap-2 p-3">
         {live ? <>
           <div className="flex gap-2"><input value={path} onChange={(e) => setPath(e.target.value)} className="hud-value flex-1 rounded-md border border-line bg-deep px-2 py-1.5 text-[12px]" /><button className="btn btn-primary" onClick={run} disabled={!path.startsWith("/api/")}><Play size={14} /> GET</button></div>
-          <pre className="min-h-0 flex-1 overflow-auto rounded-md border border-edge bg-deep p-3 font-mono text-[11px] text-muted">{out || "Pick a GET endpoint or type a path."}</pre>
+          <pre className="min-h-0 flex-1 scroll-quiet overflow-auto rounded-md border border-edge bg-deep p-3 font-mono text-[11px] text-muted">{out || "Pick a GET endpoint or type a path."}</pre>
         </> : (
           <div className="space-y-2 text-[12.5px] text-muted">
             <p>This hosted demo has no server. Every screen runs the same engine in your browser, on a copy of the pipeline results. To use the HTTP API and a database, run the full stack locally:</p>

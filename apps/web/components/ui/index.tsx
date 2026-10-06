@@ -3,18 +3,18 @@
  * UI primitives. Colour carries state only; everything else is the neutral
  * mission-control palette defined in tailwind.config.ts.
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { HelpCircle, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, HelpCircle, X } from "lucide-react";
 import { createPortal } from "react-dom";
 
 export const STATE_COLOR: Record<string, string> = {
   MONITORING: "#93A6CB", DETECTED: "#FFC23D", UNDER_REVIEW: "#FF4D5E",
-  FIELD_VALIDATION_REQUIRED: "#FF8A3D", CONFIRMED: "#23D484", FALSE_POSITIVE: "#8B7BFF", RESOLVED: "#5D7299",
-  PRODUCTION: "#23D484", CANDIDATE: "#FFC23D", REJECTED: "#FF4D5E", RETIRED: "#5D7299", STAGING: "#27C3F3", TRAINING: "#4D93FF",
+  FIELD_VALIDATION_REQUIRED: "#FF8A3D", CONFIRMED: "#23D484", FALSE_POSITIVE: "#8B7BFF", RESOLVED: "#93A6CB",
+  PRODUCTION: "#23D484", CANDIDATE: "#FFC23D", REJECTED: "#FF4D5E", RETIRED: "#93A6CB", STAGING: "#27C3F3", TRAINING: "#4D93FF",
   SUCCEEDED: "#23D484", FAILED: "#FF4D5E", RUNNING: "#4D93FF", QUEUED: "#93A6CB",
   PLANNED: "#93A6CB", COLLECTED: "#27C3F3", LAB_PENDING: "#FFC23D", RESULT_RECEIVED: "#23D484",
-  HIGH: "#FF4D5E", MEDIUM: "#FFC23D", LOW: "#23D484", NONE: "#5D7299",
+  HIGH: "#FF4D5E", MEDIUM: "#FFC23D", LOW: "#23D484", NONE: "#93A6CB",
 };
 
 export function Panel({ title, right, children, className = "", bodyClass = "", kicker }: {
@@ -128,11 +128,11 @@ export function Kind({ kind }: { kind?: string }) {
     COLORIMETRIC: ["COLOUR", "#27C3F3", "A measure of water colour"],
   };
   const [l, c, tip] = map[kind] || [kind, "#93A6CB", ""];
-  return <span title={tip || undefined} className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider" style={{ color: c, background: `${c}18`, border: `1px solid ${c}44` }}>{l}</span>;
+  return <span title={tip || undefined} className="rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider" style={{ color: c, background: `${c}18`, border: `1px solid ${c}44` }}>{l}</span>;
 }
 
 export function SimBadge({ text = "813 SIMULATED" }: { text?: string }) {
-  return <span className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-caution" style={{ background: "#FFC23D18", border: "1px solid #FFC23D55" }}>{text}</span>;
+  return <span className="rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-caution" style={{ background: "#FFC23D18", border: "1px solid #FFC23D55" }}>{text}</span>;
 }
 
 /** "Why am I seeing this?" - opens the evidence chain for any displayed number. */
@@ -164,7 +164,7 @@ export function Drawer({ open, onClose, title, children, width = 520 }: { open: 
     <BodyPortal><AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[60] flex justify-end bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-          <motion.aside className="panel h-full overflow-y-auto rounded-none border-l border-line p-5" style={{ width }}
+          <motion.aside className="panel h-full scroll-quiet overflow-y-auto rounded-none border-l border-line p-5" style={{ width }}
             initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 40, opacity: 0 }} transition={{ duration: 0.22, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
@@ -184,7 +184,7 @@ export function Modal({ open, onClose, title, children, width = 560 }: { open: b
     <BodyPortal><AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[70] grid place-items-center bg-black/60 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-          <motion.div className="panel max-h-[88vh] w-full overflow-y-auto p-5" style={{ maxWidth: width }}
+          <motion.div className="panel max-h-[88vh] w-full scroll-quiet overflow-y-auto p-5" style={{ maxWidth: width }}
             initial={{ y: 12, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
@@ -243,3 +243,71 @@ export const fmt = {
   },
   km: (m?: number | null) => (m == null ? "n/a" : m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`),
 };
+
+/**
+ * Paging instead of scrolling. useFitPage measures the box and its rendered
+ * rows (table body rows or [data-row] elements) and returns the slice of
+ * `items` that fits, so a list never needs a scrollbar; it re-measures when the
+ * window or the list changes. Pager renders "1–12 of 30 ‹ 1/3 ›" and nothing
+ * when everything fits on one page.
+ */
+export function useFitPage<T>(items: T[], box: React.RefObject<HTMLElement | null>, { row = "tbody > tr, [data-row]", min = 1 }: { row?: string; min?: number } = {}) {
+  const [per, setPer] = useState(Math.max(min, 8));
+  const [page, setPage] = useState(0);
+  // Phones and tablets scroll the page, so lists show in full there.
+  const [desk, setDesk] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const on = () => setDesk(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  useEffect(() => setPage(0), [items.length]);
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el || !desk) return;
+    const measure = () => {
+      const rows = Array.from(el.querySelectorAll<HTMLElement>(row));
+      if (!rows.length) return;
+      const tallest = Math.max(...rows.map((r) => r.offsetHeight));
+      const pitch = rows.length > 1 ? (rows[rows.length - 1].offsetTop - rows[0].offsetTop) / (rows.length - 1) : tallest;
+      const st = getComputedStyle(el);
+      const head = el.querySelector<HTMLElement>("thead")?.offsetHeight ?? 0;
+      const room = el.clientHeight - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom) - head;
+      const fit = Math.max(min, Math.floor((room + Math.max(0, pitch - tallest)) / Math.max(tallest, pitch, 1)));
+      setPer((n) => (n === fit ? n : fit));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [box, row, min, items.length, desk]);
+  // Rows on a later page can be taller than the ones measured: if the current
+  // page still overflows, keep only the rows that fit (this only ever shrinks).
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el || !desk || el.scrollHeight <= el.clientHeight + 1) return;
+    const bottom = el.getBoundingClientRect().bottom;
+    const rows = Array.from(el.querySelectorAll<HTMLElement>(row));
+    const fits = rows.filter((r) => r.getBoundingClientRect().bottom <= bottom + 0.5).length;
+    if (fits >= 1 && fits < rows.length) setPer(fits);
+  });
+  if (!desk) return { rows: items, page: 0, pages: 1, setPage, from: items.length ? 1 : 0, to: items.length, total: items.length };
+  const pages = Math.max(1, Math.ceil(items.length / per));
+  const p = Math.min(page, pages - 1);
+  return { rows: items.slice(p * per, (p + 1) * per), page: p, pages, setPage, from: items.length ? p * per + 1 : 0, to: Math.min(items.length, (p + 1) * per), total: items.length };
+}
+
+export function Pager({ page, pages, setPage, from, to, total, className = "" }: { page: number; pages: number; setPage: (p: number) => void; from: number; to: number; total: number; className?: string }) {
+  if (pages <= 1) return null;
+  const btn = "grid h-6 w-6 place-items-center rounded-md border border-edge text-muted hover:border-line hover:text-ink disabled:opacity-40";
+  return (
+    <div className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11.5px] text-muted ${className}`}>
+      <span className="hud-value">{from}–{to} of {total}</span>
+      <button type="button" className={btn} onClick={() => setPage(page - 1)} disabled={page === 0} aria-label="Previous page"><ChevronLeft size={13} /></button>
+      <span className="hud-value">{page + 1}/{pages}</span>
+      <button type="button" className={btn} onClick={() => setPage(page + 1)} disabled={page >= pages - 1} aria-label="Next page"><ChevronRight size={13} /></button>
+    </div>
+  );
+}

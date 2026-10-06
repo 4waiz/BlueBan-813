@@ -7,13 +7,13 @@
  * selected incident is distance and direction only: intake locations are not
  * public, so none is estimated.
  */
-import React, { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { MapPin, Plus, Search } from "lucide-react";
 import { getOperator, mutate, useEngineQuery } from "@/lib/engine";
 import type { AssetRow } from "@/lib/engine/types";
-import { Chip, fmt, Modal, Panel, toast } from "@/components/ui";
+import { Chip, fmt, Modal, Pager, Panel, toast, useFitPage } from "@/components/ui";
 
 const IncidentMap = dynamic(() => import("@/components/map/IncidentMap"), { ssr: false });
 
@@ -56,6 +56,8 @@ function Assets() {
       .map((a) => ({ a, d: c ? hav(c[0], c[1], a.lon, a.lat) : null, dir: c ? bearing(c[0], c[1], a.lon, a.lat) : null }))
       .sort((x, y) => (x.d ?? 1e12) - (y.d ?? 1e12));
   }, [assets, type, q, inc?.centroid]);
+  const listBox = useRef<HTMLDivElement>(null);
+  const pg = useFitPage(rows, listBox);
   const counts = useMemo(() => assets.reduce((m, a) => { m[a.type] = (m[a.type] || 0) + 1; return m; }, {} as Record<string, number>), [assets]);
 
   const add = async () => {
@@ -78,11 +80,14 @@ function Assets() {
           <button onClick={() => setType("")} className={`rounded-md border px-2 py-1 text-[11px] ${!type ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted"}`}>All {assets.length}</button>
           {Object.entries(counts).map(([t, n]) => <button key={t} onClick={() => setType(t === type ? "" : t)} className={`rounded-md border px-2 py-1 text-[11px] ${type === t ? "border-beam bg-beam/15 text-ink" : "border-edge text-muted"}`}><span className="mr-1 inline-block h-2 w-2 rounded-full" style={{ background: TYPES[t]?.color || "#93A6CB" }} />{TYPES[t]?.label || t} {n}</button>)}
         </div>
-        <div className="relative"><Search size={13} className="absolute left-2 top-2 text-dim" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search assets" className="w-full rounded-md border border-line bg-deep py-1.5 pl-7 pr-2 text-[12px]" /></div>
-        <div className="min-h-0 flex-1 overflow-y-auto rounded-md border border-edge">
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-0 flex-1"><Search size={13} className="absolute left-2 top-2 text-dim" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search assets" className="w-full rounded-md border border-line bg-deep py-1.5 pl-7 pr-2 text-[12px]" /></div>
+          <Pager {...pg} />
+        </div>
+        <div ref={listBox} className="scroll-quiet min-h-0 flex-1 overflow-y-auto rounded-md border border-edge">
           <table className="w-full text-[11.5px]">
             <thead className="sticky top-0 bg-panel"><tr className="border-b border-edge text-dim"><th className="px-2 py-1 text-left">Asset</th><th className="px-2 text-left">Type</th><th className="whitespace-nowrap px-2 text-right">{inc ? "From incident" : "Location"}</th></tr></thead>
-            <tbody>{rows.map(({ a, d, dir }) => (
+            <tbody>{pg.rows.map(({ a, d, dir }) => (
               <tr key={a.id} className="border-b border-edge/50" title={a.notes || a.source}>
                 <td className="px-2 py-1"><div className="font-semibold text-ink">{a.name}</div><div className="text-[10.5px] text-dim">{a.source}</div></td>
                 <td className="px-2"><Chip label={TYPES[a.type]?.label || a.type} color={TYPES[a.type]?.color} /></td>

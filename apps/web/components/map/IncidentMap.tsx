@@ -440,8 +440,8 @@ export default function IncidentMap(props: Props) {
       </div>
       {mode === "split" && (
         <>
-          <div data-map-ui className="map-pill absolute left-3 top-16 z-10">{timeline[tIdx ?? 0]?.date === eventDate ? "EVENT DAY" : timeline[tIdx ?? 0]?.date && eventDate && timeline[tIdx ?? 0].date > eventDate ? "AFTER" : "BEFORE"} · {timeline[tIdx ?? 0]?.date || "earlier"}</div>
-          <div data-map-ui className="map-pill absolute right-16 top-16 z-10">INCIDENT · {timeline[eventIdx]?.date || eventDate}</div>
+          <div data-map-ui className={`map-pill absolute left-3 z-10 ${narrow ? "top-[7.5rem]" : "top-16"}`}>{timeline[tIdx ?? 0]?.date === eventDate ? "EVENT DAY" : timeline[tIdx ?? 0]?.date && eventDate && timeline[tIdx ?? 0].date > eventDate ? "AFTER" : "BEFORE"} · {timeline[tIdx ?? 0]?.date || "earlier"}</div>
+          <div data-map-ui className={`map-pill absolute right-16 z-10 ${narrow ? "top-[7.5rem]" : "top-16"}`}>INCIDENT · {timeline[eventIdx]?.date || eventDate}</div>
         </>
       )}
 
@@ -450,7 +450,7 @@ export default function IncidentMap(props: Props) {
         <div data-map-ui className="absolute left-3 right-16 top-3 z-10 flex flex-wrap items-center gap-2">
           <div className="panel-flat flex p-1">
             {([["2d", "2D Map", "2D", <MapIcon key="m" size={14} />], ["3d", "3D Globe", "3D", <Globe2 key="g" size={14} />], ["split", "Before / after", "Split", <SplitSquareHorizontal key="s" size={14} />]] as const).map(([k, l, short, ic]) => (
-              <button key={k} onClick={() => setMode(k)} title={l} aria-pressed={mode === k} className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-[12px] font-semibold ${narrow ? "px-2" : ""} ${mode === k ? "bg-beam text-white shadow-beam" : "text-muted hover:text-ink"}`}>{ic}{narrow ? short : l}</button>
+              <button key={k} onClick={() => setMode(k)} title={l} aria-pressed={mode === k} className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-[12px] font-semibold ${narrow ? "px-2" : ""} ${mode === k ? "bg-beam-fill text-white shadow-beam" : "text-muted hover:text-ink"}`}>{ic}{narrow ? short : l}</button>
             ))}
           </div>
           {timeline.length > 0 && showTimeline && (
@@ -458,7 +458,7 @@ export default function IncidentMap(props: Props) {
               <span className="hud-value whitespace-nowrap text-[11.5px] text-ink" title={timeline[tIdx ?? 0]?.date === eventDate ? "The image the incident was detected on" : "True colour only: the anomaly layers belong to the event image"}>{timeline[tIdx ?? 0]?.date}{timeline[tIdx ?? 0]?.date === eventDate && <span className="ml-1.5 rounded bg-critical/20 px-1 text-[10px] font-bold text-critical">EVENT</span>}</span>
               <input name="timeline" type="range" min={0} max={timeline.length - 1} value={tIdx ?? 0} onChange={(e) => { setPlaying(false); setTIdx(Number(e.target.value)); }} className="flex-1 accent-[#2F7BFF]" aria-label="Image date" />
               <span className="text-[10.5px] text-muted">{timeline.length} images</span>
-              <button onClick={() => setPlaying((p) => !p)} className="grid h-7 w-7 place-items-center rounded-full bg-beam text-white" aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause size={13} /> : <Play size={13} />}</button>
+              <button onClick={() => setPlaying((p) => !p)} className="grid h-7 w-7 place-items-center rounded-full bg-beam-fill text-white" aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause size={13} /> : <Play size={13} />}</button>
             </div>
           )}
         </div>
@@ -482,7 +482,7 @@ export default function IncidentMap(props: Props) {
 
       {/* layer panel */}
       {!compact && panel && (
-        <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="panel absolute right-14 top-14 z-10 max-h-[calc(100%-120px)] w-[228px] overflow-y-auto p-2.5">
+        <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="panel absolute right-14 top-14 z-10 max-h-[calc(100%-120px)] w-[228px] scroll-quiet overflow-y-auto p-2.5">
           {searchOpen && <div className="mb-2 flex gap-1">
             <input name="map-search" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} placeholder="Place, area or asset" className="w-full rounded-md border border-line bg-deep px-2 py-1.5 text-[12px] outline-none focus:border-beam2" />
             <button onClick={doSearch} className="btn px-2 py-1"><Search size={13} /></button>
@@ -529,5 +529,5 @@ export default function IncidentMap(props: Props) {
 }
 
 function ToolBtn({ icon, title, onClick, active }: { icon: React.ReactNode; title: string; onClick: () => void; active?: boolean }) {
-  return <button title={title} aria-label={title} onClick={onClick} className={`grid h-8 w-8 place-items-center rounded-md ${active ? "bg-beam text-white" : "text-muted hover:bg-panel2 hover:text-ink"}`}>{icon}</button>;
+  return <button title={title} aria-label={title} onClick={onClick} className={`grid h-8 w-8 place-items-center rounded-md ${active ? "bg-beam-fill text-white" : "text-muted hover:bg-panel2 hover:text-ink"}`}>{icon}</button>;
 }

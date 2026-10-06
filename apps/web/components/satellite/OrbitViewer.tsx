@@ -468,7 +468,7 @@ function BandStrip({ k }: { k: SensorKey }) {
       <defs><linearGradient id="vis" x1="0" x2="1"><stop offset="0" stopColor="#6a00ff" /><stop offset="0.25" stopColor="#0080ff" /><stop offset="0.45" stopColor="#00ff66" /><stop offset="0.7" stopColor="#ffee00" /><stop offset="1" stopColor="#ff2200" /></linearGradient></defs>
       <rect x={x(400)} y={2} width={x(700) - x(400)} height={4} fill="url(#vis)" opacity={0.8} />
       {s.bands.map(([c, fw], i) => <rect key={i} x={x(c - fw / 2)} y={10} width={Math.max(1, x(c + fw / 2) - x(c - fw / 2))} height={30} fill={bandColor(c)} opacity={0.8} />)}
-      {[400, 700, 1000, 1300, 1700].filter((t) => t <= hi).map((t) => <text key={t} x={x(t)} y={54} fill="#5D7299" fontSize="9" textAnchor="middle">{t}</text>)}
+      {[400, 700, 1000, 1300, 1700].filter((t) => t <= hi).map((t) => <text key={t} x={x(t)} y={54} fill="#93A6CB" fontSize="10" textAnchor="middle">{t}</text>)}
     </svg>
   );
 }
@@ -637,7 +637,7 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
       </div>
 
       {/* sensors list */}
-      <div className="absolute left-3 top-[104px] max-h-[calc(100%-230px)] w-[250px] overflow-y-auto rounded-lg border border-edge bg-void/75 p-2 backdrop-blur short:top-[92px]">
+      <div className="scroll-quiet absolute left-3 top-[104px] max-h-[calc(100%-230px)] w-[250px] overflow-y-auto rounded-lg border border-edge bg-void/75 p-2 backdrop-blur short:top-[92px]">
         {groups.map((g) => {
           const spec = SENSORS[g];
           const on = visible.has(g);
@@ -650,7 +650,7 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
               {sats.filter((s) => s.sensor === g).map((s) => (
                 <button key={s.key} onClick={() => select(s.key)} disabled={!on}
                   className={`flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-[12px] ${selected === s.key ? "bg-beam/20 text-ink" : on ? "text-muted hover:bg-white/5 hover:text-ink" : "text-dim"}`}>
-                  <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />{s.name}{s.synth && <span className="rounded border border-caution/60 px-1 text-[9px] font-bold text-caution">ILLUSTRATIVE</span>}</span>
+                  <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />{s.name}{s.synth && <span className="rounded border border-caution/60 px-1 text-[10px] font-bold text-caution">ILLUSTRATIVE</span>}</span>
                   <span className="hud-value text-[10.5px]">{positions.current.get(s.key) ? `${Math.round(positions.current.get(s.key)!.lla.alt)} km` : ""}</span>
                 </button>))}
             </div>);
@@ -659,13 +659,13 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
 
       {/* selected spacecraft */}
       {sel && selSpec && (
-        <div className="absolute right-3 top-[104px] max-h-[calc(100%-230px)] w-[330px] overflow-y-auto rounded-lg border border-edge bg-void/80 p-3 backdrop-blur short:top-[92px]">
+        <div className="scroll-quiet absolute right-3 top-[104px] max-h-[calc(100%-230px)] w-[330px] overflow-y-auto rounded-lg border border-edge bg-void/80 p-2.5 backdrop-blur short:top-[92px]">
           <div className="flex items-center justify-between">
             <div className="font-display text-[19px] font-bold">{sel.name}</div>
             {sel.synth ? <span className="rounded border border-caution/60 px-1.5 py-0.5 text-[10px] font-bold text-caution">ILLUSTRATIVE ORBIT</span> : <span className="hud-value text-[11px] text-muted" title="Satellite catalogue number">NORAD {sel.norad}</span>}
           </div>
           <div className="text-[12px]" style={{ color: selSpec.color }}>{selSpec.kind}</div>
-          <div className="mt-1 text-[11.5px] text-muted">{sel.role}</div>
+          <div className="mt-1 text-[11.5px] text-muted mini:hidden">{sel.role}</div>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11.5px]">
             <div className="kv"><span>Latitude</span><span className="hud-value">{live ? `${(live.lla.lat / DEG).toFixed(2)}°` : "…"}</span></div>
             <div className="kv"><span>Longitude</span><span className="hud-value">{live ? `${(live.lla.lon / DEG).toFixed(2)}°` : "…"}</span></div>
@@ -677,18 +677,18 @@ export default function OrbitViewer({ tle, aois, incident, initialSensor = "S2",
             <div className="kv"><span>Sunlit</span><span className="hud-value">{sunlit == null ? "…" : sunlit ? "yes" : "no (in shadow)"}</span></div>
           </div>
           <div className="mt-1 text-[10.5px] text-dim" title={sel.synth ? "Sun-synchronous orbit at 500 km. The marker is abstract." : "Positions are computed with SGP4 from public two-line orbit elements (TLE)."}>{sel.synth ? "813's orbit, height, coverage and spacecraft are not published. This 500 km orbit is for illustration only." : `Orbit data from ${sel.epoch?.slice(0, 16).replace("T", " ")} UTC (${tleAgeDays != null ? `${Math.abs(tleAgeDays).toFixed(1)} days ${tleAgeDays >= 0 ? "old" : "ahead"}` : ""}) · width source: ${selSpec.swath_src}`}</div>
-          <div className="mt-3 hud-kicker">Bands · {selSpec.range}</div>
+          <div className="mt-2 hud-kicker">Bands · {selSpec.range}</div>
           <BandStrip k={sel.sensor} />
           <div className="mt-2 hud-kicker">{sel.synth ? "Colour fan" : `Next UAE passes · 7 days (${selSpec.optical ? "daylight, " : ""}in view)`}</div>
           {sel.synth ? <p className="text-[11.5px] text-muted">The fan under the marker shows 813&apos;s published bands: 205 narrow bands from 400 to 1700 nm. Infrared is drawn in false colour. The sweep shows how the sensor reads one line at a time.</p>
             : passes == null ? <p className="text-[11.5px] text-muted">Finding passes…</p>
               : passes.length === 0 ? <p className="text-[11.5px] text-muted">No UAE pass in the next 7 days of simulated time.</p>
-                : <ul className="mt-1 space-y-1">{passes.map((p, i) => (
-                  <li key={i} className="flex items-center justify-between rounded-md border border-edge bg-deep/60 px-2 py-1 text-[11.5px]">
+                : <ul className="mt-1 space-y-0.5">{passes.map((p, i) => (
+                  <li key={i} className="flex items-center justify-between rounded-md border border-edge bg-deep/60 px-2 py-0.5 text-[11.5px]">
                     <span><b>{p.sat}</b> <span className="text-dim">{p.dir === "desc" ? "↓" : "↑"}</span> <span className="text-muted">{p.aois.slice(0, 3).join(", ")}{p.aois.length > 3 ? ` +${p.aois.length - 3}` : ""}</span></span>
                     <span className="hud-value text-[11px] text-cyan" title={fmtUTC(p.t)}>{new Date(p.t).toISOString().slice(5, 16).replace("T", " ")}Z</span>
                   </li>))}</ul>}
-          <p className="mt-2 text-[10.5px] text-dim">{selSpec.note}</p>
+          <p className="mt-2 text-[10.5px] text-dim mini:hidden">{selSpec.note}</p>
           <div className="mt-2 flex gap-2">
             <button onClick={() => setFollow(follow ? null : sel.key)} className={`btn flex-1 px-2 py-1.5 text-[12px] ${follow ? "border-beam bg-beam/20" : ""}`}><LocateFixed size={14} /> {follow ? "Following" : "Follow (F)"}</button>
             <button onClick={() => { const p = positions.current.get(sel.key); if (p) { setFollow(null); flyTo.current = p.v.clone().normalize().multiplyScalar(1.9); } }} className="btn px-2 py-1.5 text-[12px]"><Crosshair size={14} /> Go to</button>

@@ -26,7 +26,7 @@ export default function IncidentsPage() {
     <div className="grid gap-3 p-3 xl:grid-cols-[1fr_380px]">
       <Panel title="Review queue" kicker="DETECT → VERIFY" right={
         <div className="flex items-center gap-1"><Filter size={14} className="text-muted" />
-          {FILTERS.map((x) => <button key={x.key} onClick={() => setF(x.key)} className={`rounded-md px-2.5 py-1 text-[11.5px] font-semibold ${f === x.key ? "bg-beam text-white" : "text-muted hover:text-ink"}`}>{x.label}</button>)}
+          {FILTERS.map((x) => <button key={x.key} onClick={() => setF(x.key)} className={`rounded-md px-2.5 py-1 text-[11.5px] font-semibold ${f === x.key ? "bg-beam-fill text-white" : "text-muted hover:text-ink"}`}>{x.label}</button>)}
         </div>} bodyClass="p-3">
         <div className="overflow-x-auto">
           <table className="w-full text-[12.5px]">
@@ -56,7 +56,7 @@ export default function IncidentsPage() {
       <Panel title="Alerts" kicker={`${open.length} awaiting review`} bodyClass="p-3 space-y-2">
         {(alerts.data || []).map((a) => (
           <div key={a.id} className={`rounded-md border p-3 text-[12px] ${a.acknowledged_at ? "border-edge opacity-60" : "border-caution/50 bg-caution/5"}`}>
-            <div className="flex justify-between"><span className="hud-value text-[11px] text-muted">{fmt.utc(a.created_at)}</span><Chip label={a.level} color={a.acknowledged_at ? "#5D7299" : "#FFC23D"} /></div>
+            <div className="flex justify-between"><span className="hud-value text-[11px] text-muted">{fmt.utc(a.created_at)}</span><Chip label={a.level} color={a.acknowledged_at ? "#93A6CB" : "#FFC23D"} /></div>
             <p className="mt-1">{a.message}</p>
             {a.incident_id && <Link href={`/incident?id=${a.incident_id}`} className="mt-1 inline-block text-[11.5px] text-beam2">Open {a.incident_id} →</Link>}
             {a.acknowledged_at && <div className="text-[10.5px] text-dim">handled by {a.acknowledged_by}</div>}

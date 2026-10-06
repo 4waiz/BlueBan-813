@@ -23,13 +23,17 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Laptop-sized screens draw the interface at 90 % (what the browser's 90 %
-   zoom does), so the one-screen dashboards keep room to breathe; large
-   monitors stay at 100 %. The app frame is anchored with position: fixed and
-   inset: 0, which fills the window at any zoom (100vh would leave a gap).
-   3D views use components/three/ZoomCanvas, which is zoom-aware. */
+/* Laptop-sized screens draw the interface at 85 % (what the browser's zoom
+   menu does), so the one-screen dashboards keep room to breathe, and windows
+   under 700 px tall at 80 %; large monitors stay at 100 %. The app frame is
+   anchored with position: fixed and inset: 0, which fills the window at any
+   zoom (100vh would leave a gap). 3D views use components/three/ZoomCanvas,
+   which is zoom-aware. */
 @media (min-width: 1024px) and (max-width: 1799px), (min-width: 1024px) and (max-height: 949px) {
-  html { zoom: 0.9; }
+  html { zoom: 0.85; }
+}
+@media (min-width: 1024px) and (max-height: 699px) {
+  html { zoom: 0.8; }
 }
 
 body {
@@ -51,7 +55,7 @@ body {
   color: #8EA2C9;
 }
 .hud-kicker {
-  font-size: 10px;
+  font-size: 10.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #7088B3;
@@ -93,8 +97,9 @@ body {
 .btn:hover { border-color: rgba(77,147,255,0.7); background: rgba(20,40,80,0.9); }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
-.btn-primary { background: linear-gradient(180deg, #2F7BFF, #2563EB); border-color: #4D93FF; color: white; box-shadow: 0 0 18px -6px rgba(47,123,255,0.8); }
-.btn-primary:hover { background: linear-gradient(180deg, #4D93FF, #2F7BFF); }
+/* White text stays at 5.2:1 or better across the whole gradient (WCAG AA). */
+.btn-primary { background: linear-gradient(180deg, #2563EB, #1D4ED8); border-color: #4D93FF; color: white; box-shadow: 0 0 18px -6px rgba(47,123,255,0.8); }
+.btn-primary:hover { background: linear-gradient(180deg, #2B6CF0, #2059E0); }
 .btn-good { border-color: rgba(35,212,132,0.55); color: #BFF5DC; background: rgba(9,40,32,0.75); }
 .btn-good:hover { border-color: #23D484; background: rgba(12,56,44,0.9); }
 .btn-bad { border-color: rgba(255,77,94,0.55); color: #FFD0D5; background: rgba(48,12,22,0.75); }
@@ -120,6 +125,26 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
 
 .kv { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; }
 .kv > span:first-child { color: #93A6CB; }
+@media (max-height: 820px) { .kv { padding: 3px 0; } }
+
+/* Desktop panels sized to fit the window: no scrollbar is drawn. If a very small
+   window still overflows, wheel and keyboard scrolling keep working and a fade
+   at the bottom edge shows there is more (scroll-driven, so it only appears
+   while there is something left to scroll to). */
+@property --sq-fade { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes sq-fade { from { --sq-fade: 28px; } 98% { --sq-fade: 28px; } to { --sq-fade: 0px; } }
+@media (min-width: 1024px) {
+  .scroll-quiet { scrollbar-width: none; }
+  .scroll-quiet::-webkit-scrollbar { display: none; }
+  @supports (animation-timeline: scroll()) {
+    .scroll-quiet {
+      -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sq-fade)), transparent);
+      mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sq-fade)), transparent);
+      animation: sq-fade linear both;
+      animation-timeline: scroll(self);
+    }
+  }
+}
 
 .meter { height: 4px; border-radius: 99px; background: rgba(58,98,178,0.25); overflow: hidden; }
 .meter > i { display: block; height: 100%; border-radius: 99px; }
@@ -150,11 +175,11 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
 /* ------------------------------------------------------------- MapLibre */
 .maplibregl-ctrl-attrib {
   background: rgba(4,9,21,0.78) !important;
-  color: #5D7299 !important;
-  font-size: 9.5px !important;
+  color: #93A6CB !important;
+  font-size: 10px !important;
   border-radius: 6px 0 0 0;
 }
-.maplibregl-ctrl-attrib a { color: #93A6CB !important; }
+.maplibregl-ctrl-attrib a { color: #C7D5F2 !important; }
 .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left { z-index: 3; }
 .maplibregl-popup-content {
   background: rgba(8,18,40,0.96) !important;

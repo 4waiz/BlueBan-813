@@ -38,18 +38,18 @@ export default function SensorCard({ incident }: { incident: Incident | null }) 
         </svg>
         <div className="relative flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-display text-[17px] font-bold leading-tight text-ink">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-display text-[17px] font-bold leading-tight text-ink tiny:text-[15px]">
               <span className="whitespace-nowrap">{s.name}</span>{k === "813" && <SimBadge text="SIMULATED" />}
             </div>
-            <div className="line-clamp-2 text-[12px] leading-snug text-cyan">{s.kind}</div>
+            <div className="line-clamp-2 text-[12px] leading-snug text-cyan tiny:line-clamp-1" title={s.kind}>{s.kind}</div>
           </div>
           <Link href={`/satellite?sensor=${k}`} className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-edge bg-void/70 px-2 py-1 text-[10.5px] font-semibold text-muted backdrop-blur hover:border-beam hover:text-ink" title="Open the full-screen 3D view: real orbits, coverage and UAE passes">
             <Maximize2 size={12} /> 3D orbits
           </Link>
         </div>
         <div className="relative min-w-0 leading-snug">
-          <div className="truncate text-[12px] text-ink">{s.range}</div>
-          <div className="truncate text-[12px] text-muted">{s.res}</div>
+          <div className="truncate text-[12px] text-ink">{s.range}<span className="hidden text-muted mini:inline"> · {s.res}</span></div>
+          <div className="truncate text-[12px] text-muted mini:hidden">{s.res}</div>
           {k !== "813" && <div className="mt-0.5 truncate text-[10.5px] font-bold tracking-wider text-caution">{s.status(incident)}</div>}
         </div>
         {s.bands.length > 0 && (

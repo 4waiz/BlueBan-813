@@ -12,7 +12,7 @@ import { Download, FlaskConical, MapPinned, Plus, Trash2, Upload } from "lucide-
 import { getOperator, mutate, useEngineQuery, useStatic } from "@/lib/engine";
 import type { Sample } from "@/lib/engine/types";
 import { MEASUREMENT_PARAMETERS, PARAMETER_LABEL } from "@/lib/engine/rules";
-import { Chip, fmt, Modal, Panel, statusText, toast } from "@/components/ui";
+import { Chip, fmt, Modal, Pager, Panel, statusText, toast, useFitPage } from "@/components/ui";
 import { download } from "@/lib/report";
 
 const IncidentMap = dynamic(() => import("@/components/map/IncidentMap"), { ssr: false });
@@ -39,7 +39,9 @@ function Field() {
   const [entry, setEntry] = useState<Sample | null>(null);
   const [form, setForm] = useState({ parameter: "chlorophyll_a", value: "", unit: "mg m-3", method: "", measured_at: "" });
   const fileRef = useRef<HTMLInputElement>(null);
+  const planBox = useRef<HTMLDivElement>(null);
   const samples = inc?.samples || [];
+  const pg = useFitPage(samples, planBox);
   const meas = inc?.measurements || [];
 
   const op = () => { const o = getOperator(); if (!o) toast("Set your operator name first (top-right avatar)", "err"); return o; };
@@ -103,9 +105,10 @@ function Field() {
         </div>
       </div>
       <div className="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] gap-3">
-        <Panel title="Sample plan" kicker={`${samples.length} points · always includes a clean-water reference`} bodyClass="overflow-y-auto p-3 space-y-2">
-          {samples.map((s) => (
-            <div key={s.id} className="rounded-lg border border-edge bg-deep/60 p-3">
+        <Panel title="Sample plan" kicker={`${samples.length} points · always includes a clean-water reference`} right={<Pager {...pg} />} bodyClass="flex min-h-0 flex-col gap-2 p-3">
+          <div ref={planBox} className="scroll-quiet min-h-0 flex-1 space-y-2 overflow-y-auto">
+          {pg.rows.map((s) => (
+            <div key={s.id} data-row className="rounded-lg border border-edge bg-deep/60 p-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2"><span className="hud-value text-[15px] font-bold">{s.code}</span><span className="rounded px-1.5 py-0.5 text-[10px] font-bold" title={ROLE_HINT[s.role]} style={{ color: ROLE_COLOR[s.role] || "#EAF1FF", border: `1px solid ${ROLE_COLOR[s.role] || "#EAF1FF"}55` }}>{s.role.replace(/_/g, " ")}</span></div>
                 <Chip label={s.status} />
@@ -122,10 +125,11 @@ function Field() {
             </div>
           ))}
           {!samples.length && <p className="text-[12.5px] text-muted">No sample points yet. Add one with the pin tool on the map.</p>}
-          <button className="btn w-full" onClick={() => toast("Pick the pin tool in the map toolbar, then click the map", "info")}><Plus size={14} /> Add a point on the map</button>
+          </div>
+          <button className="btn w-full shrink-0" onClick={() => toast("Pick the pin tool in the map toolbar, then click the map", "info")}><Plus size={14} /> Add a point on the map</button>
         </Panel>
         <Panel title="Results & calibration" bodyClass="p-3 space-y-2 text-[12px]">
-          <div className="max-h-[150px] overflow-y-auto">
+          <div className="scroll-quiet max-h-[150px] overflow-y-auto">
             {meas.map((m) => <div key={m.id} className="kv py-1"><span>{PARAMETER_LABEL[m.parameter] || m.parameter} · {m.sample_id?.split("-").pop() || "no point"}</span><span className="hud-value">{m.value} {m.unit} <span className="text-dim">({m.source}, {m.entered_by})</span></span></div>)}
             {!meas.length && <div className="text-muted">No results yet.</div>}
           </div>
